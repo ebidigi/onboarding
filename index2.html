@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>toBビジネス用語テスト【第2弾】</title>
+  <style>
+    :root {
+      --primary: #553c9a;
+      --primary-light: #6b46c1;
+      --accent: #d69e2e;
+      --correct: #38a169;
+      --wrong: #e53e3e;
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --text: #2d3748;
+      --text-light: #718096;
+      --border: #e2e8f0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    .header h1 { font-size: 1.6rem; margin-bottom: 0.3rem; }
+    .header p { font-size: 0.9rem; opacity: 0.85; }
+    .header .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    /* ===== Login Screen ===== */
+    .login-screen {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .login-screen h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .login-screen p { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1.5rem; }
+    .login-screen .login-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .user-info {
+      display: none;
+      background: #faf5ff;
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+    .user-info .email { font-weight: 700; color: var(--primary); }
+    .name-input {
+      width: 100%;
+      max-width: 300px;
+      padding: 0.7rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      text-align: center;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .name-input:focus { border-color: var(--primary-light); }
+    .name-input::placeholder { color: #cbd5e0; }
+
+    /* ===== Quiz ===== */
+    .quiz-area { display: none; }
+    .quiz-area.show { display: block; }
+
+    .quiz-intro {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--accent);
+    }
+    .quiz-intro h2 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .quiz-intro p { font-size: 0.9rem; color: var(--text-light); }
+    .quiz-intro .notice {
+      margin-top: 0.8rem;
+      padding: 0.6rem 0.8rem;
+      background: #fff5f5;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--wrong);
+      font-weight: 600;
+    }
+    .quiz-intro .user-badge {
+      margin-top: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      background: #faf5ff;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--primary);
+    }
+
+    .progress-bar {
+      background: var(--border);
+      border-radius: 20px;
+      height: 8px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, var(--primary-light), var(--accent));
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.4s ease;
+    }
+    .progress-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .question-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .question-card.answered-correct { border-left: 4px solid var(--correct); }
+    .question-card.answered-wrong { border-left: 4px solid var(--wrong); }
+    .result-badge {
+      display: inline-block;
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-left: 0.5rem;
+    }
+    .result-badge.correct { background: #f0fff4; color: var(--correct); }
+    .result-badge.wrong { background: #fff5f5; color: var(--wrong); }
+
+    .q-number {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      text-align: center; line-height: 28px;
+      font-size: 0.8rem; font-weight: 700;
+      margin-right: 0.5rem;
+    }
+    .q-category {
+      display: inline-block;
+      background: #f3e8ff;
+      color: var(--primary-light);
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .q-text {
+      font-size: 1.05rem; font-weight: 600;
+      margin: 0.8rem 0;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .option-btn {
+      display: block; width: 100%; text-align: left;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text);
+    }
+    .option-btn:hover:not(:disabled) { border-color: var(--primary-light); background: #faf5ff; }
+    .option-btn:disabled { cursor: default; }
+    .option-btn.selected { border-color: var(--primary-light); background: #faf5ff; }
+    .option-btn.correct { border-color: var(--correct); background: #f0fff4; color: var(--correct); font-weight: 600; }
+    .option-btn.wrong { border-color: var(--wrong); background: #fff5f5; color: var(--wrong); }
+
+    .explanation {
+      display: none;
+      margin-top: 0.8rem; padding: 0.8rem;
+      background: #fffff0;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      border-left: 3px solid var(--accent);
+    }
+    .explanation.show { display: block; }
+
+    .btn-primary {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff; border: none;
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(85,60,154,0.3); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary {
+      display: inline-block;
+      background: #fff; color: var(--primary);
+      border: 2px solid var(--primary);
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: var(--primary); color: #fff; }
+
+    .btn-group {
+      display: flex; gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem; flex-wrap: wrap;
+    }
+
+    .result-card {
+      display: none;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem; text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+    }
+    .result-card.show { display: block; }
+    .score-circle {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 2rem; font-weight: 800; color: #fff;
+    }
+    .score-high { background: linear-gradient(135deg, #38a169, #48bb78); }
+    .score-mid { background: linear-gradient(135deg, #d69e2e, #ed8936); }
+    .score-low { background: linear-gradient(135deg, #e53e3e, #fc8181); }
+    .result-msg { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .result-detail { font-size: 0.9rem; color: var(--text-light); }
+    .result-saved {
+      margin-top: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .result-saved.success { background: #f0fff4; color: var(--correct); }
+    .result-saved.error { background: #fff5f5; color: var(--wrong); }
+    .result-saved.saving { background: #faf5ff; color: var(--primary-light); }
+
+    .category-breakdown {
+      margin-top: 1rem;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    .category-breakdown h3 {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      color: var(--text-light);
+    }
+    .cat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .cat-row:last-child { border-bottom: none; }
+    .cat-name { font-size: 0.82rem; }
+    .cat-score { font-weight: 700; font-size: 0.85rem; }
+
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.25rem; }
+      .container { padding: 1rem 0.8rem 3rem; }
+      .btn-group { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>toBビジネス用語テスト【第2弾】</h1>
+  <p>新入社員向け ― 応用編・実践的なビジネス知識チェック</p>
+  <span class="badge">Vol.2 / 全30問</span>
+</div>
+
+<div class="container">
+  <!-- ===== LOGIN ===== -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-icon">&#128218;</div>
+    <h2>テストを開始する</h2>
+    <p>Googleアカウントで認証後、氏名を入力してテストを開始してください。<br>回答結果は自動的にスプレッドシートに記録されます。</p>
+    <div class="user-info" id="userInfo">
+      ログイン中: <span class="email" id="userEmail"></span>
+    </div>
+    <div>
+      <input type="text" class="name-input" id="userName" placeholder="氏名を入力（例：山田 太郎）">
+    </div>
+    <div class="btn-group" style="margin-top:0.5rem">
+      <button class="btn-primary" id="startBtn" onclick="startQuiz()">Google認証してテスト開始</button>
+    </div>
+    <div id="manualStart" style="display:none; margin-top:1.5rem; text-align:center;">
+      <div style="background:#f0fff4; border:2px solid #38a169; border-radius:10px; padding:1.2rem; margin-bottom:0.8rem;">
+        <p style="font-size:1rem; font-weight:700; color:#38a169; margin-bottom:0.3rem;">認証が完了したらこちらをクリック</p>
+        <p style="font-size:0.82rem; color:#718096; margin-bottom:0.8rem;">認証画面のタブは手動で閉じてください</p>
+        <button class="btn-primary" onclick="forceStart()" style="width:100%; max-width:300px; font-size:1.05rem; padding:1rem;">テストを開始する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div id="quizArea" class="quiz-area">
+    <div class="quiz-intro">
+      <h2>toBビジネス知識テスト 第2弾（全30問）</h2>
+      <p>第1弾とは異なる問題です。4択から正しいものを選んでください。</p>
+      <div class="notice">※ テスト中は単語集を見ないで回答してください。事前学習用の単語集は別途配布されています。</div>
+      <div class="user-badge" id="quizUserBadge"></div>
+    </div>
+
+    <div class="progress-text" id="progressText">0 / 30 回答済み</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+    <div id="quizContainer"></div>
+
+    <div class="btn-group" id="quizActions">
+      <button class="btn-primary" id="submitBtn" disabled onclick="gradeQuiz()">答え合わせをする</button>
+    </div>
+
+    <div class="result-card" id="resultCard">
+      <div class="score-circle" id="scoreCircle"></div>
+      <div class="result-msg" id="resultMsg"></div>
+      <div class="result-detail" id="resultDetail"></div>
+      <div class="category-breakdown" id="categoryBreakdown"></div>
+      <div class="result-saved saving" id="resultSaved">結果を記録中...</div>
+    </div>
+
+    <div class="btn-group" id="retryGroup" style="display:none">
+      <button class="btn-primary" onclick="scrollToReview()">答え合わせを確認する</button>
+      <button class="btn-secondary" onclick="resetQuiz()">もう一度挑戦する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================
+// ★★★ GASデプロイ後、以下のURLを書き換えてください ★★★
+// =====================================================
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwbORrd13QnVttniwYR-K5U1vKgRXGjdI1AJiMq1jU3rQz2gPFUK8HlI02kKxLgzCIkdw/exec';
+// =====================================================
+
+const quizData = [
+  // ===== 企業・組織形態（4問） =====
+  { q:"お客様の組織図に「CTO」という役職がありました。この役職が担う領域として最も適切なのはどれですか？",
+    answer:"技術戦略やシステム開発の統括", category:"企業・組織形態",
+    options:["技術戦略やシステム開発の統括","財務・経理の統括","マーケティング戦略の統括","人事・採用の統括"],
+    explanation:"CTOはChief Technology Officerの略で、技術部門の最高責任者です。CFOは財務、CMOはマーケ、CHROは人事の責任者です。" },
+  { q:"2社が対等な立場で共同出資し、新しい会社を設立して事業を行う形態を何と呼びますか？",
+    answer:"ジョイントベンチャー", category:"企業・組織形態",
+    options:["ジョイントベンチャー","フランチャイズ","持株会社","吸収合併"],
+    explanation:"JV（ジョイントベンチャー）は合弁事業とも呼ばれ、複数企業が共同出資で新会社を作る形態です。" },
+  { q:"取締役会に社外の独立した視点を入れるために選任される役員は何ですか？",
+    answer:"社外取締役", category:"企業・組織形態",
+    options:["社外取締役","執行役員","監査役","相談役"],
+    explanation:"社外取締役は経営の監視・助言を行う独立した存在で、コーポレートガバナンス強化のため上場企業では必須です。" },
+  { q:"企業が社会的責任を果たしながら持続的に成長するための経営管理の仕組みを何と呼びますか？",
+    answer:"コーポレートガバナンス", category:"企業・組織形態",
+    options:["コーポレートガバナンス","コンプライアンス","内部統制","リスクマネジメント"],
+    explanation:"ガバナンスは企業統治の仕組み全体を指します。コンプライアンスは法令遵守で、ガバナンスの一部です。" },
+
+  // ===== M&A・経営戦略（4問） =====
+  { q:"食品メーカーが原材料の農場を買収しました。このようにサプライチェーンの上流を取り込む戦略は？",
+    answer:"垂直統合", category:"M&A・経営戦略",
+    options:["垂直統合","水平統合","コングロマリット化","分社化"],
+    explanation:"垂直統合は川上（原材料）や川下（販売）を取り込む戦略。水平統合は同業他社の統合です。" },
+  { q:"不採算事業を売却し、中核事業に経営資源を集中させる戦略を何と呼びますか？",
+    answer:"選択と集中", category:"M&A・経営戦略",
+    options:["選択と集中","多角化","リストラクチャリング","スピンオフ"],
+    explanation:"選択と集中は強みのある事業にリソースを集中し、非中核事業は売却・撤退する経営戦略です。" },
+  { q:"M&Aで買収先企業の価値を金銭的に評価するプロセスを何と呼びますか？",
+    answer:"バリュエーション", category:"M&A・経営戦略",
+    options:["バリュエーション","デューデリジェンス","ベンチマーク","アセスメント"],
+    explanation:"バリュエーションは企業価値算定のこと。DCF法や類似企業比較法などの手法があります。" },
+  { q:"両社の統合により、コスト削減や売上増大など単独では得られない効果を何と呼びますか？",
+    answer:"シナジー", category:"M&A・経営戦略",
+    options:["シナジー","レバレッジ","スケールメリット","アービトラージ"],
+    explanation:"シナジーは相乗効果。M&Aでは「1+1=3」のように統合後に新たな価値が生まれることを期待します。" },
+
+  // ===== 財務・会計（5問） =====
+  { q:"企業の「売上が入金されるまでの期間」と「仕入れの支払いまでの期間」のズレで資金不足が起きることを何と呼びますか？",
+    answer:"資金繰りの悪化", category:"財務・会計",
+    options:["資金繰りの悪化","債務超過","粉飾決算","減価償却"],
+    explanation:"黒字でも入金と支払いのタイミングのズレで現金が不足すると「黒字倒産」になりえます。資金繰り管理が重要です。" },
+  { q:"売上1億円、売上原価6,000万円、販管費3,000万円の場合、営業利益はいくらですか？",
+    answer:"1,000万円", category:"財務・会計",
+    options:["1,000万円","4,000万円","7,000万円","3,000万円"],
+    explanation:"営業利益＝売上−売上原価−販管費。1億−6,000万−3,000万＝1,000万円です。" },
+  { q:"設備投資した機械の購入費用を、耐用年数にわたって費用として計上する会計処理は？",
+    answer:"減価償却", category:"財務・会計",
+    options:["減価償却","引当金計上","減損処理","繰延資産計上"],
+    explanation:"減価償却は固定資産の取得原価を使用期間にわたって費用配分する処理です。" },
+  { q:"お客様が「うちは売上は順調だが、EBITDAが伸びない」と言いました。EBITDAとは何ですか？",
+    answer:"税引前利益に利息・減価償却を加えた利益指標", category:"財務・会計",
+    options:["税引前利益に利息・減価償却を加えた利益指標","最終的な純利益のこと","売上から原価を引いた粗利のこと","株主に帰属する1株あたり利益"],
+    explanation:"EBITDAは本業の稼ぐ力を国際比較しやすい指標です。設備投資の影響や税制の違いを排除して評価できます。" },
+  { q:"月末に届いた請求書の支払期限が「月末締め翌月末払い」です。12月分の請求はいつ支払えばよいですか？",
+    answer:"1月末", category:"財務・会計",
+    options:["1月末","12月末","2月末","翌年3月末"],
+    explanation:"「月末締め翌月末払い」は当月分を翌月末に支払う条件。12月分は1月末が支払期限です。BtoBでは一般的な支払条件です。" },
+
+  // ===== 営業・マーケティング（5問） =====
+  { q:"営業が直接訪問せず、電話やメールで商談のアポイントを獲得する役割を何と呼びますか？",
+    answer:"インサイドセールス", category:"営業・マーケティング",
+    options:["インサイドセールス","フィールドセールス","カスタマーサクセス","テレマーケティング"],
+    explanation:"インサイドセールスは内勤営業。リードに対して非対面でアプローチし、商談化してフィールドセールスに引き渡します。" },
+  { q:"サービス導入後にお客様の成功を支援し、継続利用や拡大利用を促進する専門チームは？",
+    answer:"カスタマーサクセス", category:"営業・マーケティング",
+    options:["カスタマーサクセス","カスタマーサポート","アカウントマネージャー","プリセールス"],
+    explanation:"カスタマーサクセスは受動的な問い合わせ対応ではなく、能動的に顧客の成功を支援してLTV最大化を目指します。" },
+  { q:"Webサイトの訪問者が問い合わせや資料請求など目標行動を達成した割合を何と呼びますか？",
+    answer:"コンバージョン率", category:"営業・マーケティング",
+    options:["コンバージョン率","直帰率","インプレッション数","リーチ率"],
+    explanation:"CVR（コンバージョン率）はWebマーケティングの重要KPI。フォーム送信や購入など設定した目標の達成割合です。" },
+  { q:"商談中のお客様から「他社と比較検討中です」と言われました。提供すべき資料として最も効果的なものは？",
+    answer:"競合比較表", category:"営業・マーケティング",
+    options:["競合比較表","会社沿革パンフレット","個人情報保護方針","組織図"],
+    explanation:"比較検討フェーズでは、自社の強みが明確に伝わる競合比較表が最も有効です。" },
+  { q:"お客様1社を獲得するためにかかったマーケティング・営業コストの合計を示す指標は？",
+    answer:"CAC", category:"営業・マーケティング",
+    options:["CAC","CPA","CPM","CPC"],
+    explanation:"CAC（Customer Acquisition Cost）は顧客獲得コスト。LTVとの比率で投資効率を判断します。LTV/CAC > 3が健全な目安です。" },
+
+  // ===== 契約・法務（4問） =====
+  { q:"お客様がシステム導入にあたり「PoC契約を結びたい」と言いました。PoCとは何ですか？",
+    answer:"技術やサービスの有効性を小規模に検証する試み", category:"契約・法務",
+    options:["技術やサービスの有効性を小規模に検証する試み","大規模な本番導入契約","保守運用の年間契約","知的財産のライセンス契約"],
+    explanation:"PoC（Proof of Concept）は概念実証。本格導入前に小規模で試して効果を確認するステップです。" },
+  { q:"契約書で「瑕疵担保責任」が「契約不適合責任」に変わりました。この責任が問われるのはどんな場合ですか？",
+    answer:"納品物が契約内容に適合していない場合", category:"契約・法務",
+    options:["納品物が契約内容に適合していない場合","代金の支払いが遅延した場合","競合他社に情報が漏洩した場合","契約期間が満了した場合"],
+    explanation:"2020年民法改正で名称が変更。納品物に不具合やバグがある場合、修補・損害賠償・解除などを請求できます。" },
+  { q:"業務の一部を外部企業に委託する際に締結する契約の一般的な名称は？",
+    answer:"業務委託契約", category:"契約・法務",
+    options:["業務委託契約","雇用契約","売買契約","賃貸借契約"],
+    explanation:"業務委託契約は請負や準委任の形態があります。雇用契約とは異なり、指揮命令関係がない点が特徴です。" },
+  { q:"個人情報を取り扱う企業に求められる法律で、2022年に改正施行された法律は？",
+    answer:"個人情報保護法", category:"契約・法務",
+    options:["個人情報保護法","特定商取引法","不正競争防止法","下請法"],
+    explanation:"改正個人情報保護法では、漏えい時の報告義務化や、Cookie等の個人関連情報の規制が強化されました。" },
+
+  // ===== IT・DX関連（4問） =====
+  { q:"お客様が「RPAを導入して定型業務を自動化したい」と言いました。RPAとは何ですか？",
+    answer:"ソフトウェアロボットによる業務プロセスの自動化", category:"IT・DX関連",
+    options:["ソフトウェアロボットによる業務プロセスの自動化","工場の産業用ロボットの導入","リモートでPCを操作する技術","AIによる意思決定の自動化"],
+    explanation:"RPA（Robotic Process Automation）はPC上の定型作業をソフトウェアが代行する技術。データ入力や転記作業の自動化に使われます。" },
+  { q:"社内で使っている複数のクラウドサービスに一度のログインでアクセスできる仕組みを何と呼びますか？",
+    answer:"SSO", category:"IT・DX関連",
+    options:["SSO","MFA","VPN","WAF"],
+    explanation:"SSO（Single Sign-On）は一度の認証で複数サービスを利用できる仕組み。MFA（多要素認証）はセキュリティ強化の別概念です。" },
+  { q:"システム障害が発生した際の「復旧までの目標時間」を表す指標は？",
+    answer:"RTO", category:"IT・DX関連",
+    options:["RTO","RPO","MTBF","MTTR"],
+    explanation:"RTO（Recovery Time Objective）は復旧目標時間。RPOは「どの時点のデータまで戻すか」の目標値です。" },
+  { q:"お客様が「ゼロトラストセキュリティを導入したい」と言いました。この考え方の基本原則は？",
+    answer:"社内外を問わずすべてのアクセスを信頼せず検証する", category:"IT・DX関連",
+    options:["社内外を問わずすべてのアクセスを信頼せず検証する","社内ネットワークは無条件に信頼する","ファイアウォールだけでセキュリティを確保する","パスワードを定期的に変更する"],
+    explanation:"ゼロトラストは「何も信頼しない」前提のセキュリティモデル。リモートワーク普及で注目されています。" },
+
+  // ===== ベンチャー・スタートアップ（4問） =====
+  { q:"投資家がスタートアップに出資する際、将来の株式と交換できる権利を付与する契約形態は？",
+    answer:"コンバーティブルノート", category:"ベンチャー・スタートアップ",
+    options:["コンバーティブルノート","ストックオプション","ワラント","劣後ローン"],
+    explanation:"コンバーティブルノートは将来の資金調達時に株式に転換される融資形態。初期段階でバリュエーションが難しい時に使われます。" },
+  { q:"SaaSスタートアップの成長指標で、月次経常収益が前月比で何%成長しているかを表すものは？",
+    answer:"MoM成長率", category:"ベンチャー・スタートアップ",
+    options:["MoM成長率","YoY成長率","CAGR","ROE"],
+    explanation:"MoM（Month over Month）は月次成長率。SaaSでは月次MRRのMoM成長率が投資家が注目する重要指標です。" },
+  { q:"スタートアップが創業初期にVCよりも前の段階で個人から出資を受ける場合、その投資家を何と呼びますか？",
+    answer:"エンジェル投資家", category:"ベンチャー・スタートアップ",
+    options:["エンジェル投資家","機関投資家","アクティビスト","ファンドマネージャー"],
+    explanation:"エンジェル投資家は創業初期のスタートアップに個人資金を投じる投資家。起業経験者が多く、助言も行います。" },
+  { q:"従業員に対して、将来一定の価格で自社株を購入できる権利を付与する制度は？",
+    answer:"ストックオプション", category:"ベンチャー・スタートアップ",
+    options:["ストックオプション","譲渡制限付株式","従業員持株会","退職金制度"],
+    explanation:"ストックオプションは行使価格と市場価格の差額が利益になります。ベンチャーでは給与の代わりに優秀な人材を惹きつける手段です。" },
+];
+
+let userAnswers = {};
+let graded = false;
+let currentUser = { email: '', name: '' };
+let shuffledOptions = [];
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ===== LOGIN & AUTH =====
+function startQuiz() {
+  const name = document.getElementById('userName').value.trim();
+  if (!name) {
+    document.getElementById('userName').style.borderColor = '#e53e3e';
+    document.getElementById('userName').placeholder = '氏名を入力してください';
+    return;
+  }
+  currentUser.name = name;
+
+  const btn = document.getElementById('startBtn');
+  btn.disabled = true;
+  btn.textContent = '認証中... ポップアップを確認してください';
+
+  const authWindow = window.open(GAS_URL, 'gas_auth', 'width=500,height=400');
+
+  if (!authWindow || authWindow.closed) {
+    btn.disabled = false;
+    btn.textContent = 'Google認証してテスト開始';
+    alert('ポップアップがブロックされました。ブラウザのポップアップを許可してから再度お試しください。');
+    return;
+  }
+
+  const pollTimer = setInterval(() => {
+    if (authWindow.closed) {
+      clearInterval(pollTimer);
+      currentUser.email = '(Google認証済み)';
+      showQuiz();
+    }
+  }, 500);
+
+  document.getElementById('manualStart').style.display = 'block';
+}
+
+function forceStart() {
+  currentUser.email = '(Google認証済み)';
+  showQuiz();
+}
+
+function showQuiz() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('quizArea').classList.add('show');
+  document.getElementById('quizUserBadge').textContent =
+    `受験者: ${currentUser.name}（${currentUser.email}）`;
+  renderQuiz();
+}
+
+// ===== QUIZ =====
+function renderQuiz() {
+  shuffledOptions = quizData.map(q => shuffleArray(q.options));
+
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = quizData.map((q, i) => `
+    <div class="question-card" id="qcard-${i}">
+      <span class="q-number">${i+1}</span>
+      <span class="q-category">${q.category}</span>
+      <div class="q-text">${q.q}</div>
+      <div class="options">
+        ${shuffledOptions[i].map((opt, j) => `
+          <button class="option-btn" id="opt-${i}-${j}" onclick="selectOption(${i}, ${j}, '${opt.replace(/'/g,"\\'")}')">${opt}</button>
+        `).join('')}
+      </div>
+      <div class="explanation" id="exp-${i}">${q.explanation}</div>
+    </div>
+  `).join('');
+}
+
+function selectOption(qi, oi, value) {
+  if (graded) return;
+  userAnswers[qi] = { index: oi, value: value };
+  for (let j = 0; j < 4; j++) {
+    document.getElementById(`opt-${qi}-${j}`).classList.toggle('selected', j === oi);
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  const count = Object.keys(userAnswers).length;
+  document.getElementById('progressText').textContent = `${count} / ${quizData.length} 回答済み`;
+  document.getElementById('progressFill').style.width = `${(count/quizData.length)*100}%`;
+  document.getElementById('submitBtn').disabled = count < quizData.length;
+}
+
+function gradeQuiz() {
+  if (Object.keys(userAnswers).length < quizData.length) return;
+  graded = true;
+  let correct = 0;
+
+  const catStats = {};
+  quizData.forEach((q, i) => {
+    const card = document.getElementById(`qcard-${i}`);
+    const isCorrect = userAnswers[i].value === q.answer;
+    if (isCorrect) correct++;
+    card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+
+    const badge = isCorrect
+      ? '<span class="result-badge correct">&#9675; 正解</span>'
+      : '<span class="result-badge wrong">&#10005; 不正解</span>';
+    card.querySelector('.q-text').insertAdjacentHTML('afterend', '');
+    card.querySelector('.q-number').insertAdjacentHTML('afterend', badge);
+
+    shuffledOptions[i].forEach((opt, j) => {
+      const btn = document.getElementById(`opt-${i}-${j}`);
+      btn.disabled = true;
+      if (opt === q.answer) btn.classList.add('correct');
+      if (j === userAnswers[i].index && !isCorrect) btn.classList.add('wrong');
+    });
+    document.getElementById(`exp-${i}`).classList.add('show');
+
+    if (!catStats[q.category]) catStats[q.category] = { correct: 0, total: 0 };
+    catStats[q.category].total++;
+    if (isCorrect) catStats[q.category].correct++;
+  });
+
+  const pct = Math.round((correct/quizData.length)*100);
+  const scoreCircle = document.getElementById('scoreCircle');
+  scoreCircle.textContent = `${pct}%`;
+  scoreCircle.className = 'score-circle ' + (pct >= 80 ? 'score-high' : pct >= 50 ? 'score-mid' : 'score-low');
+
+  const resultMsg = document.getElementById('resultMsg');
+  if (pct >= 80) resultMsg.textContent = '素晴らしい！応用知識もしっかり身についています';
+  else if (pct >= 50) resultMsg.textContent = 'もう少し！単語集を復習して再挑戦しましょう';
+  else resultMsg.textContent = '単語集をじっくり読んで、用語を覚えていきましょう';
+
+  document.getElementById('resultDetail').textContent = `${quizData.length}問中 ${correct}問正解（正答率 ${pct}%）`;
+
+  const catOrder = ['企業・組織形態','M&A・経営戦略','財務・会計','営業・マーケティング','契約・法務','IT・DX関連','ベンチャー・スタートアップ'];
+  let catHtml = '<h3>カテゴリ別正答率</h3>';
+  catOrder.forEach(cat => {
+    if (catStats[cat]) {
+      const s = catStats[cat];
+      const catPct = Math.round((s.correct/s.total)*100);
+      catHtml += `<div class="cat-row"><span class="cat-name">${cat}</span><span class="cat-score">${s.correct}/${s.total}（${catPct}%）</span></div>`;
+    }
+  });
+  document.getElementById('categoryBreakdown').innerHTML = catHtml;
+
+  document.getElementById('resultCard').classList.add('show');
+  document.getElementById('quizActions').style.display = 'none';
+  document.getElementById('retryGroup').style.display = 'flex';
+
+  const categories = {};
+  catOrder.forEach(cat => {
+    if (catStats[cat]) {
+      categories[cat] = `${catStats[cat].correct}/${catStats[cat].total}`;
+    }
+  });
+
+  sendResult({
+    email: currentUser.email,
+    name: currentUser.name,
+    correct: correct,
+    total: quizData.length,
+    percentage: pct,
+    categories: categories
+  });
+
+  document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function sendResult(data) {
+  const savedEl = document.getElementById('resultSaved');
+
+  if (GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
+    savedEl.textContent = '※ GAS未設定のため結果は記録されていません';
+    savedEl.className = 'result-saved error';
+    return;
+  }
+
+  savedEl.textContent = '結果をスプレッドシートに記録中...';
+  savedEl.className = 'result-saved saving';
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+    mode: 'no-cors'
+  })
+  .then(() => {
+    savedEl.textContent = '結果をスプレッドシートに記録しました';
+    savedEl.className = 'result-saved success';
+  })
+  .catch(err => {
+    savedEl.textContent = '記録に失敗しました。管理者に連絡してください。';
+    savedEl.className = 'result-saved error';
+  });
+}
+
+function scrollToReview() {
+  document.getElementById('qcard-0').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetQuiz() {
+  userAnswers = {};
+  graded = false;
+  document.getElementById('resultCard').classList.remove('show');
+  document.getElementById('quizActions').style.display = 'flex';
+  document.getElementById('retryGroup').style.display = 'none';
+  renderQuiz();
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
