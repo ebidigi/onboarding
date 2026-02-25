@@ -497,6 +497,16 @@ const quizData = [
 let userAnswers = {};
 let graded = false;
 let currentUser = { email: '', name: '' };
+let shuffledOptions = []; // シャッフル後の選択肢を保持
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 // ===== LOGIN & AUTH =====
 function startQuiz() {
@@ -551,6 +561,9 @@ function showQuiz() {
 
 // ===== QUIZ =====
 function renderQuiz() {
+  // 各問題の選択肢をシャッフル
+  shuffledOptions = quizData.map(q => shuffleArray(q.options));
+
   const container = document.getElementById('quizContainer');
   container.innerHTML = quizData.map((q, i) => `
     <div class="question-card" id="qcard-${i}">
@@ -558,7 +571,7 @@ function renderQuiz() {
       <span class="q-category">${q.category}</span>
       <div class="q-text">${q.q}</div>
       <div class="options">
-        ${q.options.map((opt, j) => `
+        ${shuffledOptions[i].map((opt, j) => `
           <button class="option-btn" id="opt-${i}-${j}" onclick="selectOption(${i}, ${j}, '${opt.replace(/'/g,"\\'")}')">${opt}</button>
         `).join('')}
       </div>
@@ -603,7 +616,7 @@ function gradeQuiz() {
     card.querySelector('.q-text').insertAdjacentHTML('afterend', '');
     card.querySelector('.q-number').insertAdjacentHTML('afterend', badge);
 
-    q.options.forEach((opt, j) => {
+    shuffledOptions[i].forEach((opt, j) => {
       const btn = document.getElementById(`opt-${i}-${j}`);
       btn.disabled = true;
       if (opt === q.answer) btn.classList.add('correct');
