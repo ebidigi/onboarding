@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>toBビジネス用語 単語集【第3弾】</title>
+  <style>
+    :root {
+      --primary: #9c4221;
+      --primary-light: #c05621;
+      --accent: #2b6cb0;
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --text: #2d3748;
+      --text-light: #718096;
+      --border: #e2e8f0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #9c4221, #c05621);
+      color: #fff;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    .header h1 { font-size: 1.6rem; margin-bottom: 0.3rem; }
+    .header p { font-size: 0.9rem; opacity: 0.85; }
+    .header .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    .intro {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid #c05621;
+    }
+    .intro h2 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .intro p { font-size: 0.9rem; color: var(--text-light); }
+    .intro .word-count {
+      display: inline-block;
+      margin-top: 0.5rem;
+      background: #feebc8;
+      color: #9c4221;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-box:focus { border-color: #c05621; }
+
+    .glossary-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .filter-btn {
+      padding: 0.4rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: #fff;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text);
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: #9c4221;
+      color: #fff;
+      border-color: #9c4221;
+    }
+
+    .category-header {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #9c4221;
+      margin: 1.5rem 0 0.8rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid #feebc8;
+    }
+    .category-header:first-child { margin-top: 0; }
+
+    .glossary-card {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 1.2rem;
+      margin-bottom: 0.8rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      border-left: 4px solid var(--primary-light);
+    }
+    .glossary-card .term {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .glossary-card .reading {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-bottom: 0.3rem;
+    }
+    .glossary-card .definition {
+      font-size: 0.92rem;
+      margin-bottom: 0.4rem;
+    }
+    .glossary-card .example {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      background: #f7fafc;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+    }
+    .glossary-card .example::before {
+      content: '使用例：';
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .btn-group {
+      display: flex; gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem; flex-wrap: wrap;
+    }
+    .btn-secondary {
+      display: inline-block;
+      background: #fff; color: #9c4221;
+      border: 2px solid #9c4221;
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: #9c4221; color: #fff; }
+
+    .result-count {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 1rem;
+    }
+
+    @media print {
+      .header { background: none !important; color: #000; border-bottom: 2px solid #000; }
+      .search-box, .glossary-filter, .btn-group, .intro { display: none !important; }
+      .glossary-card { break-inside: avoid; border: 1px solid #ccc; box-shadow: none; }
+      .category-header { break-after: avoid; }
+      body { background: #fff; }
+    }
+
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.25rem; }
+      .container { padding: 1rem 0.8rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>toBビジネス用語 単語集【第3弾】</h1>
+  <p>新入社員向け ― テスト第3弾の事前学習用教材</p>
+  <span class="badge">Vol.3 / 実務・戦略編</span>
+</div>
+
+<div class="container">
+  <div class="intro">
+    <h2>この単語集について</h2>
+    <p>第1弾・第2弾に続く応用編です。経営戦略のフレームワーク、営業実務の管理手法、法務・IT領域の専門用語などをカテゴリ別にまとめています。</p>
+    <span class="word-count" id="wordCount"></span>
+  </div>
+
+  <input type="text" class="search-box" id="searchBox" placeholder="用語を検索...">
+  <div class="glossary-filter" id="filterContainer"></div>
+  <div class="result-count" id="resultCount"></div>
+  <div id="glossaryContainer"></div>
+  <div class="btn-group">
+    <button class="btn-secondary" onclick="window.print()">単語集を印刷する</button>
+  </div>
+</div>
+
+<script>
+const glossary = [
+  // 企業・組織形態
+  { term:"BCP", reading:"びーしーぴー", category:"企業・組織形態",
+    def:"Business Continuity Planの略。事業継続計画。災害・パンデミック・システム障害などの緊急時に、重要業務を中断させず、または早期に復旧するための計画。",
+    example:"「コロナ禍を経てBCPを見直し、リモートワーク体制を強化しました」" },
+  { term:"マトリクス組織", reading:"まとりくすそしき", category:"企業・組織形態",
+    def:"事業部門と機能部門のように、複数の指揮系統を同時に持つ組織構造。柔軟な対応が可能だが、指揮命令が複雑になる課題もある。",
+    example:"「マトリクス組織なので、製品ラインの上司と地域の上司の両方に報告しています」" },
+  { term:"OEM", reading:"おーいーえむ", category:"企業・組織形態",
+    def:"Original Equipment Manufacturerの略。他社ブランドの製品を製造すること、またはその製造者。発注元のブランドで販売される。",
+    example:"「A社の化粧品はOEMでB社が製造しています」" },
+  { term:"プロフィットセンター", reading:"ぷろふぃっとせんたー", category:"企業・組織形態",
+    def:"売上と利益に直接責任を持つ事業部門。独立採算で運営され、業績評価の単位となる。対義語はコストセンター。",
+    example:"「各プロフィットセンターの営業利益を比較して、投資配分を決定します」" },
+  { term:"コストセンター", reading:"こすとせんたー", category:"企業・組織形態",
+    def:"直接的な収益は生まないが、企業活動に不可欠な管理部門。経理・人事・法務・情報システム部門など。",
+    example:"「コストセンターであっても、業務効率化で間接的にコスト削減に貢献しています」" },
+
+  // M&A・経営戦略
+  { term:"ブルーオーシャン戦略", reading:"ぶるーおーしゃんせんりゃく", category:"M&A・経営戦略",
+    def:"競合が存在しない新しい市場空間を創造し、競争を回避する戦略。既存の競争が激しい市場はレッドオーシャンと呼ぶ。",
+    example:"「価格競争のレッドオーシャンから抜け出し、ブルーオーシャンを狙いましょう」" },
+  { term:"SWOT分析", reading:"すうぉっとぶんせき", category:"M&A・経営戦略",
+    def:"Strength（強み）・Weakness（弱み）・Opportunity（機会）・Threat（脅威）の4要素で戦略を整理するフレームワーク。",
+    example:"「新規事業を始める前に、SWOT分析で自社の立ち位置を客観的に把握しましょう」" },
+  { term:"コアコンピタンス", reading:"こあこんぴたんす", category:"M&A・経営戦略",
+    def:"他社が容易に模倣できない、その企業固有の中核的な強み・能力。競争優位の源泉となる。",
+    example:"「弊社のコアコンピタンスはAI技術とデータ分析のノウハウです」" },
+  { term:"サンクコスト", reading:"さんくこすと", category:"M&A・経営戦略",
+    def:"埋没費用。すでに支出済みで回収不可能な費用。合理的な意思決定では考慮すべきでないが、「もったいない」と判断を歪めがち。",
+    example:"「開発に2年かけたからといってサンクコストに囚われず、撤退判断も検討すべきです」" },
+  { term:"3C分析", reading:"さんしーぶんせき", category:"M&A・経営戦略",
+    def:"Customer（顧客）・Competitor（競合）・Company（自社）の3つの視点から事業環境を分析するフレームワーク。",
+    example:"「3C分析で市場環境を整理してから、具体的な戦略を策定しましょう」" },
+
+  // 財務・会計
+  { term:"のれん", reading:"のれん", category:"財務・会計",
+    def:"M&Aで買収価格が対象企業の純資産額を上回る差額。ブランド力・顧客基盤・技術力など目に見えない価値を表す無形資産。",
+    example:"「のれんの金額が大きいため、減損リスクについても確認しておきましょう」" },
+  { term:"固定費", reading:"こていひ", category:"財務・会計",
+    def:"売上の増減に関わらず一定額が発生する費用。家賃・正社員人件費・リース料・保険料など。",
+    example:"「固定費が月間500万円あるので、最低でもこの分は売上でカバーする必要があります」" },
+  { term:"変動費", reading:"へんどうひ", category:"財務・会計",
+    def:"売上や生産量に比例して増減する費用。原材料費・販売手数料・外注費・配送費など。",
+    example:"「変動費率が60%なので、売上が増えるほど利益も増えるビジネスモデルです」" },
+  { term:"損益分岐点", reading:"そんえきぶんきてん", category:"財務・会計",
+    def:"売上と費用がちょうど同額になり、利益がゼロとなる売上高または販売数量。これを超えると黒字になる。",
+    example:"「損益分岐点を月商800万円と試算しているので、それ以上が目標ラインです」" },
+  { term:"運転資金", reading:"うんてんしきん", category:"財務・会計",
+    def:"日常の事業活動を回すために必要な資金。売掛金＋在庫−買掛金で算出。事業拡大に伴い増加する傾向がある。",
+    example:"「事業拡大で売掛金が増えたため、運転資金として追加の融資が必要です」" },
+  { term:"手形サイト", reading:"てがたさいと", category:"財務・会計",
+    def:"手形の振出日から支払期日までの日数。サイトが長いほど入金が遅れ、資金繰りに影響する。",
+    example:"「手形サイトを120日から90日に短縮できないか交渉しています」" },
+
+  // 営業・マーケティング
+  { term:"パイプライン管理", reading:"ぱいぷらいんかんり", category:"営業・マーケティング",
+    def:"商談を「初回接触→提案→見積→交渉→受注」のように段階で管理し、各段階の件数・金額を可視化する手法。",
+    example:"「パイプラインを見ると、提案段階の案件が少ないので、来月の売上が不安です」" },
+  { term:"SFA", reading:"えすえふえー", category:"営業・マーケティング",
+    def:"Sales Force Automationの略。営業支援システム。商談管理・活動履歴・日報などを一元管理し、営業効率を高めるツール。",
+    example:"「SFAに商談情報を入力して、チーム全体で進捗を共有してください」" },
+  { term:"ABM", reading:"えーびーえむ", category:"営業・マーケティング",
+    def:"Account Based Marketingの略。ターゲット企業を選定し、個社ごとにカスタマイズした営業・マーケティング施策を展開する戦略。",
+    example:"「ABMで上位50社に絞ったアプローチを行い、大型案件の受注率が向上しました」" },
+  { term:"フォーキャスト", reading:"ふぉーきゃすと", category:"営業・マーケティング",
+    def:"売上予測。各商談の確度と金額をもとに、月次・四半期の着地見込みを算出する活動。経営判断の重要な基礎データ。",
+    example:"「今週のフォーキャストでは、今月の着地見込みは目標の95%です」" },
+  { term:"ペルソナ", reading:"ぺるそな", category:"営業・マーケティング",
+    def:"自社サービスの理想的な顧客像を、役職・年齢・課題・行動パターンなどを含めて具体的に設定したもの。",
+    example:"「ペルソナを明確にしたことで、コンテンツの訴求ポイントがブレなくなりました」" },
+
+  // 契約・法務
+  { term:"下請法", reading:"したうけほう", category:"契約・法務",
+    def:"下請代金支払遅延等防止法の通称。資本金の大きい親事業者が下請事業者に対して不当な取引を行うことを禁止する法律。",
+    example:"「下請法では受領後60日以内に支払う義務があるので、支払いサイトに注意してください」" },
+  { term:"責任制限条項", reading:"せきにんげんげんじょうこう", category:"契約・法務",
+    def:"契約において損害賠償の上限額を定める条項。多くの場合、契約金額の総額や直近1年間の支払額を上限とする。",
+    example:"「責任制限条項により、損害賠償は年間契約金額を上限としています」" },
+  { term:"独占禁止法", reading:"どくせんきんしほう", category:"契約・法務",
+    def:"公正な競争を促進するための法律。カルテル・入札談合・不当廉売・優越的地位の濫用などを禁止。公正取引委員会が所管。",
+    example:"「競合他社と価格を相談することはカルテルにあたり、独占禁止法違反になります」" },
+  { term:"ISMS", reading:"あいえすえむえす", category:"契約・法務",
+    def:"Information Security Management Systemの略。情報セキュリティマネジメントシステム。ISO27001認証として、情報資産の適切な管理体制を第三者が認定する。",
+    example:"「ISMS認証を取得しているので、御社の情報を安全に取り扱う体制が整っています」" },
+  { term:"Pマーク", reading:"ぴーまーく", category:"契約・法務",
+    def:"プライバシーマーク。個人情報の取り扱いが適切であることを示す第三者認証制度。JIPDEC（日本情報経済社会推進協会）が認定。",
+    example:"「Pマーク取得企業として、個人情報の取り扱いには万全の体制を敷いています」" },
+
+  // IT・DX関連
+  { term:"BIツール", reading:"びーあいつーる", category:"IT・DX関連",
+    def:"Business Intelligenceツール。社内データを集約・分析し、グラフやダッシュボードで可視化するソフトウェア。Tableau・Power BIなどが代表例。",
+    example:"「BIツールで売上データをリアルタイムにダッシュボード化しています」" },
+  { term:"ノーコード/ローコード", reading:"のーこーど/ろーこーど", category:"IT・DX関連",
+    def:"プログラミング不要（ノーコード）または最小限のコード（ローコード）でアプリケーションを開発できるプラットフォーム。",
+    example:"「ノーコードツールを使って、業務部門が自分たちで申請フォームアプリを作りました」" },
+  { term:"アジャイル開発", reading:"あじゃいるかいはつ", category:"IT・DX関連",
+    def:"1〜2週間の短い開発サイクル（スプリント）を繰り返し、段階的に機能を開発・改善していく手法。要件変更に柔軟に対応できる。",
+    example:"「アジャイル開発で2週間ごとにリリースし、ユーザーの声を反映しています」" },
+  { term:"ERP", reading:"いーあーるぴー", category:"IT・DX関連",
+    def:"Enterprise Resource Planningの略。経理・人事・生産・販売・在庫など企業の基幹業務を統合的に管理するシステム。",
+    example:"「ERPを導入して、部門ごとに分散していた業務データを一元管理しています」" },
+  { term:"ウォーターフォール開発", reading:"うぉーたーふぉーるかいはつ", category:"IT・DX関連",
+    def:"要件定義→設計→開発→テスト→リリースを順番に進める開発手法。各工程が完了してから次に進む。大規模案件や官公庁案件で多い。",
+    example:"「このプロジェクトはウォーターフォールで進めるため、要件定義を最初にしっかり固めます」" },
+  { term:"SLA", reading:"えすえるえー", category:"IT・DX関連",
+    def:"Service Level Agreementの略。サービスの品質基準を提供者と顧客の間で合意する文書。稼働率・応答時間・復旧時間などを定める。",
+    example:"「SLAで月間稼働率99.9%を保証しているので、年間のダウンタイムは約8.7時間以内です」" },
+
+  // ベンチャー・スタートアップ
+  { term:"ベスティング", reading:"べすてぃんぐ", category:"ベンチャー・スタートアップ",
+    def:"ストックオプションや株式が、在籍期間に応じて段階的に行使・取得可能になる仕組み。一般的に4年間で設定される。",
+    example:"「ベスティング期間は4年で、1年のクリフ後に毎月1/48ずつ権利が確定します」" },
+  { term:"タームシート", reading:"たーむしーと", category:"ベンチャー・スタートアップ",
+    def:"投資家とスタートアップの間で、出資額・バリュエーション・取締役指名権などの主要条件を記載した交渉用文書。通常は法的拘束力を持たない。",
+    example:"「VCからタームシートを受領したので、弁護士と一緒に条件を精査しましょう」" },
+  { term:"ARR", reading:"えーあーるあーる", category:"ベンチャー・スタートアップ",
+    def:"Annual Recurring Revenueの略。年間経常収益。MRR×12で算出。SaaS企業の規模と成長性を測る最重要指標。",
+    example:"「ARRが10億円を突破し、シリーズBの資金調達を開始しました」" },
+  { term:"ダウンラウンド", reading:"だうんらうんど", category:"ベンチャー・スタートアップ",
+    def:"前回の資金調達時よりも低い企業価値評価で新たに資金調達を行うこと。既存株主の持分価値が希薄化する。",
+    example:"「業績悪化でダウンラウンドになると、既存投資家との関係が難しくなります」" },
+  { term:"NRR", reading:"えぬあーるあーる", category:"ベンチャー・スタートアップ",
+    def:"Net Revenue Retentionの略。既存顧客からの売上維持率。アップセル・ダウングレード・解約を含めた実質的な顧客収益の増減を示す。100%超が理想。",
+    example:"「NRRが120%で、既存顧客だけで前年比20%の成長を実現しています」" },
+  { term:"クリフ", reading:"くりふ", category:"ベンチャー・スタートアップ",
+    def:"ベスティングにおける最初の権利確定までの待機期間。通常1年に設定され、1年未満で退職するとストックオプションの権利がゼロになる。",
+    example:"「クリフが1年なので、入社から1年経つまではストックオプションは行使できません」" },
+];
+
+const categories = [...new Set(glossary.map(g => g.category))];
+let currentFilter = 'all';
+
+document.getElementById('wordCount').textContent = `全${glossary.length}語収録`;
+
+function renderFilters() {
+  const container = document.getElementById('filterContainer');
+  container.innerHTML = `<button class="filter-btn active" onclick="filterGlossary('all', this)">すべて</button>` +
+    categories.map(c => {
+      const count = glossary.filter(g => g.category === c).length;
+      return `<button class="filter-btn" onclick="filterGlossary('${c}', this)">${c}（${count}）</button>`;
+    }).join('');
+}
+
+function renderGlossary(items) {
+  const container = document.getElementById('glossaryContainer');
+  if (items.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:2rem;">該当する用語が見つかりません</p>';
+    document.getElementById('resultCount').textContent = '';
+    return;
+  }
+
+  const grouped = {};
+  items.forEach(g => {
+    if (!grouped[g.category]) grouped[g.category] = [];
+    grouped[g.category].push(g);
+  });
+
+  let html = '';
+  for (const cat of categories) {
+    if (!grouped[cat]) continue;
+    html += `<div class="category-header">${cat}（${grouped[cat].length}語）</div>`;
+    html += grouped[cat].map(g => `
+      <div class="glossary-card">
+        <div class="term">${g.term}</div>
+        <div class="reading">${g.reading}</div>
+        <div class="definition">${g.def}</div>
+        <div class="example">${g.example}</div>
+      </div>
+    `).join('');
+  }
+  container.innerHTML = html;
+  document.getElementById('resultCount').textContent = `${items.length}語を表示中`;
+}
+
+function filterGlossary(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = cat === 'all' ? glossary : glossary.filter(g => g.category === cat);
+  renderGlossary(filtered);
+  document.getElementById('searchBox').value = '';
+}
+
+document.getElementById('searchBox').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.filter-btn').classList.add('active');
+  currentFilter = 'all';
+  const filtered = glossary.filter(g =>
+    g.term.toLowerCase().includes(q) || g.reading.includes(q) || g.def.includes(q)
+  );
+  renderGlossary(filtered);
+});
+
+renderFilters();
+renderGlossary(glossary);
+</script>
+
+</body>
+</html>
