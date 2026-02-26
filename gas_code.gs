@@ -90,6 +90,7 @@ function doPost(e) {
 
     const row = [
       new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
+      data.testName || '第1弾',
       email,
       data.name || '',
       data.correct,
