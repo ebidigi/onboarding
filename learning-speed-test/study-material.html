@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学習速度テスト 事前学習教材</title>
+  <style>
+    :root {
+      --primary: #1a365d;
+      --primary-light: #2b6cb0;
+      --accent: #ed8936;
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --text: #2d3748;
+      --text-light: #718096;
+      --border: #e2e8f0;
+      --green: #2d6a4f;
+      --green-light: #40916c;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .header {
+      background: linear-gradient(135deg, var(--green), var(--green-light));
+      color: #fff;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    .header h1 { font-size: 1.6rem; margin-bottom: 0.3rem; }
+    .header p { font-size: 0.9rem; opacity: 0.85; }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+    .intro {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--accent);
+    }
+    .intro h2 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .intro p { font-size: 0.9rem; color: var(--text-light); margin-bottom: 0.5rem; }
+    .intro .important {
+      background: #fff5f5;
+      border-radius: 6px;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.85rem;
+      color: #e53e3e;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+    .word-count {
+      display: inline-block;
+      margin-top: 0.5rem;
+      background: #d8f3dc;
+      color: #2d6a4f;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .search-box {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      outline: none;
+    }
+    .search-box:focus { border-color: var(--green); }
+    .glossary-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .filter-btn {
+      padding: 0.4rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: #fff;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text);
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+    .category-header {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--green);
+      margin: 1.5rem 0 0.8rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid #d8f3dc;
+    }
+    .glossary-card {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 1.2rem;
+      margin-bottom: 0.8rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      border-left: 4px solid var(--primary-light);
+    }
+    .glossary-card .term {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .glossary-card .reading {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-bottom: 0.3rem;
+    }
+    .glossary-card .definition {
+      font-size: 0.92rem;
+      margin-bottom: 0.4rem;
+    }
+    .glossary-card .example {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      background: #f7fafc;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+    }
+    .glossary-card .example::before {
+      content: '使用例：';
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .glossary-card .point {
+      font-size: 0.85rem;
+      color: var(--green);
+      background: #f0fff4;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      margin-top: 0.4rem;
+    }
+    .glossary-card .point::before {
+      content: '覚えるポイント：';
+      font-weight: 600;
+    }
+    .result-count {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 1rem;
+    }
+    .btn-group {
+      display: flex; gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem; flex-wrap: wrap;
+    }
+    .btn-secondary {
+      display: inline-block;
+      background: #fff; color: var(--green);
+      border: 2px solid var(--green);
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-secondary:hover { background: var(--green); color: #fff; }
+    @media print {
+      .header { background: none !important; color: #000; border-bottom: 2px solid #000; }
+      .search-box, .glossary-filter, .btn-group, .intro { display: none !important; }
+      .glossary-card { break-inside: avoid; border: 1px solid #ccc; box-shadow: none; }
+      body { background: #fff; }
+    }
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.25rem; }
+      .container { padding: 1rem 0.8rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>学習速度テスト 事前学習教材</h1>
+  <p>ビジネス基礎 + IT基礎知識 ― テスト前に必ず学習してください</p>
+</div>
+
+<div class="container">
+  <div class="intro">
+    <h2>この教材について</h2>
+    <p>本教材はビジネス基礎用語とIT基礎知識をカテゴリ別にまとめた学習資料です。<br>
+    テストでは教材の内容をもとに、<strong>理解度・応用力</strong>を問う問題が出題されます。</p>
+    <p>単語の暗記だけでなく、<strong>「なぜそうなるのか」「実際にどう使うのか」</strong>まで理解することが重要です。</p>
+    <div class="important">
+      テスト当日は本教材を参照できません。1問あたり30秒の制限時間があります。しっかり準備してください。
+    </div>
+    <span class="word-count" id="wordCount"></span>
+  </div>
+
+  <input type="text" class="search-box" id="searchBox" placeholder="用語を検索...">
+  <div class="glossary-filter" id="filterContainer"></div>
+  <div class="result-count" id="resultCount"></div>
+  <div id="glossaryContainer"></div>
+  <div class="btn-group">
+    <button class="btn-secondary" onclick="window.print()">教材を印刷する</button>
+  </div>
+</div>
+
+<script>
+const glossary = [
+  // ===== 企業・組織形態 =====
+  { term:"ホールディングス（持株会社）", reading:"ほーるでぃんぐす", category:"企業・組織形態",
+    def:"グループ企業の株式を保有し、経営管理を行う親会社。自ら事業を行わず、傘下の事業会社を統括する。",
+    example:"「○○ホールディングスの傘下にはIT事業会社と人材事業会社があります」",
+    point:"持株会社は「株を持つだけ」の会社。事業会社との違いを区別しよう。" },
+  { term:"子会社・関連会社", reading:"こがいしゃ・かんれんがいしゃ", category:"企業・組織形態",
+    def:"子会社＝議決権50%超を保有される会社。関連会社＝議決権20〜50%を保有される会社。支配の度合いが異なる。",
+    example:"「A社はB社の株式を60%持つ親子関係。C社はD社の30%を持つ関連会社関係です」",
+    point:"50%超＝子会社、20〜50%＝関連会社。この数字の境界線が重要。" },
+  { term:"ステークホルダー", reading:"すてーくほるだー", category:"企業・組織形態",
+    def:"企業活動に関わる利害関係者の総称。株主、取引先、従業員、顧客、地域社会などを含む広い概念。",
+    example:"「このプロジェクトのステークホルダーを洗い出して、影響範囲を確認しましょう」",
+    point:"シェアホルダー（株主のみ）とステークホルダー（全利害関係者）の違い。" },
+  { term:"執行役員", reading:"しっこうやくいん", category:"企業・組織形態",
+    def:"取締役会の決定に基づき事業執行を担う役職。会社法上の「役員」ではなく、社内の任意ポスト。",
+    example:"「執行役員は経営の意思決定には関与せず、現場の執行責任を担います」",
+    point:"会社法上の「取締役」とは別物。取締役＝意思決定、執行役員＝実行。" },
+  { term:"コーポレートガバナンス", reading:"こーぽれーとがばなんす", category:"企業・組織形態",
+    def:"企業統治の仕組み。経営者の暴走を防ぎ、株主やステークホルダーの利益を守るための監督体制。",
+    example:"「社外取締役を増やしてガバナンスを強化する方針です」",
+    point:"ガバナンス＝統治の仕組み、コンプライアンス＝法令遵守。混同しないこと。" },
+
+  // ===== M&A・経営戦略 =====
+  { term:"M&A（合併と買収）", reading:"えむあんどえー", category:"M&A・経営戦略",
+    def:"Mergers and Acquisitionsの略。企業の合併・買収のこと。事業拡大や技術獲得のために他社を統合する。",
+    example:"「競合のE社がF社をM&Aしたことで、市場シェアが大きく変動しました」",
+    point:"水平統合（同業買収）と垂直統合（サプライチェーン統合）の違いを理解する。" },
+  { term:"デューデリジェンス（DD）", reading:"でゅーでりじぇんす", category:"M&A・経営戦略",
+    def:"M&Aや投資の際に対象企業の財務・法務・事業などを詳細に調査すること。財務DD・法務DD・事業DDがある。",
+    example:"「買収前にDDを実施して、簿外債務がないか確認します」",
+    point:"DDはM&Aの「前」、PMIはM&Aの「後」。この順番を覚えよう。" },
+  { term:"PMI（統合プロセス）", reading:"ぴーえむあい", category:"M&A・経営戦略",
+    def:"Post Merger Integrationの略。M&A後に組織・制度・システム・文化を統合するプロセス。M&Aの成否を左右する。",
+    example:"「M&A後のPMIがうまくいかず、期待したシナジーが出ていません」",
+    point:"PMIの失敗がM&A失敗の最大要因。「買収して終わり」ではない。" },
+  { term:"MBO / TOB / LBO", reading:"えむびーおー", category:"M&A・経営戦略",
+    def:"MBO＝経営陣による自社買収。TOB＝株式公開買付。LBO＝借入金を使った買収。それぞれ買収の手法が異なる。",
+    example:"「経営陣がMBOで上場廃止し、中長期的な改革に着手しました」",
+    point:"M＝Management、T＝Takeover（公開買付）、L＝Leveraged（借入）。頭文字で覚える。" },
+  { term:"シナジー", reading:"しなじー", category:"M&A・経営戦略",
+    def:"複数の事業や企業が統合・協力することで生まれる相乗効果。1+1が3以上になること。",
+    example:"「両社の営業ネットワークを統合すれば、大きなシナジーが期待できます」",
+    point:"コストシナジー（コスト削減）と売上シナジー（売上増加）の2種類がある。" },
+
+  // ===== 財務・会計 =====
+  { term:"損益計算書（PL）", reading:"ぴーえる", category:"財務・会計",
+    def:"一定期間の収益と費用を示す財務諸表。売上高→売上総利益→営業利益→経常利益→当期純利益の順で読む。",
+    example:"「PLを見ると売上は伸びていますが、販管費の増加で営業利益が減少しています」",
+    point:"PLは「フロー」（一定期間の動き）、BSは「ストック」（ある時点の状態）。" },
+  { term:"貸借対照表（BS）", reading:"びーえす", category:"財務・会計",
+    def:"ある時点での資産・負債・純資産を示す財務諸表。左側＝資産、右側＝負債＋純資産で必ず一致する。",
+    example:"「BSを確認すると借入金の比率が高く、財務体質の改善が課題です」",
+    point:"資産＝負債＋純資産。負債が資産を上回ると「債務超過」。" },
+  { term:"営業利益", reading:"えいぎょうりえき", category:"財務・会計",
+    def:"売上高から売上原価と販管費を引いた本業の利益。企業の本業の稼ぐ力を最もよく示す指標。",
+    example:"「営業利益率が10%以上あれば、収益性が高い企業と言えます」",
+    point:"粗利（売上総利益）→営業利益→経常利益→当期純利益。段階的に費用が引かれる。" },
+  { term:"ROI（投資利益率）", reading:"あーるおーあい", category:"財務・会計",
+    def:"Return on Investmentの略。ROI＝（利益−投資額）÷投資額×100。投資効率を測る指標。",
+    example:"「500万円の広告投資で2,000万円の売上増。ROIは300%です」",
+    point:"計算式を確実に覚える。利益（売上ではない）から投資額を引いて投資額で割る。" },
+  { term:"債務超過", reading:"さいむちょうか", category:"財務・会計",
+    def:"負債が資産を上回り、純資産がマイナスの状態。BSで確認する。赤字決算（PLの話）とは異なる概念。",
+    example:"「3期連続赤字で債務超過に陥り、銀行からの追加融資が困難になりました」",
+    point:"赤字＝PLの話（期間の損失）。債務超過＝BSの話（財政状態）。この違いは頻出。" },
+  { term:"キャッシュフロー", reading:"きゃっしゅふろー", category:"財務・会計",
+    def:"企業の現金の流れ。営業CF（本業）・投資CF（設備投資等）・財務CF（借入・返済等）の3区分がある。",
+    example:"「利益が出ていてもCFがマイナスなら倒産リスクがあります（黒字倒産）」",
+    point:"営業CF＝プラスが健全。投資CF＝マイナスが成長中。財務CF＝状況による。" },
+
+  // ===== 営業・マーケティング =====
+  { term:"リードジェネレーション / ナーチャリング", reading:"りーどじぇねれーしょん", category:"営業・マーケティング",
+    def:"リードジェネレーション＝見込み顧客の獲得。ナーチャリング＝見込み顧客の育成。営業パイプラインの入口。",
+    example:"「展示会でリードを獲得し、メルマガでナーチャリングして商談化を目指します」",
+    point:"獲得→育成→商談化→受注。この流れをファネル（漏斗）と呼ぶ。" },
+  { term:"アップセル / クロスセル", reading:"あっぷせる", category:"営業・マーケティング",
+    def:"アップセル＝上位プランへの切替提案。クロスセル＝別商品の追加提案。どちらも顧客単価向上の手法。",
+    example:"「月額10万円のプランから月額20万円への切替がアップセル。別サービスの追加提案がクロスセル」",
+    point:"アップ＝上に（グレードアップ）、クロス＝横に（別商品を横断）。" },
+  { term:"LTV（顧客生涯価値）", reading:"えるてぃーぶい", category:"営業・マーケティング",
+    def:"Life Time Valueの略。1顧客が取引期間全体で企業にもたらす利益の総額。LTV＝月額単価×粗利率×継続月数。",
+    example:"「LTVがCAC（顧客獲得コスト）の3倍以上あれば健全な事業です」",
+    point:"LTV > CAC が必須条件。CACを回収できなければ赤字顧客。" },
+  { term:"チャーンレート（解約率）", reading:"ちゃーんれーと", category:"営業・マーケティング",
+    def:"一定期間内に解約した顧客の割合。SaaSでは月次1%以下が目安。リテンション率（継続率）は逆の概念。",
+    example:"「チャーンレートが月3%だと、年間で約30%の顧客を失うことになります」",
+    point:"チャーン＝解約（離脱）、リテンション＝継続（維持）。表裏の関係。" },
+  { term:"KPI / KGI", reading:"けーぴーあい", category:"営業・マーケティング",
+    def:"KGI＝最終目標の指標（売上目標等）。KPI＝KGI達成のためのプロセス指標（アポ数、商談化率等）。",
+    example:"「KGIは月間売上1億円、KPIはアポ数100件・商談化率30%・受注率25%です」",
+    point:"KGI＝ゴール、KPI＝ゴールへの途中指標。KPIは行動で変えられるものを設定する。" },
+  { term:"CRM / SFA / MA", reading:"しーあーるえむ", category:"営業・マーケティング",
+    def:"CRM＝顧客関係管理。SFA＝営業支援システム。MA＝マーケティングオートメーション。営業DXの三大ツール。",
+    example:"「MAでリード育成→SFAで商談管理→CRMで顧客管理、と連携させます」",
+    point:"MA→SFA→CRMの順で営業プロセスに対応。ツール例：HubSpot、Salesforce。" },
+
+  // ===== 契約・法務 =====
+  { term:"NDA（秘密保持契約）", reading:"えぬでぃーえー", category:"契約・法務",
+    def:"Non-Disclosure Agreementの略。取引で知り得た秘密情報を第三者に漏らさない契約。商談初期に締結する。",
+    example:"「具体的な提案に入る前に、まずNDAを締結させてください」",
+    point:"NDAは「入口」の契約。NDA→基本契約→個別契約の順が一般的。" },
+  { term:"SLA（サービスレベル合意）", reading:"えすえるえー", category:"契約・法務",
+    def:"Service Level Agreementの略。稼働率・障害対応時間・サポート範囲などのサービス品質基準を定めた合意。",
+    example:"「SLAで稼働率99.9%を保証、年間ダウンタイム約8.7時間以内です」",
+    point:"99.9%と99.99%では許容ダウンタイムが約10倍違う。数字の意味を理解する。" },
+  { term:"RFP / RFI", reading:"あーるえふぴー", category:"契約・法務",
+    def:"RFP＝提案依頼書（具体的要件を示して提案を求める）。RFI＝情報提供依頼書（幅広く情報収集する前段階）。",
+    example:"「まずRFIで各社の概要を把握し、絞り込んでからRFPを出します」",
+    point:"RFI（情報収集）→ RFP（提案依頼）→ 選定 → 契約。この順番を覚える。" },
+  { term:"コンプライアンス", reading:"こんぷらいあんす", category:"契約・法務",
+    def:"法令・社内規程・社会的ルールを遵守すること。ガバナンス（統治の仕組み）とは異なる概念。",
+    example:"「コンプライアンス違反は企業の信頼を根本から損なうリスクがあります」",
+    point:"コンプライアンス＝守ること（法令遵守）。ガバナンス＝統治の仕組み。" },
+
+  // ===== IT基礎知識 =====
+  { term:"クラウドコンピューティング", reading:"くらうどこんぴゅーてぃんぐ", category:"IT基礎知識",
+    def:"インターネット経由でサーバー・ストレージ・ソフトウェアなどのITリソースを利用する形態。自前で機器を持たない。",
+    example:"「自社サーバーの維持費が年間1,000万円かかっていたが、クラウド移行で月額30万円に」",
+    point:"IaaS（インフラ）・PaaS（開発環境）・SaaS（ソフトウェア）の3層構造。" },
+  { term:"IaaS / PaaS / SaaS", reading:"いあーす / ぱーす / さーす", category:"IT基礎知識",
+    def:"IaaS＝サーバー・ネットワークの提供（AWS EC2等）。PaaS＝開発環境の提供（Heroku等）。SaaS＝ソフトウェアの提供（Gmail等）。",
+    example:"「IaaSは土地を借りる、PaaSは建物付きの土地を借りる、SaaSは完成した部屋を借りるイメージです」",
+    point:"下から順にIaaS→PaaS→SaaS。自由度はIaaS>PaaS>SaaS、手軽さは逆。" },
+  { term:"オンプレミス vs クラウド", reading:"おんぷれみす", category:"IT基礎知識",
+    def:"オンプレミス＝自社にサーバー設置して運用。クラウド＝外部サービスを利用。初期費用・運用負荷・柔軟性が大きく異なる。",
+    example:"「オンプレミスは初期費用が高いが自由度が高い。クラウドは月額課金で始めやすい」",
+    point:"オンプレ＝CAPEX（初期投資型）、クラウド＝OPEX（月額費用型）。" },
+  { term:"API（アプリケーション連携）", reading:"えーぴーあい", category:"IT基礎知識",
+    def:"Application Programming Interfaceの略。異なるシステム間でデータをやり取りするための接続口・ルール。",
+    example:"「CRMと会計ソフトをAPI連携して、受注データを自動で会計に反映します」",
+    point:"APIは「レストランの注文窓口」のようなもの。メニュー（仕様）通りに頼めば料理（データ）が返ってくる。" },
+  { term:"データベース（DB）", reading:"でーたべーす", category:"IT基礎知識",
+    def:"データを構造化して蓄積・管理するシステム。テーブル（表）にデータを格納し、SQLという言語で操作する。",
+    example:"「顧客情報は顧客DBに格納され、営業担当が検索・更新できるようになっています」",
+    point:"RDB（リレーショナルDB）＝表形式で管理、NoSQL＝より柔軟な形式。企業の基幹はRDBが主流。" },
+  { term:"SQL", reading:"えすきゅーえる", category:"IT基礎知識",
+    def:"Structured Query Languageの略。データベースを操作するための言語。データの取得（SELECT）・追加（INSERT）・更新（UPDATE）・削除（DELETE）が基本。",
+    example:"「SQLで顧客DBから東京都の法人顧客だけを抽出してリストを作成します」",
+    point:"SELECT＝取得、INSERT＝追加、UPDATE＝更新、DELETE＝削除。この4つが基本操作。" },
+  { term:"IPアドレス / ドメイン", reading:"あいぴーあどれす", category:"IT基礎知識",
+    def:"IPアドレス＝ネットワーク上の住所（例：192.168.1.1）。ドメイン＝IPアドレスに名前をつけたもの（例：google.com）。DNSが変換する。",
+    example:"「ドメインは人間が覚えやすい名前、IPアドレスはコンピュータが使う番号です」",
+    point:"DNS＝ドメインをIPアドレスに変換する仕組み（電話帳のようなもの）。" },
+  { term:"HTTP / HTTPS", reading:"えいちてぃーてぃーぴー", category:"IT基礎知識",
+    def:"Webサイトとブラウザ間の通信ルール。HTTPSはSSL/TLSで通信を暗号化した安全な版。現在はHTTPSが標準。",
+    example:"「URLがhttps://で始まるサイトは通信が暗号化されており、情報が盗み見られにくい」",
+    point:"HTTPS＝HTTP + Secure（暗号化）。鍵マークが目印。" },
+  { term:"セキュリティの三要素（CIA）", reading:"しーあいえー", category:"IT基礎知識",
+    def:"機密性（Confidentiality）＝許可された人だけがアクセス。完全性（Integrity）＝データが改ざんされない。可用性（Availability）＝必要な時に使える。",
+    example:"「パスワード管理は機密性、バックアップは可用性、改ざん検知は完全性の対策です」",
+    point:"C＝見せない、I＝変えさせない、A＝止めない。セキュリティの全ての対策はこの3つに分類できる。" },
+  { term:"VPN（仮想プライベートネットワーク）", reading:"ぶいぴーえぬ", category:"IT基礎知識",
+    def:"Virtual Private Networkの略。インターネット上に仮想的な専用回線を作り、安全に社内ネットワークへ接続する技術。",
+    example:"「リモートワーク時はVPN接続してから社内システムにアクセスしてください」",
+    point:"VPN＝インターネット上のトンネル。暗号化された安全な通信路を作る。" },
+  { term:"サーバー / クライアント", reading:"さーばー", category:"IT基礎知識",
+    def:"サーバー＝サービスを提供する側のコンピュータ。クライアント＝サービスを利用する側。Webサイトの場合、Webサーバーとブラウザの関係。",
+    example:"「ブラウザ（クライアント）がWebサーバーにリクエストを送り、HTMLが返ってきて画面に表示されます」",
+    point:"クライアントが「お願い」→サーバーが「処理して返す」。この往復が通信の基本。" },
+  { term:"フロントエンド / バックエンド", reading:"ふろんとえんど", category:"IT基礎知識",
+    def:"フロントエンド＝ユーザーが直接触れる画面側（HTML/CSS/JavaScript）。バックエンド＝サーバー側の処理・データベース操作。",
+    example:"「画面のデザイン変更はフロントエンド、データ処理の修正はバックエンドの作業です」",
+    point:"フロント＝見える部分（舞台の表）、バック＝見えない部分（舞台の裏）。" },
+  { term:"Git / バージョン管理", reading:"ぎっと", category:"IT基礎知識",
+    def:"ソースコードの変更履歴を管理するシステム。誰が・いつ・何を変更したかを記録し、過去の状態に戻せる。",
+    example:"「Gitで管理しているので、間違った変更があっても前のバージョンに戻せます」",
+    point:"GitHubはGitをクラウドで使うサービス。Git＝仕組み、GitHub＝サービス。" },
+  { term:"AI / 機械学習 / 深層学習", reading:"えーあい", category:"IT基礎知識",
+    def:"AI＝人工知能の総称。機械学習＝データからパターンを学ぶAIの手法。深層学習＝機械学習の中でニューラルネットワークを使う手法。",
+    example:"「ChatGPTは深層学習の一種である大規模言語モデル（LLM）を使っています」",
+    point:"AI > 機械学習 > 深層学習 > LLM。包含関係を理解する。" },
+  { term:"DX（デジタルトランスフォーメーション）", reading:"でぃーえっくす", category:"IT基礎知識",
+    def:"デジタル技術で業務プロセス・ビジネスモデルを根本的に変革すること。単なるIT化（効率化）とは異なる。",
+    example:"「紙の申請書をPDF化するのはIT化。申請プロセス自体をなくすのがDX」",
+    point:"IT化＝既存業務のデジタル化、DX＝ビジネスの変革。レベルが違う。" },
+
+  // ===== ベンチャー・スタートアップ =====
+  { term:"PMF（プロダクトマーケットフィット）", reading:"ぴーえむえふ", category:"ベンチャー・スタートアップ",
+    def:"Product Market Fitの略。プロダクトが市場ニーズに合致し、顧客に受け入れられている状態。成長フェーズの前提条件。",
+    example:"「PMFを達成してからスケールさせないと、広告費が無駄になります」",
+    point:"PMF前に大規模投資はNG。PMF確認→スケール投資の順。" },
+  { term:"バーンレート / ランウェイ", reading:"ばーんれーと", category:"ベンチャー・スタートアップ",
+    def:"バーンレート＝月間の資金消費額。ランウェイ＝手元資金÷バーンレートで算出する資金が持つ期間。",
+    example:"「バーンレート月500万円、手元資金3,000万円→ランウェイ6ヶ月」",
+    point:"ランウェイ＝手元資金÷バーンレート。計算問題が出やすい。" },
+  { term:"エクイティ / デット", reading:"えくいてぃ", category:"ベンチャー・スタートアップ",
+    def:"エクイティ＝株式発行による資金調達（返済不要だが株式希薄化）。デット＝借入による調達（返済義務あり）。",
+    example:"「エクイティで3億円調達。株式の20%を投資家に渡しました」",
+    point:"エクイティ＝返済不要だが経営権が希薄化。デット＝経営権は守れるが返済必要。" },
+  { term:"シリーズA / B / C", reading:"しりーず", category:"ベンチャー・スタートアップ",
+    def:"資金調達のラウンド（段階）。シード→シリーズA→B→Cと進むにつれ調達額が大きくなり、企業の成長段階も進む。",
+    example:"「シリーズAで2億円を調達し、プロダクト開発と営業チーム構築に充てます」",
+    point:"シード＝アイデア段階、A＝PMF後の拡大、B＝事業拡大、C＝上場準備。" },
+  { term:"ピボット", reading:"ぴぼっと", category:"ベンチャー・スタートアップ",
+    def:"事業の方向転換。市場の反応を踏まえて、ビジネスモデルやターゲットを大きく変更すること。",
+    example:"「toC向けサービスからtoB向けにピボットして、成長軌道に乗りました」",
+    point:"有名なピボット例：Slack（ゲーム→チャット）、Instagram（位置情報→写真）。" },
+  { term:"IPO / エグジット", reading:"あいぴーおー", category:"ベンチャー・スタートアップ",
+    def:"IPO＝株式上場。エグジット＝投資の回収手段（IPOまたはM&Aによる売却）。VC投資のゴール。",
+    example:"「3年後のIPOを目指して、内部統制の体制を整備しています」",
+    point:"エグジット＝出口。IPO（上場）かM&A（売却）の2択が基本。" },
+  { term:"MRR / ARR", reading:"えむあーるあーる", category:"ベンチャー・スタートアップ",
+    def:"MRR＝Monthly Recurring Revenue（月次経常収益）。ARR＝Annual Recurring Revenue（年次経常収益）。ARR＝MRR×12。",
+    example:"「MRR 500万円 → ARR 6,000万円。前年比200%成長です」",
+    point:"SaaSの最重要指標。MRR×12＝ARR。この計算は必須。" },
+];
+
+const categories = [...new Set(glossary.map(g => g.category))];
+let currentFilter = 'all';
+
+document.getElementById('wordCount').textContent = `全${glossary.length}語収録 ― 8カテゴリ`;
+
+function renderFilters() {
+  const container = document.getElementById('filterContainer');
+  container.innerHTML = `<button class="filter-btn active" onclick="filterGlossary('all', this)">すべて</button>` +
+    categories.map(c => {
+      const count = glossary.filter(g => g.category === c).length;
+      return `<button class="filter-btn" onclick="filterGlossary('${c}', this)">${c}（${count}）</button>`;
+    }).join('');
+}
+
+function renderGlossary(items) {
+  const container = document.getElementById('glossaryContainer');
+  if (items.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:2rem;">該当する用語が見つかりません</p>';
+    document.getElementById('resultCount').textContent = '';
+    return;
+  }
+  const grouped = {};
+  items.forEach(g => {
+    if (!grouped[g.category]) grouped[g.category] = [];
+    grouped[g.category].push(g);
+  });
+  let html = '';
+  for (const cat of categories) {
+    if (!grouped[cat]) continue;
+    html += `<div class="category-header">${cat}（${grouped[cat].length}語）</div>`;
+    html += grouped[cat].map(g => `
+      <div class="glossary-card">
+        <div class="term">${g.term}</div>
+        <div class="reading">${g.reading}</div>
+        <div class="definition">${g.def}</div>
+        <div class="example">${g.example}</div>
+        ${g.point ? `<div class="point">${g.point}</div>` : ''}
+      </div>
+    `).join('');
+  }
+  container.innerHTML = html;
+  document.getElementById('resultCount').textContent = `${items.length}語を表示中`;
+}
+
+function filterGlossary(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = cat === 'all' ? glossary : glossary.filter(g => g.category === cat);
+  renderGlossary(filtered);
+  document.getElementById('searchBox').value = '';
+}
+
+document.getElementById('searchBox').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.filter-btn').classList.add('active');
+  currentFilter = 'all';
+  const filtered = glossary.filter(g =>
+    g.term.toLowerCase().includes(q) || g.reading.includes(q) || g.def.includes(q)
+  );
+  renderGlossary(filtered);
+});
+
+renderFilters();
+renderGlossary(glossary);
+</script>
+
+</body>
+</html>

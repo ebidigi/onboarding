@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学習速度テスト</title>
+  <style>
+    :root {
+      --primary: #1a365d;
+      --primary-light: #2b6cb0;
+      --accent: #ed8936;
+      --correct: #38a169;
+      --wrong: #e53e3e;
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --text: #2d3748;
+      --text-light: #718096;
+      --border: #e2e8f0;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header h1 { font-size: 1.4rem; margin-bottom: 0.2rem; }
+    .header-info {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    /* Timer */
+    .timer-bar {
+      position: sticky;
+      top: 70px;
+      z-index: 99;
+      background: var(--card);
+      padding: 0.8rem 1rem;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+    }
+    .timer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+    .timer-label { font-size: 0.85rem; font-weight: 600; }
+    .timer-value { font-size: 1.1rem; font-weight: 800; }
+    .timer-value.warning { color: var(--accent); }
+    .timer-value.danger { color: var(--wrong); animation: pulse 0.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .timer-track {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .timer-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1s linear;
+      background: linear-gradient(90deg, var(--primary-light), var(--accent));
+    }
+    .timer-fill.warning { background: linear-gradient(90deg, var(--accent), #dd6b20); }
+    .timer-fill.danger { background: var(--wrong); }
+
+    /* Login */
+    .login-screen {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .login-screen h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .login-screen p { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1rem; }
+    .login-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .name-input {
+      width: 100%; max-width: 300px;
+      padding: 0.7rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .name-input:focus { border-color: var(--primary-light); }
+    .rules-box {
+      text-align: left;
+      background: #fffff0;
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      padding: 1.2rem;
+      margin: 1rem auto;
+      max-width: 400px;
+      font-size: 0.88rem;
+    }
+    .rules-box h3 { font-size: 0.95rem; color: var(--accent); margin-bottom: 0.5rem; }
+    .rules-box ul { padding-left: 1.2rem; }
+    .rules-box li { margin-bottom: 0.3rem; }
+
+    .ai-notice {
+      text-align: left;
+      background: #ebf4ff;
+      border: 2px solid var(--primary-light);
+      border-radius: 10px;
+      padding: 1.2rem;
+      margin: 1rem auto;
+      max-width: 450px;
+      font-size: 0.82rem;
+      color: var(--text);
+    }
+    .ai-notice h3 { font-size: 0.9rem; color: var(--primary); margin-bottom: 0.5rem; }
+    .ai-notice ul { padding-left: 1.2rem; }
+    .ai-notice li { margin-bottom: 0.3rem; }
+    .ai-notice .ai-note { margin-top: 0.5rem; font-style: italic; color: var(--text-light); font-size: 0.78rem; }
+
+    /* Question */
+    .question-screen { display: none; }
+    .question-screen.show { display: block; }
+    .question-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.8rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .q-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .q-number {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .q-category {
+      display: inline-block;
+      background: #ebf4ff;
+      color: var(--primary-light);
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .q-level {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .q-level.level-1 { background: #d8f3dc; color: #2d6a4f; }
+    .q-level.level-2 { background: #fef3c7; color: #92400e; }
+    .q-level.level-3 { background: #fee2e2; color: #991b1b; }
+    .q-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      line-height: 1.6;
+    }
+    .options { display: flex; flex-direction: column; gap: 0.6rem; }
+    .option-btn {
+      display: block; width: 100%; text-align: left;
+      padding: 0.85rem 1.2rem;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--text);
+    }
+    .option-btn:hover { border-color: var(--primary-light); background: #ebf8ff; }
+    .option-btn.selected { border-color: var(--primary-light); background: #ebf8ff; font-weight: 600; }
+    .option-btn.correct-answer { border-color: var(--correct); background: #f0fff4; font-weight: 600; }
+    .option-btn.wrong-answer { border-color: var(--wrong); background: #fff5f5; }
+    .skip-note {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-light);
+      margin-top: 1rem;
+    }
+
+    /* Explanation */
+    .explanation-box {
+      display: none;
+      margin-top: 1rem;
+      padding: 1rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+    .explanation-box.show { display: block; }
+    .explanation-box.correct-bg {
+      background: #f0fff4;
+      border-left: 4px solid var(--correct);
+    }
+    .explanation-box.wrong-bg {
+      background: #fff5f5;
+      border-left: 4px solid var(--wrong);
+    }
+    .explanation-box.timeout-bg {
+      background: #fffff0;
+      border-left: 4px solid var(--accent);
+    }
+    .explanation-result {
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+    }
+    .explanation-text { color: var(--text); }
+    .explanation-next {
+      text-align: center;
+      margin-top: 0.8rem;
+    }
+    .btn-next {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff; border: none;
+      padding: 0.6rem 1.5rem; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-next:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,54,93,0.3); }
+
+    /* Tab warning */
+    .tab-warning {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(229,62,62,0.95);
+      z-index: 1000;
+      color: #fff;
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+    .tab-warning.show { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .tab-warning h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+    .tab-warning p { font-size: 1rem; margin-bottom: 1.5rem; opacity: 0.9; }
+    .tab-warning-count {
+      background: rgba(0,0,0,0.3);
+      padding: 0.5rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    /* Result */
+    .result-screen { display: none; }
+    .result-screen.show { display: block; }
+    .result-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+    }
+    .score-circle {
+      width: 130px; height: 130px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      margin: 0 auto 1rem;
+      font-weight: 800; color: #fff;
+    }
+    .score-circle .pct { font-size: 2.2rem; line-height: 1; }
+    .score-circle .label { font-size: 0.75rem; opacity: 0.85; }
+    .score-high { background: linear-gradient(135deg, #38a169, #48bb78); }
+    .score-mid { background: linear-gradient(135deg, #d69e2e, #ed8936); }
+    .score-low { background: linear-gradient(135deg, #e53e3e, #fc8181); }
+    .result-msg { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .result-detail { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1rem; }
+    .result-saved {
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .result-saved.success { background: #f0fff4; color: var(--correct); }
+    .result-saved.error { background: #fff5f5; color: var(--wrong); }
+    .result-saved.saving { background: #ebf8ff; color: var(--primary-light); }
+
+    /* Level breakdown */
+    .breakdown-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 1rem;
+    }
+    .breakdown-card h3 {
+      font-size: 0.95rem;
+      color: var(--text-light);
+      margin-bottom: 0.8rem;
+      text-align: center;
+    }
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-name { font-size: 0.88rem; }
+    .breakdown-score { font-weight: 700; font-size: 0.88rem; }
+    .breakdown-bar {
+      flex: 1;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      margin: 0 0.8rem;
+      overflow: hidden;
+    }
+    .breakdown-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+    .stat-item {
+      background: #f7fafc;
+      border-radius: 8px;
+      padding: 0.8rem;
+      text-align: center;
+    }
+    .stat-value { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+    .stat-label { font-size: 0.78rem; color: var(--text-light); }
+
+    .btn-primary {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff; border: none;
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,54,93,0.3); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-group { display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
+
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.15rem; }
+      .container { padding: 1rem 0.8rem 3rem; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>学習速度テスト</h1>
+  <div class="header-info">
+    <span id="headerUser"></span>
+    <span id="headerProgress"></span>
+  </div>
+</div>
+
+<!-- Tab Warning Overlay -->
+<div class="tab-warning" id="tabWarning">
+  <h2>画面を離れないでください</h2>
+  <p>テスト中に別のタブやウィンドウに移動することは禁止されています。<br>この行為は記録されます。</p>
+  <div class="tab-warning-count" id="tabWarningCount"></div>
+  <button class="btn-primary" style="margin-top:1.5rem" onclick="dismissTabWarning()">テストに戻る</button>
+</div>
+
+<div class="container">
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-icon">&#128221;</div>
+    <h2>学習速度テスト</h2>
+    <p>事前配布した教材（ビジネス基礎 + IT基礎知識）の学習成果を確認するテストです。</p>
+
+    <div class="rules-box">
+      <h3>テストルール</h3>
+      <ul>
+        <li><strong>全40問</strong>（ビジネス基礎 + IT基礎知識）</li>
+        <li>1問あたり<strong>制限時間30秒</strong></li>
+        <li>時間切れは<strong>自動で次の問題</strong>に進みます</li>
+        <li><strong>前の問題に戻ることはできません</strong></li>
+        <li>別タブへの移動は<strong>検知・記録</strong>されます</li>
+        <li>難易度3段階：記憶 → 理解 → 応用</li>
+        <li>回答後に<strong>解説が表示</strong>されます</li>
+      </ul>
+    </div>
+
+    <div class="ai-notice">
+      <h3>本テストにおけるAIの活用について</h3>
+      <ul>
+        <li><strong>問題文・選択肢の作成：</strong>教材の各Chapterの内容を基に、AIを活用して問題文・選択肢・解説文を生成しました。</li>
+        <li><strong>解説の作成：</strong>各問題の解説は、AIが教材の「理解のポイント」や「ケーススタディ」を参照しながら、正解の根拠と誤答の理由を構造的に説明するよう生成しました。</li>
+        <li><strong>難易度設計：</strong>Level 1（記憶）・Level 2（理解）・Level 3（応用）の3段階をAIが教材の深度に合わせて設定しています。</li>
+        <li><strong>人間による監修：</strong>AIが生成した問題・解説は、教材の内容と整合するよう人間が確認・修正を行っています。</li>
+      </ul>
+      <div class="ai-note">※ AIはあくまで作成補助として活用しており、テストの品質・正確性については人間が最終確認を行っています。AIを使うことで、教材の全範囲を網羅的にカバーし、一貫した解説品質を担保しています。</div>
+    </div>
+
+    <div style="margin-top:1.5rem">
+      <input type="text" class="name-input" id="userName" placeholder="氏名を入力（例：山田 太郎）">
+    </div>
+    <div class="btn-group" style="margin-top:0.5rem">
+      <button class="btn-primary" id="startBtn" onclick="startTest()">テストを開始する</button>
+    </div>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div id="questionScreen" class="question-screen">
+    <div class="timer-bar" id="timerBar">
+      <div class="timer-row">
+        <span class="timer-label">残り時間</span>
+        <span class="timer-value" id="timerValue">30</span>
+      </div>
+      <div class="timer-track">
+        <div class="timer-fill" id="timerFill" style="width:100%"></div>
+      </div>
+    </div>
+
+    <div class="question-card" id="questionCard">
+      <div class="q-meta">
+        <span class="q-number" id="qNumber"></span>
+        <span class="q-category" id="qCategory"></span>
+        <span class="q-level" id="qLevel"></span>
+      </div>
+      <div class="q-text" id="qText"></div>
+      <div class="options" id="qOptions"></div>
+      <div class="skip-note" id="skipNote">選択すると解説が表示されます（制限時間: 30秒）</div>
+
+      <div class="explanation-box" id="explanationBox">
+        <div class="explanation-result" id="explanationResult"></div>
+        <div class="explanation-text" id="explanationText"></div>
+        <div class="explanation-next">
+          <button class="btn-next" id="nextBtn" onclick="goNext()">次の問題へ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="resultScreen" class="result-screen">
+    <div class="result-card">
+      <div class="score-circle" id="scoreCircle">
+        <div class="pct" id="scorePct"></div>
+        <div class="label">正答率</div>
+      </div>
+      <div class="result-msg" id="resultMsg"></div>
+      <div class="result-detail" id="resultDetail"></div>
+      <div class="result-saved saving" id="resultSaved">結果を記録中...</div>
+    </div>
+
+    <div class="breakdown-card">
+      <h3>難易度別スコア（学習の深さ）</h3>
+      <div id="levelBreakdown"></div>
+    </div>
+
+    <div class="breakdown-card">
+      <h3>カテゴリ別スコア</h3>
+      <div id="categoryBreakdown"></div>
+    </div>
+
+    <div class="breakdown-card">
+      <h3>テスト統計</h3>
+      <div class="stats-grid" id="statsGrid"></div>
+    </div>
+
+    <div class="breakdown-card" id="reviewSection">
+      <h3>回答一覧</h3>
+      <div id="reviewContainer"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// =====================================================
+// GASデプロイ後、以下のURLを書き換えてください
+// =====================================================
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxSDSpvP0WmUA0Fj60BLnY4bSGCt0m7qB0TveKhQRMlKAwYalCRgwRsgTVaeCHOi3gzVQ/exec';
+// =====================================================
+
+const TIME_PER_QUESTION = 30; // seconds
+
+// ===== QUESTION DATA =====
+// level: 1=記憶, 2=理解, 3=応用
+// explanation: 回答後に表示される解説
+const questions = [
+  // ========== Chapter 1: 企業の仕組みと組織形態（6問） ==========
+  { q:"親会社が子会社を支配しているとみなされる議決権の保有割合の基準は？",
+    answer:"50%超", category:"企業・組織形態", level:1,
+    options:["50%超","20%以上","30%以上","75%以上"],
+    explanation:"議決権の50%超を保有している場合、その会社は「子会社」となります。20〜50%なら「関連会社」です。この50%が境界線であり、営業先の意思決定構造を把握する上で重要です。" },
+
+  { q:"持株会社（ホールディングス）の特徴として正しいものはどれですか？",
+    answer:"自ら事業を行わず、株式保有を通じてグループ全体を経営管理する", category:"企業・組織形態", level:1,
+    options:["自ら事業を行わず、株式保有を通じてグループ全体を経営管理する","自社で主力事業を展開しながら子会社も持つ","株式を50%未満しか持たない会社","関連会社だけを管理する会社"],
+    explanation:"持株会社（HD）は自ら事業を行わず、傘下の各社の株式を保有することでグループ全体を統括します。「ABCホールディングス」のような社名が典型例です。" },
+
+  { q:"取締役と執行役員の違いについて、正しい説明はどれですか？",
+    answer:"取締役は経営の意思決定を行い、執行役員はその方針を現場で実行する", category:"企業・組織形態", level:2,
+    options:["取締役は経営の意思決定を行い、執行役員はその方針を現場で実行する","取締役は現場で働き、執行役員が方針を決める","両者は同じ役割で呼び方が違うだけ","執行役員は会社法上の役員であり、取締役より上位"],
+    explanation:"取締役は会社法上の役員で経営の「意思決定」を行います。執行役員は社内の任意ポストで「実行」を担当し、会社法上の「役員」ではありません。この分離がコーポレートガバナンスの基本です。" },
+
+  { q:"ステークホルダーとシェアホルダーの違いとして正しいものは？",
+    answer:"シェアホルダーは株主のみ、ステークホルダーは全利害関係者を含む", category:"企業・組織形態", level:2,
+    options:["シェアホルダーは株主のみ、ステークホルダーは全利害関係者を含む","両者は同じ意味","ステークホルダーは株主のみ、シェアホルダーは全利害関係者","シェアホルダーは従業員を指す"],
+    explanation:"Share=株式を持つ人（株主のみ）、Stake=利害関係がある人（株主・従業員・取引先・顧客・地域住民まで含む広い概念）。営業では「ステークホルダー＝意思決定に影響する人」を把握することが重要です。" },
+
+  { q:"コンプライアンスとガバナンスの違いを正しく説明しているものは？",
+    answer:"ガバナンスは経営を監督する仕組み、コンプライアンスは法令を守る行動", category:"企業・組織形態", level:2,
+    options:["ガバナンスは経営を監督する仕組み、コンプライアンスは法令を守る行動","両者は同じ意味で使い分け不要","ガバナンスは法令遵守、コンプライアンスは企業統治","ガバナンスは大企業のみ、コンプライアンスは中小企業のみ"],
+    explanation:"ガバナンス＝「仕組み」（企業統治）、コンプライアンス＝「行動」（法令遵守）。社外取締役を置くのはガバナンス強化。個人情報を適切に扱うのはコンプライアンス。似ているが全く違う概念です。" },
+
+  { q:"子会社の部長と商談中、「最終決裁は親会社の承認が必要」と言われました。次のアクションとして最も適切なものは？",
+    answer:"親会社のキーパーソン（ステークホルダー）へのアプローチを計画する", category:"企業・組織形態", level:3,
+    options:["親会社のキーパーソン（ステークホルダー）へのアプローチを計画する","子会社の部長に決裁権限を委譲するよう依頼する","親会社には関わらず子会社だけで完結させる","提案を中止する"],
+    explanation:"子会社は大きな投資判断で親会社の承認が必要になるケースが多いです。部長は執行側の人間であり、最終的な意思決定は取締役レベルで行われる可能性が高い。親会社のステークホルダーへのアプローチが必要です。" },
+
+  // ========== Chapter 2: M&Aと経営戦略（5問） ==========
+  { q:"M&Aの3つのフェーズを正しい時系列順に並べたものはどれですか？",
+    answer:"デューデリジェンス → クロージング → PMI", category:"M&A・経営戦略", level:1,
+    options:["デューデリジェンス → クロージング → PMI","PMI → デューデリジェンス → クロージング","クロージング → PMI → デューデリジェンス","PMI → クロージング → デューデリジェンス"],
+    explanation:"DD（買う前の調査）→ クロージング（契約・対価支払い）→ PMI（買った後の統合）の順番です。PMIの失敗がM&A全体の失敗に直結するため、統合作業が最も重要なフェーズと言われています。" },
+
+  { q:"PMI（Post Merger Integration）が失敗すると、どのような問題が起きますか？",
+    answer:"シナジーが出ず、M&A自体が失敗に終わる", category:"M&A・経営戦略", level:2,
+    options:["シナジーが出ず、M&A自体が失敗に終わる","デューデリジェンスをやり直す必要がある","買収価格が自動的に下がる","法律上の罰則を受ける"],
+    explanation:"PMI＝買収後の組織・制度・システム・文化の統合プロセス。これが難航すると期待していたシナジーが実現せず、M&A全体の失敗に直結します。M&A失敗の最大要因はPMIの失敗です。" },
+
+  { q:"コンビニAがコンビニBを買収してシェアを拡大する戦略は何と呼ばれますか？",
+    answer:"水平統合", category:"M&A・経営戦略", level:1,
+    options:["水平統合","垂直統合","多角化","リストラクチャリング"],
+    explanation:"同業他社を買収してシェアを拡大するのが「水平統合」です。一方、サプライチェーンの上流・下流を買収する（例：メーカーが仕入先を買収）のが「垂直統合」です。" },
+
+  { q:"MBO・TOB・LBOのうち、経営陣が自社株を買い取って上場を廃止する手法は？",
+    answer:"MBO（Management Buyout）", category:"M&A・経営戦略", level:1,
+    options:["MBO（Management Buyout）","TOB（Takeover Bid）","LBO（Leveraged Buyout）","IPO（Initial Public Offering）"],
+    explanation:"MBO＝経営陣が自社株を買い取る手法。上場を廃止して短期的な株主圧力から離れ、中長期改革に集中するのが主な目的です。TOBは株式の公開買付、LBOは借入金を使った買収です。" },
+
+  { q:"A社がB社を買収し、A社の顧客にB社のサービスを追加販売して売上を増やしました。これは何シナジーですか？",
+    answer:"売上シナジー", category:"M&A・経営戦略", level:3,
+    options:["売上シナジー","コストシナジー","財務シナジー","技術シナジー"],
+    explanation:"互いの顧客基盤を活用して売上を増加させるのが「売上シナジー」（クロスセル）。重複部門の統合でコスト削減するのが「コストシナジー」です。シナジー＝統合による相乗効果（1+1が3以上になること）。" },
+
+  // ========== Chapter 3: 財務・会計（7問） ==========
+  { q:"PL（損益計算書）とBS（貸借対照表）の違いとして正しいものは？",
+    answer:"PLは一定期間の収益と費用を示し、BSはある時点の資産・負債を示す", category:"財務・会計", level:1,
+    options:["PLは一定期間の収益と費用を示し、BSはある時点の資産・負債を示す","PLはある時点の財産を示し、BSは期間の収支を示す","両者は同じ内容を別角度で見たもの","PLは現金の流れ、BSは利益を示す"],
+    explanation:"PL＝「フロー」（期間の動き＝家計簿）、BS＝「ストック」（ある時点の状態＝財産目録）。この違いが「赤字」と「債務超過」の違いに直結します。赤字＝PLの話、債務超過＝BSの話です。" },
+
+  { q:"PLの利益の段階構造で、本業の稼ぐ力を最もよく表す指標はどれですか？",
+    answer:"営業利益", category:"財務・会計", level:1,
+    options:["営業利益","粗利（売上総利益）","経常利益","当期純利益"],
+    explanation:"粗利から販管費を引いたものが営業利益で、本業の実力を最もよく表します。粗利は商品力、経常利益は財務活動も含めた実力、当期純利益は特別損益・税金も含めた最終利益です。" },
+
+  { q:"売上目標12億円、粗利率40%のとき、粗利はいくらですか？",
+    answer:"4億8,000万円", category:"財務・会計", level:2,
+    options:["4億8,000万円","3億6,000万円","7億2,000万円","4億円"],
+    explanation:"粗利 ＝ 売上高 × 粗利率 ＝ 12億 × 0.4 ＝ 4億8,000万円。粗利率は「売上のうち何%が粗利として残るか」を示す指標です。" },
+
+  { q:"広告に500万円を投資して2,000万円の売上増加があった場合、ROIは何%ですか？",
+    answer:"300%", category:"財務・会計", level:2,
+    options:["300%","400%","250%","150%"],
+    explanation:"ROI ＝（利益 − 投資額）÷ 投資額 × 100 ＝（2,000万 − 500万）÷ 500万 × 100 ＝ 300%。注意：「売上」から投資額を引くのであって、売上をそのまま割ってはいけません（2,000÷500=400%は誤り）。" },
+
+  { q:"黒字倒産のメカニズムとして正しい説明はどれですか？",
+    answer:"PLは黒字だが入金が遅れ、手元のキャッシュが枯渇して支払いができなくなる", category:"財務・会計", level:2,
+    options:["PLは黒字だが入金が遅れ、手元のキャッシュが枯渇して支払いができなくなる","赤字が続いて負債が膨らみ倒産する","株価が暴落して経営が成り立たなくなる","従業員が全員退職して事業継続できなくなる"],
+    explanation:"PLで利益が出ていても、CFがマイナスなら倒産リスクがあります。商品を売っても入金が3ヶ月後、その間に支払期限が来て手元キャッシュが足りなくなるケース。だからPL・BS・CFの3つセットで見る必要があるのです。" },
+
+  { q:"BSで負債が資産を上回っている状態を何と呼びますか？",
+    answer:"債務超過", category:"財務・会計", level:1,
+    options:["債務超過","赤字決算","資金ショート","減損"],
+    explanation:"債務超過＝BSの問題（負債が資産を上回る状態、純資産がマイナス）。赤字＝PLの問題（今期の損失）。赤字が続くと債務超過に至りますが、赤字＝債務超過ではありません。" },
+
+  { q:"お客様の決算でPL売上20%増・営業利益30%減・BS負債>資産・営業CFマイナスの場合、最も刺さる提案は？",
+    answer:"コスト削減に貢献するソリューション", category:"財務・会計", level:3,
+    options:["コスト削減に貢献するソリューション","大規模な設備投資の提案","新規事業立ち上げ支援","ブランディング強化の提案"],
+    explanation:"売上は伸びているが販管費が増加（営業利益減の原因）。債務超過で営業CFマイナスなので財務体質は危険。黒字倒産リスクもある。このお客様には売上拡大ではなくコスト削減に貢献するソリューションが最適です。" },
+
+  // ========== Chapter 4: 営業・マーケティング（7問） ==========
+  { q:"展示会で名刺を集める活動は、営業ファネルのどのプロセスに該当しますか？",
+    answer:"リードジェネレーション（見込み顧客の獲得）", category:"営業・マーケティング", level:1,
+    options:["リードジェネレーション（見込み顧客の獲得）","リードナーチャリング（見込み顧客の育成）","商談化","クロージング"],
+    explanation:"名刺を集める＝リードジェネレーション（獲得）。その名刺リストにメルマガを送って関係を構築＝リードナーチャリング（育成）。「獲得」と「育成」は別のプロセスです。" },
+
+  { q:"月額10万円のプランの顧客に月額20万円のプランを勧める手法は何ですか？",
+    answer:"アップセル", category:"営業・マーケティング", level:1,
+    options:["アップセル","クロスセル","リテンション","オンボーディング"],
+    explanation:"アップセル＝上位プランへの切替提案（グレードアップ：↑上に）。クロスセル＝別商品の追加提案（→横に別商品を横断）。どちらも顧客単価を上げる方法ですが、方向性が異なります。" },
+
+  { q:"月次チャーンレート2%のSaaSサービスの年間チャーンレートはおよそ何%ですか？",
+    answer:"約21.5%", category:"営業・マーケティング", level:3,
+    options:["約21.5%","24%","2%","約12%"],
+    explanation:"月2%×12ヶ月＝24%ではありません。複利計算で1−0.98^12＝約21.5%です。毎月「残った顧客の2%」が離脱するため、単純な掛け算より少なくなります。この複利の理解がテストで問われます。" },
+
+  { q:"LTVの計算式として正しいものはどれですか？",
+    answer:"月額単価 × 粗利率 × 平均継続月数", category:"営業・マーケティング", level:2,
+    options:["月額単価 × 粗利率 × 平均継続月数","月額単価 × 顧客数","売上高 ÷ 顧客数","月額単価 × 12ヶ月"],
+    explanation:"LTV（顧客生涯価値）＝月額単価×粗利率×平均継続月数。LTVが重要なのはCAC（顧客獲得コスト）との関係。LTV≧CAC×3が健全な目安です。LTV<CACだと獲得するほど損する赤字顧客になります。" },
+
+  { q:"KGIとKPIの関係について正しいものはどれですか？",
+    answer:"KGIは最終目標（結果指標）、KPIはその達成のためのプロセス指標", category:"営業・マーケティング", level:2,
+    options:["KGIは最終目標（結果指標）、KPIはその達成のためのプロセス指標","KGIとKPIは同じもの","KPIが上位でKGIが下位の指標","KGIは個人目標、KPIは組織目標"],
+    explanation:"KGI＝ゴール（例：月間売上1億円）、KPI＝プロセス（例：アポ数1,000件・商談化率40%）。「売上1億円」はKGIであってKPIではない。KPIは「自分の行動で変えられるもの」を設定します。" },
+
+  { q:"MA・SFA・CRMを営業プロセスの順に並べたとき、SFAの主な役割は？",
+    answer:"商談管理・営業活動の可視化", category:"営業・マーケティング", level:2,
+    options:["商談管理・営業活動の可視化","リード育成の自動化","受注後の顧客関係管理","会計処理の自動化"],
+    explanation:"MA（リード育成）→ SFA（商談管理）→ CRM（顧客管理）の順番で営業プロセスに対応します。SFA＝Sales Force Automationで商談の進捗管理や営業活動の可視化を担当します。" },
+
+  { q:"MRR 300万円の企業のARRはいくらですか？",
+    answer:"3,600万円", category:"営業・マーケティング", level:1,
+    options:["3,600万円","300万円","36,000万円","900万円"],
+    explanation:"ARR（年次経常収益）＝ MRR（月次経常収益）× 12 ＝ 300万 × 12 ＝ 3,600万円。SaaSビジネスでは成長の指標としてARRが重要視されます。" },
+
+  // ========== Chapter 5: 契約・法務（4問） ==========
+  { q:"商談の最も初期段階で締結する、秘密情報の漏洩を防ぐ契約は何ですか？",
+    answer:"NDA（秘密保持契約）", category:"契約・法務", level:1,
+    options:["NDA（秘密保持契約）","基本契約","SLA","個別契約"],
+    explanation:"NDA（Non-Disclosure Agreement）は商談の入口で結びます。提案内容や価格情報を保護し、互いに知り得た秘密情報を第三者に漏らさないことを約束する契約です。" },
+
+  { q:"RFIとRFPの違いと、RFIを先に出す理由は何ですか？",
+    answer:"RFIは情報収集、RFPは提案依頼。先に幅広く情報を集めて要件を固めるため", category:"契約・法務", level:2,
+    options:["RFIは情報収集、RFPは提案依頼。先に幅広く情報を集めて要件を固めるため","RFPが先でRFIは不要","両者は同じ文書の別名称","法律で順番が決まっているため"],
+    explanation:"RFI（情報提供依頼書）で幅広く情報収集して要件を固め、その上でRFP（提案依頼書）で具体的な提案を求めます。いきなりRFPを出すと要件が曖昧なまま提案を受けることになり、比較が困難になります。" },
+
+  { q:"SLAで「99.9%の稼働率」が保証されている場合、年間のダウンタイムはおよそ何時間ですか？",
+    answer:"約8.7時間", category:"契約・法務", level:2,
+    options:["約8.7時間","約3.65日","約52.6分","約1時間"],
+    explanation:"99.9%（スリーナイン）の稼働率は年間約8.7時間のダウンタイムを意味します。99%なら約3.65日、99.99%（フォーナイン）なら約52.6分。数字が1桁増えるだけでダウンタイムが約10倍違います。" },
+
+  { q:"取締役が個人情報を不正に利用する指示を出した場合、これは何の問題ですか？",
+    answer:"コンプライアンスの問題（法令違反）", category:"契約・法務", level:3,
+    options:["コンプライアンスの問題（法令違反）","ガバナンスの問題（権限逸脱）","財務の問題（損害賠償リスク）","人事の問題（管理不行き届き）"],
+    explanation:"法律に違反する指示を出す＝コンプライアンス（法令遵守）の問題。一方、執行役員が独断で権限を越えた意思決定をする＝ガバナンス（統治の仕組み）の問題。ガバナンス＝仕組み、コンプライアンス＝行動の区別が重要です。" },
+
+  // ========== Chapter 6: IT基礎知識（7問） ==========
+  { q:"オンプレミスの費用は「CAPEX（設備投資）」に分類されます。クラウドの費用は何に分類されますか？",
+    answer:"OPEX（運用費用）", category:"IT基礎知識", level:1,
+    options:["OPEX（運用費用）","CAPEX（設備投資）","APEX（頂上費用）","FOREX（外国為替）"],
+    explanation:"オンプレミス＝サーバー購入のCAPEX（設備投資）、クラウド＝月額課金のOPEX（運用費用）。初期費用の大小が両者の大きな違いで、クラウドは少額から始められます。" },
+
+  { q:"IaaS・PaaS・SaaSを「自由度が高い順」に並べたものは？",
+    answer:"IaaS > PaaS > SaaS", category:"IT基礎知識", level:1,
+    options:["IaaS > PaaS > SaaS","SaaS > PaaS > IaaS","PaaS > IaaS > SaaS","全て同じ"],
+    explanation:"IaaS（土地を借りる）→PaaS（建物付き土地を借りる）→SaaS（完成した部屋を借りる）。自由度はIaaS>PaaS>SaaS、手軽さは逆でSaaS>PaaS>IaaS。" },
+
+  { q:"「お客様からの受注データがCRMに入力されると、会計ソフトに自動で反映される」この仕組みを実現するのは？",
+    answer:"API連携", category:"IT基礎知識", level:2,
+    options:["API連携","VPN接続","DNS設定","SQL実行"],
+    explanation:"API（Application Programming Interface）＝異なるシステム間でデータをやり取りする接続口。CRMと会計ソフトをAPI連携することで、二重入力がなくなります。レストランのメニューのように、仕様通りに頼めばデータが返ってきます。" },
+
+  { q:"セキュリティのCIA三要素で、「データベースの数字が書き換えられた」場合に損なわれた要素は？",
+    answer:"完全性（Integrity）", category:"IT基礎知識", level:2,
+    options:["完全性（Integrity）","機密性（Confidentiality）","可用性（Availability）","信頼性（Reliability）"],
+    explanation:"完全性＝データが改ざんされない（変えさせない）。機密性＝許可された人だけがアクセスできる（見せない）。可用性＝必要な時にシステムが使える（止めない）。データ改ざんは完全性の問題です。" },
+
+  { q:"HTTPSの「S」は何を意味しますか？HTTPとの違いは？",
+    answer:"Secure。通信がSSL/TLSで暗号化される", category:"IT基礎知識", level:1,
+    options:["Secure。通信がSSL/TLSで暗号化される","Speed。通信速度が高速化する","Server。サーバーに直接接続する","Standard。標準化された通信"],
+    explanation:"HTTPS＝HTTP+Secure。SSL/TLSで通信を暗号化し、第三者に盗み見られにくくする技術。ブラウザの鍵マークが目印です。Speed（速度向上）ではありません。" },
+
+  { q:"「紙の申請書をPDF化した」はDXですか、IT化ですか？",
+    answer:"IT化。業務プロセス自体は変わっていないから", category:"IT基礎知識", level:2,
+    options:["IT化。業務プロセス自体は変わっていないから","DX。デジタル技術を導入したから","どちらでもない","DXでありIT化でもある"],
+    explanation:"IT化＝既存業務をデジタルに置き換える（効率化）。DX＝ビジネスの仕組み自体を変革する。「PDFにしました」はIT化。「申請プロセス自体をなくし、AIが自動判定する仕組みに変えた」がDXです。" },
+
+  { q:"お客様が「SaaSのメリットは自社サーバーでデータを完全管理できることですよね？」と言いました。正しい対応は？",
+    answer:"誤りを指摘し、自社サーバーでの完全管理はオンプレミスの特徴だと説明する", category:"IT基礎知識", level:3,
+    options:["誤りを指摘し、自社サーバーでの完全管理はオンプレミスの特徴だと説明する","その通りですと同意する","SaaSにはメリットがないと伝える","PaaSを勧める"],
+    explanation:"SaaSはベンダーのクラウド上で動くため、データはベンダー側で管理されます。自社サーバーでの完全管理はオンプレミスの特徴。SaaSのメリットは「初期費用が低い・常に最新版・場所を問わない」です。" },
+
+  // ========== Chapter 7: ベンチャー・スタートアップ（4問） ==========
+  { q:"バーンレートが月500万円、手元資金3,000万円のときのランウェイは？",
+    answer:"6ヶ月", category:"ベンチャー・スタートアップ", level:1,
+    options:["6ヶ月","5ヶ月","8ヶ月","12ヶ月"],
+    explanation:"ランウェイ（月）＝手元資金÷バーンレート＝3,000万÷500万＝6ヶ月。ランウェイが6ヶ月を切ったら次の資金調達を急ぐ必要があります。" },
+
+  { q:"エクイティファイナンスのデメリットは何ですか？",
+    answer:"株式が希薄化し、投資家の発言権が増す", category:"ベンチャー・スタートアップ", level:2,
+    options:["株式が希薄化し、投資家の発言権が増す","返済義務が生じる","金利負担が大きい","経営権に影響しない"],
+    explanation:"エクイティ＝「お金はもらえるが、会社の一部を渡す」（返済不要だが株式希薄化）。デット＝「お金を借りるが、会社は自分のまま」（返済義務あり）。返済義務と経営権のトレードオフです。" },
+
+  { q:"PMF達成前に大規模な広告投資を行うべきでない理由は？",
+    answer:"プロダクトが市場に合っていないため、集客しても顧客が定着しない", category:"ベンチャー・スタートアップ", level:2,
+    options:["プロダクトが市場に合っていないため、集客しても顧客が定着しない","法律で禁止されている","投資家が許可しない","広告会社が受け付けない"],
+    explanation:"PMF（Product Market Fit）＝プロダクトが市場ニーズに合致している状態。PMF前に広告を打っても集客しても定着せず、広告費が無駄になりバーンレートだけが増加します。正しい順番：PMF達成確認→スケール投資。" },
+
+  { q:"MRR 300万円・バーンレート月800万円・手元資金4,800万円・月次チャーン5%・PMF未達成のスタートアップ。最も適切な判断は？",
+    answer:"広告投資を控え、PMF達成とチャーン改善を優先し、追加調達かピボットを検討する", category:"ベンチャー・スタートアップ", level:3,
+    options:["広告投資を控え、PMF達成とチャーン改善を優先し、追加調達かピボットを検討する","大規模な広告投資で顧客数を増やす","すぐにIPOの準備を始める","事業を全て停止する"],
+    explanation:"ランウェイ＝4,800万÷800万＝6ヶ月。チャーン5%は年間約46%の顧客を失う計算。PMF未達で広告を打っても定着しない。まずPMF達成とチャーン改善が先。ランウェイ6ヶ月なのでピボットか追加調達が急務です。" },
+];
+
+// ===== STATE =====
+let currentUser = { name: '' };
+let currentQ = 0;
+let answers = []; // { selected: index|null, correct: bool, timeSpent: number }
+let timer = null;
+let timeLeft = TIME_PER_QUESTION;
+let testStartTime = null;
+let tabSwitchCount = 0;
+let shuffledQuestions = [];
+let shuffledOptionsMap = [];
+let isShowingExplanation = false;
+
+// ===== SHUFFLE =====
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ===== TAB SWITCH DETECTION =====
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && testStartTime && !testEndTime) {
+    tabSwitchCount++;
+    document.getElementById('tabWarning').classList.add('show');
+    document.getElementById('tabWarningCount').textContent =
+      `タブ離脱回数: ${tabSwitchCount}回`;
+  }
+});
+
+let testEndTime = null;
+
+function dismissTabWarning() {
+  document.getElementById('tabWarning').classList.remove('show');
+}
+
+// ===== START =====
+function startTest() {
+  const name = document.getElementById('userName').value.trim();
+  if (!name) {
+    document.getElementById('userName').style.borderColor = '#e53e3e';
+    document.getElementById('userName').placeholder = '氏名を入力してください';
+    return;
+  }
+  currentUser.name = name;
+  document.getElementById('headerUser').textContent = name;
+
+  // Shuffle questions
+  shuffledQuestions = shuffleArray(questions);
+  shuffledOptionsMap = shuffledQuestions.map(q => shuffleArray(q.options));
+
+  testStartTime = new Date();
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('questionScreen').classList.add('show');
+  showQuestion();
+}
+
+// ===== SHOW QUESTION =====
+function showQuestion() {
+  if (currentQ >= shuffledQuestions.length) {
+    finishTest();
+    return;
+  }
+
+  isShowingExplanation = false;
+  const q = shuffledQuestions[currentQ];
+  const opts = shuffledOptionsMap[currentQ];
+
+  document.getElementById('headerProgress').textContent =
+    `${currentQ + 1} / ${shuffledQuestions.length}`;
+  document.getElementById('qNumber').textContent = `Q${currentQ + 1}`;
+  document.getElementById('qCategory').textContent = q.category;
+
+  const levelLabels = { 1: '記憶', 2: '理解', 3: '応用' };
+  const levelEl = document.getElementById('qLevel');
+  levelEl.textContent = levelLabels[q.level];
+  levelEl.className = `q-level level-${q.level}`;
+
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('qOptions').innerHTML = opts.map((opt, i) =>
+    `<button class="option-btn" onclick="selectAnswer(${i})">${opt}</button>`
+  ).join('');
+
+  // Hide explanation
+  document.getElementById('explanationBox').classList.remove('show');
+  document.getElementById('explanationBox').className = 'explanation-box';
+  document.getElementById('skipNote').style.display = 'block';
+
+  // Reset & start timer
+  timeLeft = TIME_PER_QUESTION;
+  updateTimerDisplay();
+  clearInterval(timer);
+  timer = setInterval(tick, 1000);
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function tick() {
+  timeLeft--;
+  updateTimerDisplay();
+  if (timeLeft <= 0) {
+    clearInterval(timer);
+    // Time's up - record as unanswered and show explanation
+    answers.push({ selected: null, correct: false, timeSpent: TIME_PER_QUESTION });
+    showExplanation(null);
+  }
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timerValue');
+  const fill = document.getElementById('timerFill');
+  const pct = (timeLeft / TIME_PER_QUESTION) * 100;
+
+  el.textContent = timeLeft;
+  fill.style.width = pct + '%';
+
+  el.className = 'timer-value';
+  fill.className = 'timer-fill';
+  if (timeLeft <= 5) {
+    el.classList.add('danger');
+    fill.classList.add('danger');
+  } else if (timeLeft <= 10) {
+    el.classList.add('warning');
+    fill.classList.add('warning');
+  }
+}
+
+// ===== SELECT ANSWER =====
+function selectAnswer(idx) {
+  if (isShowingExplanation) return;
+  clearInterval(timer);
+
+  const q = shuffledQuestions[currentQ];
+  const selectedValue = shuffledOptionsMap[currentQ][idx];
+  const isCorrect = selectedValue === q.answer;
+  const timeSpent = TIME_PER_QUESTION - timeLeft;
+
+  // Visual feedback on options
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach((b, i) => {
+    b.style.pointerEvents = 'none';
+    if (shuffledOptionsMap[currentQ][i] === q.answer) {
+      b.classList.add('correct-answer');
+    }
+    if (i === idx && !isCorrect) {
+      b.classList.add('wrong-answer');
+    }
+  });
+
+  answers.push({ selected: idx, correct: isCorrect, timeSpent: timeSpent, selectedValue: selectedValue });
+  showExplanation(idx);
+}
+
+// ===== SHOW EXPLANATION =====
+function showExplanation(selectedIdx) {
+  isShowingExplanation = true;
+  const q = shuffledQuestions[currentQ];
+  const a = answers[answers.length - 1];
+  const box = document.getElementById('explanationBox');
+  const resultEl = document.getElementById('explanationResult');
+  const textEl = document.getElementById('explanationText');
+
+  document.getElementById('skipNote').style.display = 'none';
+
+  if (selectedIdx === null) {
+    // Timeout
+    box.className = 'explanation-box show timeout-bg';
+    resultEl.innerHTML = '&#9200; 時間切れ ─ 正解: ' + q.answer;
+    resultEl.style.color = '#b7791f';
+
+    // Also highlight correct answer
+    const btns = document.querySelectorAll('.option-btn');
+    btns.forEach((b, i) => {
+      b.style.pointerEvents = 'none';
+      if (shuffledOptionsMap[currentQ][i] === q.answer) {
+        b.classList.add('correct-answer');
+      }
+    });
+  } else if (a.correct) {
+    box.className = 'explanation-box show correct-bg';
+    resultEl.innerHTML = '&#9675; 正解！';
+    resultEl.style.color = '#38a169';
+  } else {
+    box.className = 'explanation-box show wrong-bg';
+    resultEl.innerHTML = '&#10005; 不正解 ─ 正解: ' + q.answer;
+    resultEl.style.color = '#e53e3e';
+  }
+
+  textEl.textContent = q.explanation;
+
+  // Update next button text
+  const nextBtn = document.getElementById('nextBtn');
+  if (currentQ + 1 >= shuffledQuestions.length) {
+    nextBtn.textContent = '結果を見る';
+  } else {
+    nextBtn.textContent = '次の問題へ';
+  }
+
+  // Stop timer display
+  const timerEl = document.getElementById('timerValue');
+  timerEl.textContent = '-';
+  timerEl.className = 'timer-value';
+  document.getElementById('timerFill').style.width = '0%';
+}
+
+// ===== GO NEXT =====
+function goNext() {
+  currentQ++;
+  showQuestion();
+}
+
+// ===== FINISH =====
+function finishTest() {
+  testEndTime = new Date();
+  clearInterval(timer);
+
+  document.getElementById('questionScreen').classList.remove('show');
+  document.getElementById('timerBar').style.display = 'none';
+  document.getElementById('resultScreen').classList.add('show');
+
+  const total = shuffledQuestions.length;
+  const correct = answers.filter(a => a.correct).length;
+  const pct = Math.round((correct / total) * 100);
+  const totalTime = Math.round((testEndTime - testStartTime) / 1000);
+  const avgTime = (answers.reduce((s, a) => s + a.timeSpent, 0) / total).toFixed(1);
+  const unanswered = answers.filter(a => a.selected === null).length;
+
+  // Score circle
+  const scoreCircle = document.getElementById('scoreCircle');
+  document.getElementById('scorePct').textContent = pct + '%';
+  scoreCircle.className = 'score-circle ' + (pct >= 75 ? 'score-high' : pct >= 45 ? 'score-mid' : 'score-low');
+
+  // Message
+  const msg = document.getElementById('resultMsg');
+  if (pct >= 75) msg.textContent = '素晴らしい学習成果です！短期間で高い理解度を達成しています。';
+  else if (pct >= 45) msg.textContent = '基礎的な内容は理解できています。応用力をさらに高めましょう。';
+  else msg.textContent = '教材の内容をもう一度復習し、理解を深める必要があります。';
+
+  document.getElementById('resultDetail').textContent =
+    `全${total}問中 ${correct}問正解（正答率${pct}%）｜ 所要時間: ${Math.floor(totalTime/60)}分${totalTime%60}秒`;
+
+  // Level breakdown
+  const levelStats = { 1: { correct: 0, total: 0 }, 2: { correct: 0, total: 0 }, 3: { correct: 0, total: 0 } };
+  shuffledQuestions.forEach((q, i) => {
+    levelStats[q.level].total++;
+    if (answers[i].correct) levelStats[q.level].correct++;
+  });
+
+  const levelNames = { 1: 'Level 1: 記憶（用語・定義の暗記）', 2: 'Level 2: 理解（概念の説明・比較）', 3: 'Level 3: 応用（ケース判断・計算）' };
+  const levelColors = { 1: '#38a169', 2: '#d69e2e', 3: '#e53e3e' };
+  let levelHtml = '';
+  [1, 2, 3].forEach(lv => {
+    const s = levelStats[lv];
+    const lvPct = s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0;
+    levelHtml += `
+      <div class="breakdown-row">
+        <span class="breakdown-name">${levelNames[lv]}</span>
+        <div class="breakdown-bar"><div class="breakdown-bar-fill" style="width:${lvPct}%;background:${levelColors[lv]}"></div></div>
+        <span class="breakdown-score">${s.correct}/${s.total}（${lvPct}%）</span>
+      </div>`;
+  });
+  document.getElementById('levelBreakdown').innerHTML = levelHtml;
+
+  // Category breakdown
+  const catStats = {};
+  shuffledQuestions.forEach((q, i) => {
+    if (!catStats[q.category]) catStats[q.category] = { correct: 0, total: 0 };
+    catStats[q.category].total++;
+    if (answers[i].correct) catStats[q.category].correct++;
+  });
+  let catHtml = '';
+  for (const cat of Object.keys(catStats)) {
+    const s = catStats[cat];
+    const catPct = Math.round((s.correct / s.total) * 100);
+    catHtml += `
+      <div class="breakdown-row">
+        <span class="breakdown-name">${cat}</span>
+        <div class="breakdown-bar"><div class="breakdown-bar-fill" style="width:${catPct}%;background:var(--primary-light)"></div></div>
+        <span class="breakdown-score">${s.correct}/${s.total}（${catPct}%）</span>
+      </div>`;
+  }
+  document.getElementById('categoryBreakdown').innerHTML = catHtml;
+
+  // Stats grid
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-item"><div class="stat-value">${avgTime}秒</div><div class="stat-label">平均回答時間</div></div>
+    <div class="stat-item"><div class="stat-value">${unanswered}</div><div class="stat-label">時間切れ（未回答）</div></div>
+    <div class="stat-item"><div class="stat-value">${tabSwitchCount}回</div><div class="stat-label">タブ離脱回数</div></div>
+    <div class="stat-item"><div class="stat-value">${Math.floor(totalTime/60)}:${String(totalTime%60).padStart(2,'0')}</div><div class="stat-label">総所要時間</div></div>
+  `;
+
+  // Review
+  let reviewHtml = '';
+  shuffledQuestions.forEach((q, i) => {
+    const a = answers[i];
+    const icon = a.correct ? '<span style="color:#38a169">&#9675;</span>' : '<span style="color:#e53e3e">&#10005;</span>';
+    const status = a.selected === null ? '（時間切れ）' : '';
+    reviewHtml += `
+      <div style="padding:0.6rem 0;border-bottom:1px solid var(--border);font-size:0.85rem;">
+        <div>${icon} <strong>Q${i+1}</strong> ${q.q} ${status}</div>
+        <div style="color:var(--text-light);font-size:0.8rem;margin-top:0.2rem;">
+          正解: ${q.answer}${!a.correct && a.selectedValue ? ' ｜ あなたの回答: ' + a.selectedValue : ''}
+          ｜ 回答時間: ${a.timeSpent}秒 ｜ ${q.category}
+        </div>
+        <div style="font-size:0.8rem;margin-top:0.3rem;padding:0.4rem 0.6rem;background:#f7fafc;border-radius:4px;color:var(--text);">
+          ${q.explanation}
+        </div>
+      </div>`;
+  });
+  document.getElementById('reviewContainer').innerHTML = reviewHtml;
+
+  // Send results
+  const categoryScores = {};
+  for (const cat of Object.keys(catStats)) {
+    categoryScores[cat] = `${catStats[cat].correct}/${catStats[cat].total}`;
+  }
+  const levelScores = {};
+  [1, 2, 3].forEach(lv => {
+    levelScores[`Level${lv}`] = `${levelStats[lv].correct}/${levelStats[lv].total}`;
+  });
+
+  sendResult({
+    testName: '学習速度テスト',
+    name: currentUser.name,
+    correct: correct,
+    total: total,
+    percentage: pct,
+    categories: categoryScores,
+    levels: levelScores,
+    avgTime: avgTime,
+    unanswered: unanswered,
+    tabSwitchCount: tabSwitchCount,
+    totalTimeSec: totalTime,
+    startTime: testStartTime.toISOString(),
+    endTime: testEndTime.toISOString()
+  });
+}
+
+// ===== SEND RESULT =====
+function sendResult(data) {
+  const savedEl = document.getElementById('resultSaved');
+
+  if (GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
+    savedEl.textContent = 'GAS未設定のため結果は記録されていません（管理者にURLを設定してもらってください）';
+    savedEl.className = 'result-saved error';
+    return;
+  }
+
+  savedEl.textContent = '結果をスプレッドシートに記録中...';
+  savedEl.className = 'result-saved saving';
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+    mode: 'no-cors'
+  })
+  .then(() => {
+    savedEl.textContent = '結果をスプレッドシートに記録しました';
+    savedEl.className = 'result-saved success';
+  })
+  .catch(err => {
+    savedEl.textContent = '記録に失敗しました。管理者に連絡してください。';
+    savedEl.className = 'result-saved error';
+  });
+}
+</script>
+
+</body>
+</html>
