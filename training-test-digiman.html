@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DigiMan・ビジネスモデル理解テスト</title>
+  <style>
+    :root {
+      --primary: #065f46;
+      --primary-light: #047857;
+      --accent: #f59e0b;
+      --correct: #38a169;
+      --wrong: #e53e3e;
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --text: #2d3748;
+      --text-light: #718096;
+      --border: #e2e8f0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    .header h1 { font-size: 1.6rem; margin-bottom: 0.3rem; }
+    .header p { font-size: 0.9rem; opacity: 0.85; }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    /* ===== Login Screen ===== */
+    .login-screen {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .login-screen h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .login-screen p { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1.5rem; }
+    .login-screen .login-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .user-info {
+      display: none;
+      background: #ecfdf5;
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+    .user-info .email { font-weight: 700; color: var(--primary); }
+    .name-input {
+      width: 100%;
+      max-width: 300px;
+      padding: 0.7rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      text-align: center;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .name-input:focus { border-color: var(--primary-light); }
+    .name-input::placeholder { color: #cbd5e0; }
+
+    /* ===== Quiz ===== */
+    .quiz-area { display: none; }
+    .quiz-area.show { display: block; }
+
+    .quiz-intro {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--accent);
+    }
+    .quiz-intro h2 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .quiz-intro p { font-size: 0.9rem; color: var(--text-light); }
+    .quiz-intro .notice {
+      margin-top: 0.8rem;
+      padding: 0.6rem 0.8rem;
+      background: #fff5f5;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--wrong);
+      font-weight: 600;
+    }
+    .quiz-intro .user-badge {
+      margin-top: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      background: #ecfdf5;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--primary);
+    }
+
+    .progress-bar {
+      background: var(--border);
+      border-radius: 20px;
+      height: 8px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, var(--primary-light), var(--accent));
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.4s ease;
+    }
+    .progress-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .question-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .question-card.answered-correct { border-left: 4px solid var(--correct); }
+    .question-card.answered-wrong { border-left: 4px solid var(--wrong); }
+    .result-badge {
+      display: inline-block;
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-left: 0.5rem;
+    }
+    .result-badge.correct { background: #f0fff4; color: var(--correct); }
+    .result-badge.wrong { background: #fff5f5; color: var(--wrong); }
+
+    .q-number {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      text-align: center; line-height: 28px;
+      font-size: 0.8rem; font-weight: 700;
+      margin-right: 0.5rem;
+    }
+    .q-category {
+      display: inline-block;
+      background: #ecfdf5;
+      color: var(--primary-light);
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .q-text {
+      font-size: 1.05rem; font-weight: 600;
+      margin: 0.8rem 0;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .option-btn {
+      display: block; width: 100%; text-align: left;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text);
+    }
+    .option-btn:hover:not(:disabled) { border-color: var(--primary-light); background: #ecfdf5; }
+    .option-btn:disabled { cursor: default; }
+    .option-btn.selected { border-color: var(--primary-light); background: #ecfdf5; }
+    .option-btn.correct { border-color: var(--correct); background: #f0fff4; color: var(--correct); font-weight: 600; }
+    .option-btn.wrong { border-color: var(--wrong); background: #fff5f5; color: var(--wrong); }
+
+    .explanation {
+      display: none;
+      margin-top: 0.8rem; padding: 0.8rem;
+      background: #fffff0;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      border-left: 3px solid var(--accent);
+    }
+    .explanation.show { display: block; }
+
+    .btn-primary {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff; border: none;
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(6,95,70,0.3); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary {
+      display: inline-block;
+      background: #fff; color: var(--primary);
+      border: 2px solid var(--primary);
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: var(--primary); color: #fff; }
+
+    .btn-group {
+      display: flex; gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem; flex-wrap: wrap;
+    }
+
+    .result-card {
+      display: none;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem; text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+    }
+    .result-card.show { display: block; }
+    .score-circle {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 2rem; font-weight: 800; color: #fff;
+    }
+    .score-high { background: linear-gradient(135deg, #38a169, #48bb78); }
+    .score-mid { background: linear-gradient(135deg, #d69e2e, #ed8936); }
+    .score-low { background: linear-gradient(135deg, #e53e3e, #fc8181); }
+    .result-msg { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .result-detail { font-size: 0.9rem; color: var(--text-light); }
+    .result-saved {
+      margin-top: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .result-saved.success { background: #f0fff4; color: var(--correct); }
+    .result-saved.error { background: #fff5f5; color: var(--wrong); }
+    .result-saved.saving { background: #ecfdf5; color: var(--primary-light); }
+
+    .category-breakdown {
+      margin-top: 1rem;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    .category-breakdown h3 {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      color: var(--text-light);
+    }
+    .cat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .cat-row:last-child { border-bottom: none; }
+    .cat-name { font-size: 0.82rem; }
+    .cat-score { font-weight: 700; font-size: 0.85rem; }
+
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.25rem; }
+      .container { padding: 1rem 0.8rem 3rem; }
+      .btn-group { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>DigiMan・ビジネスモデル理解テスト</h1>
+  <p>営業研修 Day1 ― DigiManの事業・スタンス・経営SIMの理解度チェック</p>
+</div>
+
+<div class="container">
+  <!-- ===== LOGIN ===== -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-icon">&#128221;</div>
+    <h2>テストを開始する</h2>
+    <p>Googleアカウントで認証後、氏名を入力してテストを開始してください。<br>回答結果は自動的にスプレッドシートに記録されます。</p>
+    <div class="user-info" id="userInfo">
+      ログイン中: <span class="email" id="userEmail"></span>
+    </div>
+    <div>
+      <input type="text" class="name-input" id="userName" placeholder="氏名を入力（例：山田 太郎）">
+    </div>
+    <div class="btn-group" style="margin-top:0.5rem">
+      <button class="btn-primary" id="startBtn" onclick="startQuiz()">Google認証してテスト開始</button>
+    </div>
+    <div id="manualStart" style="display:none; margin-top:1.5rem; text-align:center;">
+      <div style="background:#f0fff4; border:2px solid #38a169; border-radius:10px; padding:1.2rem; margin-bottom:0.8rem;">
+        <p style="font-size:1rem; font-weight:700; color:#38a169; margin-bottom:0.3rem;">認証が完了したらこちらをクリック</p>
+        <p style="font-size:0.82rem; color:#718096; margin-bottom:0.8rem;">認証画面のタブは手動で閉じてください</p>
+        <button class="btn-primary" onclick="forceStart()" style="width:100%; max-width:300px; font-size:1.05rem; padding:1rem;">テストを開始する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div id="quizArea" class="quiz-area">
+    <div class="quiz-intro">
+      <h2>DigiMan・ビジネスモデル理解テスト（全20問）</h2>
+      <p>4択から正しいものを選んでください。全問回答後に「答え合わせ」ボタンで結果を確認できます。</p>
+      <div class="notice">※ テスト中は研修資料を見ないで回答してください。</div>
+      <div class="user-badge" id="quizUserBadge"></div>
+    </div>
+
+    <div class="progress-text" id="progressText">0 / 20 回答済み</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+    <div id="quizContainer"></div>
+
+    <div class="btn-group" id="quizActions">
+      <button class="btn-primary" id="submitBtn" disabled onclick="gradeQuiz()">答え合わせをする</button>
+    </div>
+
+    <div class="result-card" id="resultCard">
+      <div class="score-circle" id="scoreCircle"></div>
+      <div class="result-msg" id="resultMsg"></div>
+      <div class="result-detail" id="resultDetail"></div>
+      <div class="category-breakdown" id="categoryBreakdown"></div>
+      <div class="result-saved saving" id="resultSaved">結果を記録中...</div>
+    </div>
+
+    <div class="btn-group" id="retryGroup" style="display:none">
+      <button class="btn-primary" onclick="scrollToReview()">答え合わせを確認する</button>
+      <button class="btn-secondary" onclick="resetQuiz()">もう一度挑戦する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================
+// ★★★ GASデプロイ後、以下のURLを書き換えてください ★★★
+// =====================================================
+const GAS_URL = 'YOUR_GAS_WEB_APP_URL_HERE';
+// =====================================================
+
+const quizData = [
+  // ===== 事業理解・基本ルール（4問） =====
+  { q:"DigiManの主要事業として正しい組み合わせはどれですか？",
+    answer:"営業代行・営業コンサル・Salesforce代行", category:"事業理解・基本ルール",
+    options:["営業代行・営業コンサル・Salesforce代行","営業代行・Web制作・人材派遣","営業コンサル・経理代行・システム開発","広告運用・営業代行・物流コンサル"],
+    explanation:"DigiManは営業代行、営業コンサル、Salesforce代行の3事業を展開しています。" },
+  { q:"DigiManが委託を受けている企業の架電を行う場合、電話口で名乗る会社名はどれですか？",
+    answer:"依頼主の会社名", category:"事業理解・基本ルール",
+    options:["DigiMan","依頼主の会社名","自分の本名のみ（社名なし）","依頼主とDigiManの両方"],
+    explanation:"委託架電の場合はDigiManではなく依頼主の会社名を名乗ります。例：「PRTableの海老根です」。会社名の言い間違いは致命的なミスです。" },
+  { q:"DigiManの自社商材を売る架電の場合、名乗る会社名はどれですか？",
+    answer:"DigiMan", category:"事業理解・基本ルール",
+    options:["依頼主の会社名","特に名乗らない","DigiMan","案件ごとに異なる"],
+    explanation:"自社商材の場合は「DigiManの○○です」と名乗ります。委託架電と自社架電で名乗る会社名が変わるため、常に注意が必要です。" },
+  { q:"DigiManで複数商材を扱う際の最大のリスクとして挙げられているものはどれですか？",
+    answer:"会社名やメール署名の取り違え", category:"事業理解・基本ルール",
+    options:["架電数が分散して減ること","会社名やメール署名の取り違え","商材知識が浅くなること","顧客情報が混ざること"],
+    explanation:"委託架電と自社架電で名乗る会社名が変わるため、会社名の発声ミスやメール署名の打ち間違いが致命的なミスになりえます。ヒヤリハット集を必ず確認しましょう。" },
+
+  // ===== 人材像・スタンス（4問） =====
+  { q:"DigiManが定義する「優秀なビジネスマン」の4つの要素として正しい組み合わせはどれですか？",
+    answer:"目的志向・再現性・影響力・倫理と信頼", category:"人材像・スタンス",
+    options:["目的志向・再現性・影響力・倫理と信頼","行動力・コミュニケーション力・専門性・リーダーシップ","営業力・企画力・分析力・マネジメント力","スピード・正確性・創造性・協調性"],
+    explanation:"目的志向（PDCAを回す）、再現性（誰でも出せる型に落とす）、影響力（個人の勝ちをチームの勝ちに展開）、倫理と信頼（顧客価値を中心に置く）の4つです。" },
+  { q:"「再現性」の説明として最も適切なものはどれですか？",
+    answer:"成果を言語化し、誰がやっても出せる型に落とすこと", category:"人材像・スタンス",
+    options:["同じ作業を何度も繰り返すこと","成果を言語化し、誰がやっても出せる型に落とすこと","過去の成功体験をそのまま繰り返すこと","マニュアルを作成して配布すること"],
+    explanation:"再現性とは個人の成功体験を言語化し、「誰がやっても出せる型」に落とすことです。個人の力を組織の力に変える重要な要素です。" },
+  { q:"DigiManが目指す「T型人材」の「縦軸」と「横軸」の説明として正しいものはどれですか？",
+    answer:"縦軸＝専門性の深さ、横軸＝知識の幅", category:"人材像・スタンス",
+    options:["縦軸＝専門性の深さ、横軸＝知識の幅","縦軸＝年収の高さ、横軸＝経験年数","縦軸＝マネジメント能力、横軸＝技術スキル","縦軸＝社内評価、横軸＝社外ネットワーク"],
+    explanation:"T型人材は縦軸（Depth＝ISで培う営業基礎×データ思考の深さ）と横軸（Breadth＝マーケ/FS/営業企画/コンサル等の幅）を兼ね備えた人材です。" },
+  { q:"T型人材に必要な4つのスキルに含まれないものはどれですか？",
+    answer:"英語力", category:"人材像・スタンス",
+    options:["思考スキル（ロジカル/クリティカル/アナロジー）","情報分析力","英語力","チャレンジ精神"],
+    explanation:"T型人材に必要な4スキルは「思考スキル」「情報分析力」「自律的な行動力」「チャレンジ精神」です。" },
+
+  // ===== IS業務・PDCA（4問） =====
+  { q:"PDCAサイクルの「A（Action）」に該当するISの活動はどれですか？",
+    answer:"トーク・リスト選定をアップデートし、チームにナレッジを共有する", category:"IS業務・PDCA",
+    options:["KPIを分解し仮説を立てる","スクリプトや施策を実践する","数値データで打ち手の効果を確認する","トーク・リスト選定をアップデートし、チームにナレッジを共有する"],
+    explanation:"Action（改善）ではトークやリスト選定をアップデートし、チームにナレッジを共有します。P＝仮説立て、D＝実行、C＝検証、A＝改善・共有です。" },
+  { q:"DigiManの営業ナレッジの源泉として挙げられている3社の正しい組み合わせはどれですか？",
+    answer:"キーエンス・Salesforce・dataX", category:"IS業務・PDCA",
+    options:["トヨタ・ソニー・楽天","キーエンス・Salesforce・dataX","リクルート・サイバーエージェント・メルカリ","Google・Amazon・Microsoft"],
+    explanation:"DigiManはキーエンス（時価総額2位）、Salesforce（外資SaaS1位）、dataX（国内SaaSベンチャー10位以内）の営業ナレッジや仕組みを融合してマニュアルを作成しています。" },
+  { q:"新入社員の売上期待値として正しいものはどれですか？",
+    answer:"初月0万→2ヶ月目30万→3ヶ月目120万", category:"IS業務・PDCA",
+    options:["初月30万→2ヶ月目60万→3ヶ月目120万","初月0万→2ヶ月目30万→3ヶ月目120万","初月10万→2ヶ月目50万→3ヶ月目100万","初月0万→2ヶ月目0万→3ヶ月目50万"],
+    explanation:"初月は0万、2ヶ月目は30万、3ヶ月目で120万が売上の期待値です。" },
+  { q:"ISの全社における位置づけとして最も適切な説明はどれですか？",
+    answer:"マーケティング（MK）とフィールドセールス（FS）のハブ", category:"IS業務・PDCA",
+    options:["マーケティング（MK）とフィールドセールス（FS）のハブ","経営企画と営業の橋渡し","カスタマーサクセスの前段階","マーケティング部門の一部"],
+    explanation:"ISはMK（マーケティング）とFS（フィールドセールス）のハブとして機能し、見込み顧客を適切に選別してFSにバトンを渡す役割です。" },
+
+  // ===== 営業マインド（1問） =====
+  { q:"「ダメな営業マンの特徴」として研修で挙げられていないものはどれですか？",
+    answer:"顧客に寄り添いすぎる", category:"営業マインド",
+    options:["言われたことだけしかしない","素直じゃない・言い訳から入る","顧客に寄り添いすぎる","ストレス耐性がない"],
+    explanation:"ダメな営業マンの特徴として「言われたことだけしかしない」「頭が悪い」「平場での会話がつまらない」「ストレス耐性がない」「素直じゃない」「言い訳から入る」が挙げられています。" },
+
+  // ===== 経営SIMゲーム（4問） =====
+  { q:"経営SIMゲームで「AI＋育成戦略」がゴリ押し戦略に対して生んだ累計利益の倍率は？",
+    answer:"約2.7倍", category:"経営SIMゲーム",
+    options:["約1.5倍","約2.7倍","約5倍","約10倍"],
+    explanation:"人数ゴリ押し（累計利益2,111万）に対し、AI＋育成（累計利益5,705万）は約2.7倍。「人が強くなる→企業が強くなる」がこのゲームの核心メッセージです。" },
+  { q:"経営SIMゲームで最も利益を出した戦略はどれですか？",
+    answer:"バランス型", category:"経営SIMゲーム",
+    options:["人数ゴリ押し型","AI＋育成型","バランス型","新規事業特化型"],
+    explanation:"バランス型が累計利益6,283万で最高。AI＋育成型（5,705万）、ゴリ押し型（2,111万）の順でした。" },
+  { q:"経営SIMゲームで、AI投資を行わなかった場合の最大の弊害はどれですか？",
+    answer:"ランプ期間が長く即戦力化できない、成約率も低いまま", category:"経営SIMゲーム",
+    options:["人件費が高騰する","ランプ期間が長く即戦力化できない、成約率も低いまま","オフィスの家賃が上がる","新規事業が始められない"],
+    explanation:"AI投資なしではランプ期間が長く、新規案件の成約率も低いままです。3期目では解約率が直撃し、案件が減る一方になります。" },
+  { q:"経営SIMゲームから学ぶべき最も重要なメッセージはどれですか？",
+    answer:"人が強くなる→企業が強くなる、計画と実行のギャップを振り返る力が大事", category:"経営SIMゲーム",
+    options:["コストを最小限に抑えることが最優先","人が強くなる→企業が強くなる、計画と実行のギャップを振り返る力が大事","とにかく採用して人数を増やすことが成長の鍵","リスクを取らず安定経営を目指すべき"],
+    explanation:"「人が強くなる→企業が強くなる」「育成にはコスト・時間がかかるが好循環を生む」「AI投資＞人数の力押し」「計画と実行のギャップを振り返る力」がこのゲームの核心メッセージです。" },
+
+  // ===== キャリアパス・T型人材（3問） =====
+  { q:"ISからのキャリアステップとして研修で示されたルートに含まれないものはどれですか？",
+    answer:"IS→人事部→採用担当", category:"キャリアパス・T型人材",
+    options:["IS→FS→営業企画→コンサル","IS→マーケへシフトしてリード戦略をリード","IS→人事部→採用担当","IS→CS→解約率改善"],
+    explanation:"ISからのキャリアステップとして、FS、マーケティング、CS、営業企画、営業コンサル、ITコンサルなどが示されています。" },
+  { q:"「年収が高い＝市場価値が高い」の説明として最も適切なものはどれですか？",
+    answer:"人の倍成果を出す人には人の倍給与を支払うのが社会の定義", category:"キャリアパス・T型人材",
+    options:["長く働けば自然に年収は上がる","人の倍成果を出す人には人の倍給与を支払うのが社会の定義","資格を取れば年収が上がる","大企業に入れば年収が高い"],
+    explanation:"基本的には「人の倍成果を出す人には、人の倍給与を支払う」というのが社会の定義です。" },
+  { q:"T型人材を目指す3ステップの正しい順序はどれですか？",
+    answer:"専門分野の基盤を固める→隣接領域への理解を広げる→多様な立場と協働する経験を積む", category:"キャリアパス・T型人材",
+    options:["専門分野の基盤を固める→隣接領域への理解を広げる→多様な立場と協働する経験を積む","幅広く浅く学ぶ→一つに絞る→マネジメントに移行する","まずマネジメントを学ぶ→専門性を深める→他部署と連携する","資格取得→実務経験→独立"],
+    explanation:"Step1で「その人に聞けば間違いない」専門性を確立、Step2でFS同席やマーケ連携で知見獲得、Step3で部門横断・社外連携で人をつなぐ力を強化します。" },
+];
+
+let userAnswers = {};
+let graded = false;
+let currentUser = { email: '', name: '' };
+let shuffledOptions = []; // シャッフル後の選択肢を保持
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ===== LOGIN & AUTH =====
+function startQuiz() {
+  const name = document.getElementById('userName').value.trim();
+  if (!name) {
+    document.getElementById('userName').style.borderColor = '#e53e3e';
+    document.getElementById('userName').placeholder = '氏名を入力してください';
+    return;
+  }
+  currentUser.name = name;
+
+  const btn = document.getElementById('startBtn');
+  btn.disabled = true;
+  btn.textContent = '認証中... ポップアップを確認してください';
+
+  // ポップアップでGAS認証ページを開く
+  const authWindow = window.open(GAS_URL, 'gas_auth', 'width=500,height=400');
+
+  // ポップアップブロック対策
+  if (!authWindow || authWindow.closed) {
+    btn.disabled = false;
+    btn.textContent = 'Google認証してテスト開始';
+    alert('ポップアップがブロックされました。ブラウザのポップアップを許可してから再度お試しください。');
+    return;
+  }
+
+  // ポップアップが閉じられたことを検知してクイズ開始
+  const pollTimer = setInterval(() => {
+    if (authWindow.closed) {
+      clearInterval(pollTimer);
+      currentUser.email = '(Google認証済み)';
+      showQuiz();
+    }
+  }, 500);
+
+  // 認証ポップアップを開いたら開始ボタンをすぐ表示
+  document.getElementById('manualStart').style.display = 'block';
+}
+
+function forceStart() {
+  currentUser.email = '(Google認証済み)';
+  showQuiz();
+}
+
+function showQuiz() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('quizArea').classList.add('show');
+  document.getElementById('quizUserBadge').textContent =
+    `受験者: ${currentUser.name}（${currentUser.email}）`;
+  renderQuiz();
+}
+
+// ===== QUIZ =====
+function renderQuiz() {
+  // 各問題の選択肢をシャッフル
+  shuffledOptions = quizData.map(q => shuffleArray(q.options));
+
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = quizData.map((q, i) => `
+    <div class="question-card" id="qcard-${i}">
+      <span class="q-number">${i+1}</span>
+      <span class="q-category">${q.category}</span>
+      <div class="q-text">${q.q}</div>
+      <div class="options">
+        ${shuffledOptions[i].map((opt, j) => `
+          <button class="option-btn" id="opt-${i}-${j}" onclick="selectOption(${i}, ${j}, '${opt.replace(/'/g,"\\'")}')">${opt}</button>
+        `).join('')}
+      </div>
+      <div class="explanation" id="exp-${i}">${q.explanation}</div>
+    </div>
+  `).join('');
+}
+
+function selectOption(qi, oi, value) {
+  if (graded) return;
+  userAnswers[qi] = { index: oi, value: value };
+  for (let j = 0; j < 4; j++) {
+    document.getElementById(`opt-${qi}-${j}`).classList.toggle('selected', j === oi);
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  const count = Object.keys(userAnswers).length;
+  document.getElementById('progressText').textContent = `${count} / ${quizData.length} 回答済み`;
+  document.getElementById('progressFill').style.width = `${(count/quizData.length)*100}%`;
+  document.getElementById('submitBtn').disabled = count < quizData.length;
+}
+
+function gradeQuiz() {
+  if (Object.keys(userAnswers).length < quizData.length) return;
+  graded = true;
+  let correct = 0;
+
+  // カテゴリ別集計
+  const catStats = {};
+  quizData.forEach((q, i) => {
+    const card = document.getElementById(`qcard-${i}`);
+    const isCorrect = userAnswers[i].value === q.answer;
+    if (isCorrect) correct++;
+    card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+
+    // 正誤バッジを問題番号の横に追加
+    const badge = isCorrect
+      ? '<span class="result-badge correct">&#9675; 正解</span>'
+      : '<span class="result-badge wrong">&#10005; 不正解</span>';
+    card.querySelector('.q-text').insertAdjacentHTML('afterend', '');
+    card.querySelector('.q-number').insertAdjacentHTML('afterend', badge);
+
+    shuffledOptions[i].forEach((opt, j) => {
+      const btn = document.getElementById(`opt-${i}-${j}`);
+      btn.disabled = true;
+      if (opt === q.answer) btn.classList.add('correct');
+      if (j === userAnswers[i].index && !isCorrect) btn.classList.add('wrong');
+    });
+    document.getElementById(`exp-${i}`).classList.add('show');
+
+    // カテゴリ集計
+    if (!catStats[q.category]) catStats[q.category] = { correct: 0, total: 0 };
+    catStats[q.category].total++;
+    if (isCorrect) catStats[q.category].correct++;
+  });
+
+  const pct = Math.round((correct/quizData.length)*100);
+  const scoreCircle = document.getElementById('scoreCircle');
+  scoreCircle.textContent = `${pct}%`;
+  scoreCircle.className = 'score-circle ' + (pct >= 80 ? 'score-high' : pct >= 50 ? 'score-mid' : 'score-low');
+
+  const resultMsg = document.getElementById('resultMsg');
+  if (pct >= 80) resultMsg.textContent = '素晴らしい！DigiManのビジネスモデルをしっかり理解しています';
+  else if (pct >= 50) resultMsg.textContent = 'もう少し！研修資料を復習して再挑戦しましょう';
+  else resultMsg.textContent = '研修資料をじっくり読み直して、理解を深めましょう';
+
+  document.getElementById('resultDetail').textContent = `${quizData.length}問中 ${correct}問正解（正答率 ${pct}%）`;
+
+  // カテゴリ別結果表示
+  const catOrder = ['事業理解・基本ルール','人材像・スタンス','IS業務・PDCA','営業マインド','経営SIMゲーム','キャリアパス・T型人材'];
+  let catHtml = '<h3>カテゴリ別正答率</h3>';
+  catOrder.forEach(cat => {
+    if (catStats[cat]) {
+      const s = catStats[cat];
+      const catPct = Math.round((s.correct/s.total)*100);
+      catHtml += `<div class="cat-row"><span class="cat-name">${cat}</span><span class="cat-score">${s.correct}/${s.total}（${catPct}%）</span></div>`;
+    }
+  });
+  document.getElementById('categoryBreakdown').innerHTML = catHtml;
+
+  document.getElementById('resultCard').classList.add('show');
+  document.getElementById('quizActions').style.display = 'none';
+  document.getElementById('retryGroup').style.display = 'flex';
+
+  // スプレッドシートに送信
+  const categories = {};
+  catOrder.forEach(cat => {
+    if (catStats[cat]) {
+      categories[cat] = `${catStats[cat].correct}/${catStats[cat].total}`;
+    }
+  });
+
+  sendResult({
+    testName: 'DigiMan・ビジネスモデル理解',
+    email: currentUser.email,
+    name: currentUser.name,
+    correct: correct,
+    total: quizData.length,
+    percentage: pct,
+    categories: categories
+  });
+
+  document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function sendResult(data) {
+  const savedEl = document.getElementById('resultSaved');
+
+  if (GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
+    savedEl.textContent = '※ GAS未設定のため結果は記録されていません';
+    savedEl.className = 'result-saved error';
+    return;
+  }
+
+  savedEl.textContent = '結果をスプレッドシートに記録中...';
+  savedEl.className = 'result-saved saving';
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+    mode: 'no-cors'
+  })
+  .then(() => {
+    savedEl.textContent = '結果をスプレッドシートに記録しました';
+    savedEl.className = 'result-saved success';
+  })
+  .catch(err => {
+    savedEl.textContent = '記録に失敗しました。管理者に連絡してください。';
+    savedEl.className = 'result-saved error';
+  });
+}
+
+function scrollToReview() {
+  document.getElementById('qcard-0').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetQuiz() {
+  userAnswers = {};
+  graded = false;
+  document.getElementById('resultCard').classList.remove('show');
+  document.getElementById('quizActions').style.display = 'flex';
+  document.getElementById('retryGroup').style.display = 'none';
+  renderQuiz();
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
