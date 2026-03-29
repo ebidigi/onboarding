@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ロジカルシンキング研修クイズ</title>
+  <style>
+    :root {
+      --primary: #1a365d;
+      --primary-light: #2b6cb0;
+      --accent: #ed8936;
+      --correct: #38a169;
+      --wrong: #e53e3e;
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --text: #2d3748;
+      --text-light: #718096;
+      --border: #e2e8f0;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header h1 { font-size: 1.4rem; margin-bottom: 0.2rem; }
+    .header-sub { font-size: 0.85rem; opacity: 0.9; }
+    .header-info {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+    .screen { display: none; }
+    .screen.show { display: block; }
+
+    /* Timer */
+    .timer-bar {
+      position: sticky;
+      top: 70px;
+      z-index: 99;
+      background: var(--card);
+      padding: 0.8rem 1rem;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+    }
+    .timer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+    .timer-label { font-size: 0.85rem; font-weight: 600; }
+    .timer-value { font-size: 1.1rem; font-weight: 800; }
+    .timer-value.warning { color: var(--accent); }
+    .timer-value.danger { color: var(--wrong); animation: pulse 0.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .timer-track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .timer-fill {
+      height: 100%; border-radius: 3px; transition: width 1s linear;
+      background: linear-gradient(90deg, var(--primary-light), var(--accent));
+    }
+    .timer-fill.warning { background: linear-gradient(90deg, var(--accent), #dd6b20); }
+    .timer-fill.danger { background: var(--wrong); }
+
+    /* Login */
+    .login-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .login-card h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .login-card p { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1rem; }
+    .login-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .name-input {
+      width: 100%; max-width: 300px;
+      padding: 0.7rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .name-input:focus { border-color: var(--primary-light); }
+
+    /* Section Select */
+    .section-cards { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
+    .section-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .section-card:hover { border-color: var(--primary-light); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .section-card-icon { font-size: 2rem; }
+    .section-card-body { text-align: left; flex: 1; }
+    .section-card-title { font-size: 1.05rem; font-weight: 700; }
+    .section-card-desc { font-size: 0.82rem; color: var(--text-light); margin-top: 0.2rem; }
+    .section-card-badge {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .section-card-meta { font-size: 0.8rem; color: var(--text-light); margin-top: 0.3rem; }
+
+    /* Question */
+    .question-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.8rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .q-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+    .q-number {
+      display: inline-block; background: var(--primary); color: #fff;
+      padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;
+    }
+    .q-section-badge {
+      display: inline-block; padding: 0.15rem 0.6rem; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600; color: #fff;
+    }
+    .q-level {
+      display: inline-block; padding: 0.15rem 0.6rem; border-radius: 20px;
+      font-size: 0.72rem; font-weight: 700;
+    }
+    .q-level.level-1 { background: #d8f3dc; color: #2d6a4f; }
+    .q-level.level-2 { background: #fef3c7; color: #92400e; }
+    .q-level.level-3 { background: #fee2e2; color: #991b1b; }
+    .q-scenario {
+      background: #f0f4f8; border-radius: 8px; padding: 0.8rem 1rem;
+      font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.6;
+      border-left: 4px solid var(--primary-light);
+    }
+    .q-text { font-size: 1.1rem; font-weight: 600; margin-bottom: 1.2rem; line-height: 1.6; white-space: pre-line; }
+    .options { display: flex; flex-direction: column; gap: 0.6rem; }
+    .option-btn {
+      display: block; width: 100%; text-align: left;
+      padding: 0.85rem 1.2rem; border: 2px solid var(--border); border-radius: 10px;
+      background: #fff; font-size: 0.95rem; cursor: pointer; transition: all 0.15s; color: var(--text);
+    }
+    .option-btn:hover { border-color: var(--primary-light); background: #ebf8ff; }
+    .option-btn.selected { border-color: var(--primary-light); background: #ebf8ff; font-weight: 600; }
+    .option-btn.correct-answer { border-color: var(--correct); background: #f0fff4; font-weight: 600; }
+    .option-btn.wrong-answer { border-color: var(--wrong); background: #fff5f5; }
+    .option-btn:disabled { cursor: default; }
+    .skip-note { text-align: center; font-size: 0.82rem; color: var(--text-light); margin-top: 1rem; }
+
+    /* Explanation */
+    .explanation-box {
+      display: none; margin-top: 1rem; padding: 1rem 1.2rem;
+      border-radius: 8px; font-size: 0.88rem; line-height: 1.6;
+    }
+    .explanation-box.show { display: block; }
+    .explanation-box.correct-bg { background: #f0fff4; border-left: 4px solid var(--correct); }
+    .explanation-box.wrong-bg { background: #fff5f5; border-left: 4px solid var(--wrong); }
+    .explanation-box.timeout-bg { background: #fffff0; border-left: 4px solid var(--accent); }
+    .explanation-result { font-weight: 700; margin-bottom: 0.4rem; font-size: 0.95rem; }
+    .explanation-text { color: var(--text); }
+    .explanation-next { text-align: center; margin-top: 0.8rem; }
+    .btn-next {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff; border: none; padding: 0.6rem 1.5rem; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    }
+    .btn-next:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,54,93,0.3); }
+
+    /* Tab warning */
+    .tab-warning {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(229,62,62,0.95); z-index: 1000; color: #fff;
+      text-align: center; padding: 3rem 1rem;
+    }
+    .tab-warning.show { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .tab-warning h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+    .tab-warning p { font-size: 1rem; margin-bottom: 1.5rem; opacity: 0.9; }
+    .tab-warning-count { background: rgba(0,0,0,0.3); padding: 0.5rem 1.5rem; border-radius: 8px; font-size: 1.2rem; font-weight: 800; }
+
+    /* Result */
+    .result-card {
+      background: var(--card); border-radius: 12px; padding: 2rem;
+      text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 1.5rem;
+    }
+    .score-circle {
+      width: 130px; height: 130px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-direction: column;
+      margin: 0 auto 1rem; font-weight: 800; color: #fff;
+    }
+    .score-circle .pct { font-size: 2.2rem; line-height: 1; }
+    .score-circle .label { font-size: 0.75rem; opacity: 0.85; }
+    .score-high { background: linear-gradient(135deg, #38a169, #48bb78); }
+    .score-mid { background: linear-gradient(135deg, #d69e2e, #ed8936); }
+    .score-low { background: linear-gradient(135deg, #e53e3e, #fc8181); }
+    .result-msg { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .result-detail { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1rem; }
+    .result-saved { padding: 0.5rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
+    .result-saved.success { background: #f0fff4; color: var(--correct); }
+    .result-saved.error { background: #fff5f5; color: var(--wrong); }
+    .result-saved.saving { background: #ebf8ff; color: var(--primary-light); }
+
+    .breakdown-card {
+      background: var(--card); border-radius: 12px; padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 1rem;
+    }
+    .breakdown-card h3 { font-size: 0.95rem; color: var(--text-light); margin-bottom: 0.8rem; text-align: center; }
+    .breakdown-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.4rem 0; border-bottom: 1px solid var(--border);
+    }
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-name { font-size: 0.88rem; min-width: 90px; }
+    .breakdown-score { font-weight: 700; font-size: 0.88rem; min-width: 55px; text-align: right; }
+    .breakdown-bar { flex: 1; height: 8px; background: var(--border); border-radius: 4px; margin: 0 0.8rem; overflow: hidden; }
+    .breakdown-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 1rem; }
+    .stat-item { background: #f7fafc; border-radius: 8px; padding: 0.8rem; text-align: center; }
+    .stat-value { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+    .stat-label { font-size: 0.78rem; color: var(--text-light); }
+
+    .review-item { padding: 0.8rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+    .review-item:last-child { border-bottom: none; }
+    .review-q { font-weight: 600; margin-bottom: 0.3rem; }
+    .review-correct { color: var(--correct); }
+    .review-wrong { color: var(--wrong); }
+    .review-timeout { color: var(--accent); }
+    .review-answer { font-size: 0.82rem; margin-top: 0.2rem; }
+    .review-explanation {
+      font-size: 0.8rem; color: var(--text-light); margin-top: 0.3rem;
+      background: #f7fafc; padding: 0.5rem 0.8rem; border-radius: 6px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff; border: none; padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,54,93,0.3); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-group { display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
+
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.15rem; }
+      .container { padding: 1rem 0.8rem 3rem; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1 id="headerTitle">ロジカルシンキング研修クイズ</h1>
+  <div class="header-info">
+    <span id="headerUser"></span>
+    <span id="headerProgress"></span>
+  </div>
+</div>
+
+<!-- Tab Warning -->
+<div class="tab-warning" id="tabWarning">
+  <h2>画面を離れないでください</h2>
+  <p>テスト中に別のタブやウィンドウに移動することは禁止されています。<br>この行為は記録されます。</p>
+  <div class="tab-warning-count" id="tabWarningCount"></div>
+  <button class="btn-primary" style="margin-top:1.5rem" onclick="dismissTabWarning()">テストに戻る</button>
+</div>
+
+<div class="container">
+
+  <!-- SCREEN 1: 名前入力 -->
+  <div id="nameScreen" class="screen show">
+    <div class="login-card">
+      <div class="login-icon">&#129504;</div>
+      <h2>ロジカルシンキング研修クイズ</h2>
+      <p>講義の合間に、セクションごとにクイズを解きます。<br>まず氏名を入力してください。</p>
+      <div style="margin-top:1rem">
+        <input type="text" class="name-input" id="userName" placeholder="氏名を入力（例：山田 太郎）">
+      </div>
+      <div class="btn-group" style="margin-top:0.5rem">
+        <button class="btn-primary" onclick="submitName()">次へ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: セクション選択 -->
+  <div id="selectScreen" class="screen">
+    <div class="login-card" style="text-align:left">
+      <h2 style="text-align:center">受験するセクションを選んでください</h2>
+      <p style="text-align:center">講師の指示に従って、該当するセクションを選択してください。</p>
+      <div class="section-cards" id="sectionCards"></div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: クイズ -->
+  <div id="quizScreen" class="screen">
+    <div class="timer-bar" id="timerBar">
+      <div class="timer-row">
+        <span class="timer-label">残り時間</span>
+        <span class="timer-value" id="timerValue">45</span>
+      </div>
+      <div class="timer-track">
+        <div class="timer-fill" id="timerFill" style="width:100%"></div>
+      </div>
+    </div>
+    <div class="question-card" id="questionCard">
+      <div class="q-meta">
+        <span class="q-number" id="qNumber"></span>
+        <span class="q-section-badge" id="qSection"></span>
+        <span class="q-level" id="qLevel"></span>
+      </div>
+      <div class="q-scenario" id="qScenario" style="display:none"></div>
+      <div class="q-text" id="qText"></div>
+      <div class="options" id="qOptions"></div>
+      <div class="skip-note" id="skipNote">選択すると解説が表示されます（制限時間: 45秒）</div>
+      <div class="explanation-box" id="explanationBox">
+        <div class="explanation-result" id="explanationResult"></div>
+        <div class="explanation-text" id="explanationText"></div>
+        <div class="explanation-next">
+          <button class="btn-next" id="nextBtn" onclick="goNext()">次の問題へ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: 結果 -->
+  <div id="resultScreen" class="screen">
+    <div class="result-card">
+      <div class="score-circle" id="scoreCircle">
+        <div class="pct" id="scorePct"></div>
+        <div class="label">正答率</div>
+      </div>
+      <div class="result-msg" id="resultMsg"></div>
+      <div class="result-detail" id="resultDetail"></div>
+      <div class="result-saved saving" id="resultSaved">結果を記録中...</div>
+    </div>
+    <div class="breakdown-card">
+      <h3>難易度別スコア</h3>
+      <div id="levelBreakdown"></div>
+    </div>
+    <div class="breakdown-card">
+      <h3>テスト統計</h3>
+      <div class="stats-grid" id="statsGrid"></div>
+    </div>
+    <div class="breakdown-card">
+      <h3>回答一覧</h3>
+      <div id="reviewContainer"></div>
+    </div>
+    <div class="btn-group">
+      <button class="btn-primary" onclick="backToSelect()">セクション選択に戻る</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyOMC1_XMSOjZOl8o_n7Tr4zmcIUgQlx_QAGaLNtid0sb4-q9-QvFBWcxL24BTqspkr/exec';
+const TIME_PER_QUESTION = 45;
+
+// ===== SECTIONS =====
+const SECTIONS = [
+  { id: 'classify',  name: '分類する',       color: '#3182ce', icon: '&#128218;', desc: '物事をモレなく・ダブりなく（MECE）に分ける力を試します。', questions: 6 },
+  { id: 'decompose', name: '分解する',       color: '#38a169', icon: '&#128270;', desc: '物事を構成要素やプロセスに分解する力を試します。', questions: 6 },
+  { id: 'organize',  name: '水準を整理する', color: '#d69e2e', icon: '&#128200;', desc: '情報の抽象度（水準）を揃えて整理する力を試します。', questions: 6 },
+];
+
+// ===== ALL QUESTIONS =====
+const ALL_QUESTIONS = {
+  classify: [
+    {
+      q: "「お客様の声を分類して改善に活かしたい」とき、以下のうちMECEな分類軸はどれ？",
+      answer: "商品への不満 / サービスへの不満 / その他",
+      level: 1,
+      options: [
+        "商品への不満 / サービスへの不満 / その他",
+        "怒っている声 / 困っている声",
+        "重要な声 / 重要でない声",
+        "最近の声 / 昔の声 / 印象に残った声"
+      ],
+      explanation: "「怒っている/困っている」は感情の分類で重複があり得ます。「重要/重要でない」は主観的で人により判断が変わります。「印象に残った声」は他と重複します。対象を客観的に切り分けられる軸を選ぶのがMECEの基本です。",
+    },
+    {
+      scenario: "後輩が「当社の課題」を以下のように分類しました。\n\n① 売上が低い\n② 営業力が弱い\n③ 利益率が低い\n④ 広告費が高い",
+      q: "この分類の問題点として最も適切なものはどれ？",
+      answer: "②は①の原因、④は③の原因であり、水準の異なるものが混在している",
+      level: 1,
+      options: [
+        "②は①の原因、④は③の原因であり、水準の異なるものが混在している",
+        "4つでは数が少なすぎる",
+        "課題がネガティブすぎる",
+        "特に問題はない"
+      ],
+      explanation: "「売上が低い」と「営業力が弱い」は原因と結果の関係です。同列に並べると因果関係が見えなくなります。分類するときは、同じ抽象度・同じ水準のものを並べることが重要です。",
+    },
+    {
+      scenario: "新サービスのターゲット顧客を整理することになりました。チームから以下の案が出ました。\n\nA案：大企業 / 中小企業 / スタートアップ\nB案：IT業界 / 製造業 / サービス業 / その他\nC案：予算が多い会社 / 予算が少ない会社\nD案：東京 / 大阪 / それ以外",
+      q: "「どのセグメントに注力すべきか」を議論するための分類として、最も不適切なものはどれ？",
+      answer: "C案：予算が多い会社 / 予算が少ない会社",
+      level: 2,
+      options: [
+        "A案：大企業 / 中小企業 / スタートアップ",
+        "B案：IT業界 / 製造業 / サービス業 / その他",
+        "C案：予算が多い会社 / 予算が少ない会社",
+        "D案：東京 / 大阪 / それ以外"
+      ],
+      explanation: "「予算が多い/少ない」は営業前にはわからないため、ターゲティングの分類軸として機能しません。分類軸は「事前に判別可能で、アクションに結びつくもの」であることが重要です。企業規模・業界・地域は外部から判別できます。",
+    },
+    {
+      scenario: "あなたは「退職者が増えている原因」を調べるために、退職理由をアンケートで集めました。回答は以下のとおりです。\n\n・給与が低い(12件)\n・上司と合わない(8件)\n・残業が多い(10件)\n・キャリアが見えない(7件)\n・社風が合わない(5件)",
+      q: "この結果を経営層に報告するための分類として、最も意思決定につながるものはどれ？",
+      answer: "待遇（給与・残業）/ 人間関係（上司）/ 成長環境（キャリア・社風）",
+      level: 2,
+      options: [
+        "待遇（給与・残業）/ 人間関係（上司）/ 成長環境（キャリア・社風）",
+        "件数が多い順に並べるだけ",
+        "給与 / 上司 / 残業 / キャリア / 社風（そのまま5つ列挙）",
+        "会社が悪い理由 / 本人の問題"
+      ],
+      explanation: "5つの回答をそのまま並べるだけでは「結局何を改善すべきか？」が見えません。件数順は優先度は示せても構造がわかりません。「待遇/人間関係/成長環境」とグルーピングすることで「待遇面が最大の課題（22件）」と打ち手が明確になります。",
+    },
+    {
+      scenario: "営業部が「受注に至らなかった案件の敗因一覧」を作りました。\n\n① 価格が高かった\n② 提案内容が刺さらなかった\n③ 競合に負けた\n④ 決裁者にアプローチできなかった\n⑤ 導入時期が合わなかった\n⑥ 担当者の対応が悪かった",
+      q: "この一覧の分類として最も問題がある点はどれ？",
+      answer: "「敗因の種類」と「敗因の原因」が混在している（③は結果であり、①②④⑤⑥のどれかが真の原因）",
+      level: 3,
+      options: [
+        "「敗因の種類」と「敗因の原因」が混在している（③は結果であり、①②④⑤⑥のどれかが真の原因）",
+        "敗因の数が6つでは足りない",
+        "⑥は主観的なので除外すべき",
+        "特に問題はなく、このままでよい"
+      ],
+      explanation: "「競合に負けた」は他の敗因の結果として起きる事象であり、①②④⑤⑥と同列に並べると原因分析になりません。価格で負けたのか、提案で負けたのかを区別しないと改善策が打てない。分類では「同じ水準（原因なのか結果なのか）」を揃えることが重要です。",
+    },
+    {
+      scenario: "新規事業のアイデアを100件出した後、絞り込みのために分類したいと考えています。",
+      q: "「どのアイデアに投資すべきか」を判断するために、最も有効な分類の組み合わせはどれ？",
+      answer: "市場の大きさ（大/中/小）x 自社の強みとの適合度（高/低）",
+      level: 3,
+      options: [
+        "市場の大きさ（大/中/小）x 自社の強みとの適合度（高/低）",
+        "思いついた順に1〜100の番号をつける",
+        "BtoB / BtoC / BtoG に分ける",
+        "アイデアを出した人の部署別に分ける"
+      ],
+      explanation: "投資判断には「儲かるか（市場規模）」と「勝てるか（自社適合度）」の2軸が必要です。BtoB/BtoCは分類にはなりますが優先度の判断には直結しません。分類の目的は「意思決定を助けること」。目的に合った軸を選ぶことが最も重要です。",
+    },
+  ],
+  decompose: [
+    {
+      scenario: "上司から「最近、商談の受注率が下がっている。原因を分析してくれ」と言われました。",
+      q: "原因を探るための分解として、最も適切なものはどれ？",
+      answer: "商談プロセスを「リード獲得 → 初回商談 → 提案 → 見積 → クロージング」に分解し、どこで離脱が増えたか調べる",
+      level: 1,
+      options: [
+        "商談プロセスを「リード獲得 → 初回商談 → 提案 → 見積 → クロージング」に分解し、どこで離脱が増えたか調べる",
+        "営業メンバー全員に「なぜ受注できないと思うか」を聞く",
+        "受注率が下がった月と上がった月を比べる",
+        "競合の動きを調べる"
+      ],
+      explanation: "プロセスに分解することで「どのステップに問題があるか」を特定できます。感覚ベースのヒアリングでは主観が入り、月の比較では原因がわかりません。分解の目的は「問題の所在を特定すること」です。",
+    },
+    {
+      scenario: "「売上を上げたい」という漠然とした目標があります。",
+      q: "この目標を、具体的なアクションにつなげるために最も有効な分解はどれ？",
+      answer: "売上 = 顧客数 x 顧客単価 x 購入頻度",
+      level: 1,
+      options: [
+        "売上 = 顧客数 x 顧客単価 x 購入頻度",
+        "売上 = 今月の売上 + 来月の売上 + 再来月の売上",
+        "売上 = 営業部の売上 + マーケ部の売上 + CS部の売上",
+        "売上 = 国内売上 + 海外売上"
+      ],
+      explanation: "「顧客数 x 単価 x 頻度」に分解すると、どれを改善すべきか議論できます。時系列や部署別の分解は「事実の整理」にはなりますが、改善アクションにつながりにくい。分解は「打ち手が見える粒度」にすることが重要です。",
+    },
+    {
+      scenario: "チームの会議で「うちのサービスの解約率が高い」という問題が挙がりました。後輩が以下のように分解しました。\n\n① プロダクトが悪い\n② 営業が売り方を間違えている\n③ カスタマーサポートが弱い",
+      q: "この分解の最大の問題点はどれ？",
+      answer: "「誰が悪いか」の犯人探しになっており、改善アクションにつながらない",
+      level: 2,
+      options: [
+        "「誰が悪いか」の犯人探しになっており、改善アクションにつながらない",
+        "3つでは分解が足りない",
+        "プロダクトを最初に持ってきているのが失礼",
+        "特に問題はない"
+      ],
+      explanation: "「○○が悪い」は原因の仮説であって分解ではありません。まず「解約が起きるタイミング」（導入直後/3ヶ月後/更新時）や「解約理由」（機能不足/費用対効果/担当者変更）で分解し、データから原因を特定すべきです。分解は客観的な切り口で行いましょう。",
+    },
+    {
+      scenario: "「来期のマーケティング予算をどう配分するか」を検討しています。",
+      q: "予算配分を議論するための分解として、最も筋が良いものはどれ？",
+      answer: "顧客獲得フェーズ別（認知 → 検討 → 商談化 → 受注）に必要な施策と費用を分解する",
+      level: 2,
+      options: [
+        "顧客獲得フェーズ別（認知 → 検討 → 商談化 → 受注）に必要な施策と費用を分解する",
+        "前年と同じ比率で各施策に振り分ける",
+        "施策ごとの費用を安い順に並べる",
+        "部門ごとに均等に配分する"
+      ],
+      explanation: "フェーズ別に分解することで「どのフェーズがボトルネックか→そこに重点投資」という判断ができます。前年踏襲は思考停止、安い順や均等配分は根拠がありません。分解の目的は「判断の根拠を作ること」です。",
+    },
+    {
+      scenario: "あなたは「なぜプロジェクトが遅延したのか」を報告する必要があります。事実として以下がわかっています。\n\n・要件定義に想定の2倍の時間がかかった\n・開発中に仕様変更が3回発生した\n・テスト工程でバグが大量に見つかった",
+      q: "この報告のための分解として最も適切なものはどれ？",
+      answer: "工程別（要件定義/開発/テスト）に「計画vs実績」と「遅延の原因」を整理する",
+      level: 3,
+      options: [
+        "工程別（要件定義/開発/テスト）に「計画vs実績」と「遅延の原因」を整理する",
+        "3つの事実をそのまま時系列で報告する",
+        "「お客様の要望が多すぎた」と一言でまとめる",
+        "遅延日数の合計だけ報告する"
+      ],
+      explanation: "工程 x 計画vs実績で分解すると、どこでどれだけ遅れたかが可視化され、再発防止策が議論できます。事実の羅列では構造がなく、一言まとめでは原因が見えず、日数だけでは改善できません。",
+    },
+    {
+      scenario: "「自社プロダクトの顧客満足度を上げたい」という課題に取り組むことになりました。",
+      q: "以下の分解のうち、最もアクションにつながりにくいものはどれ？",
+      answer: "満足している顧客 / 満足していない顧客",
+      level: 3,
+      options: [
+        "満足している顧客 / 満足していない顧客",
+        "プロダクトの機能面 / サポート体制 / 価格・コスパ",
+        "導入〜定着の各フェーズにおける顧客体験",
+        "顧客の利用頻度別（ヘビー/ミドル/ライト）に満足度の違いを分析"
+      ],
+      explanation: "「満足/不満足」は結果を2つに分けただけで、なぜ満足・不満足なのかがわかりません。機能/サポート/価格という切り口、フェーズごとの体験、利用頻度別の分析はいずれも「何を改善すべきか」の示唆が得られます。分解は「次のアクションが見えるか」で良し悪しが決まります。",
+    },
+  ],
+  organize: [
+    {
+      scenario: "後輩が上司への報告書に以下の項目を並列で書いていました。\n\n・売上目標の達成\n・A社への提案資料の作成\n・チームの生産性向上\n・来週の会議の準備",
+      q: "この報告書の問題点として最も適切なものはどれ？",
+      answer: "「目標レベル」の話と「タスクレベル」の話が混在しており、水準が揃っていない",
+      level: 1,
+      options: [
+        "「目標レベル」の話と「タスクレベル」の話が混在しており、水準が揃っていない",
+        "項目が4つでは少なすぎる",
+        "売上目標を最初に書くべきではない",
+        "特に問題はない"
+      ],
+      explanation: "「売上目標の達成」「生産性向上」は中長期の目標、「提案資料の作成」「会議の準備」は今週のタスクです。抽象度の異なるものを同列に並べると、読み手は「結局何の話？」と混乱します。まず水準を揃えることが整理の第一歩です。",
+    },
+    {
+      scenario: "営業チームのミーティングで、メンバーから以下の発言がありました。\n\n・「A社の案件は来月クロージングできそうです」\n・「最近、業界全体でIT投資が縮小傾向です」\n・「B社の担当者が異動になりました」\n・「今期の受注目標に対して進捗が70%です」",
+      q: "これらの発言を整理するとき、最も適切な構造はどれ？",
+      answer: "全体状況（目標進捗70%）→ 外部環境（IT投資縮小）→ 個別案件（A社・B社）",
+      level: 1,
+      options: [
+        "全体状況（目標進捗70%）→ 外部環境（IT投資縮小）→ 個別案件（A社・B社）",
+        "発言した順にそのまま並べる",
+        "良いニュースと悪いニュースに分ける",
+        "A社 → B社 → 業界 → 目標の順（アルファベット順）"
+      ],
+      explanation: "大きい話（全体→環境→個別）の順に整理することで、聞き手は「全体感→背景→詳細」と理解しやすくなります。発言順では構造がなく、良い悪いでは水準がバラバラ、アルファベット順は意味がありません。水準を「大→小」に整えるのが基本です。",
+    },
+    {
+      scenario: "後輩がプレゼン資料のアウトラインを見せてくれました。\n\n1. 当社の強み\n2. 競合の弱み\n3. 市場が伸びている理由\n4. よって、このプロジェクトに投資すべき",
+      q: "このアウトラインの問題点はどれ？",
+      answer: "1〜3が「投資すべき理由」を支える根拠のはずだが、並列に並んでいて4との関係が不明確",
+      level: 2,
+      options: [
+        "1〜3が「投資すべき理由」を支える根拠のはずだが、並列に並んでいて4との関係が不明確",
+        "強みと弱みを同時に書くべきではない",
+        "4を最初に持ってくるべき",
+        "3つの理由では少なすぎる"
+      ],
+      explanation: "結論（投資すべき）と根拠（強み・競合・市場）の関係が構造化されていません。正しくは「結論：投資すべき → 理由①自社の強みが活きる → 理由②競合が弱い → 理由③市場が伸びている」と、結論と根拠の水準を明確に分けるべきです。なお「結論を先に」も正しい指摘ですが、最大の問題は水準の混在です。",
+    },
+    {
+      scenario: "あなたが書いた提案書に、上司から「ロジックが弱い」とフィードバックがありました。提案書の構成は以下のとおりです。\n\n・お客様の課題：業務効率が悪い\n・提案：当社のシステムを導入すべき\n・効果：コスト30%削減",
+      q: "この提案書に最も足りていないものはどれ？",
+      answer: "「なぜ当社のシステムで課題が解決するのか」という理由の層が抜けている",
+      level: 2,
+      options: [
+        "「なぜ当社のシステムで課題が解決するのか」という理由の層が抜けている",
+        "競合との比較が足りない",
+        "効果の数字が具体的すぎる",
+        "お客様の課題をもっと詳しく書くべき"
+      ],
+      explanation: "課題→提案→効果は一見論理的ですが、「なぜそれで解決するのか」の理由がありません。「業務効率が悪い→（なぜ？手作業が多いから）→（だから）自動化システムを導入→コスト30%削減」のように、結論と根拠の間に「理由」の層を入れることで説得力が生まれます。",
+    },
+    {
+      scenario: "部下が「来期の事業計画」を以下のように報告してきました。\n\n「来期は売上を150%に伸ばします。理由は、新規営業を強化するからです。具体的には、展示会に3回出展し、テレアポチームを2名増員し、既存顧客のアップセル率を20%改善します」",
+      q: "この報告の論理構成における最大の問題はどれ？",
+      answer: "理由の「新規営業の強化」と、具体策の「既存顧客のアップセル」が矛盾しており、水準の整合性が取れていない",
+      level: 3,
+      options: [
+        "理由の「新規営業の強化」と、具体策の「既存顧客のアップセル」が矛盾しており、水準の整合性が取れていない",
+        "150%という目標が高すぎる",
+        "展示会の回数が少ない",
+        "具体策が3つでは足りない"
+      ],
+      explanation: "「新規営業の強化」が理由なのに、具体策に「既存顧客のアップセル」が混じっています。理由→具体策の水準が整合していません。正しくは「理由①新規営業の強化（展示会・テレアポ）」「理由②既存顧客の深耕（アップセル改善）」と、理由レベルで分けてから具体策を紐づけるべきです。",
+    },
+    {
+      scenario: "経営会議で「当社が今期注力すべき3つの柱」として以下が提案されました。\n\n1. プロダクトの機能改善\n2. 大手企業への営業強化\n3. エンジニアの採用",
+      q: "この「3つの柱」の論理構成における問題点はどれ？",
+      answer: "3は1や2を実現するための手段であり、同列の「柱」として並べるべきではない",
+      level: 3,
+      options: [
+        "3は1や2を実現するための手段であり、同列の「柱」として並べるべきではない",
+        "3つの柱では多すぎる、2つに絞るべき",
+        "プロダクトと営業の両方に注力すると中途半端になる",
+        "特に問題はなく、このままでよい"
+      ],
+      explanation: "「プロダクト改善」と「営業強化」は事業の方向性（目的）ですが、「エンジニア採用」はそれを実現するためのリソース確保（手段）です。目的と手段を同列に並べると、優先順位の議論が噛み合いません。水準を揃えるなら「注力領域：プロダクト/営業」と「そのための体制：採用」を分けて整理すべきです。",
+    },
+  ],
+};
+
+// ===== STATE =====
+let userName = '';
+let selectedSection = null;
+let currentQuestions = [];
+let shuffledOptionsMap = [];
+let currentQ = 0;
+let answers = [];
+let timer = null;
+let timeLeft = TIME_PER_QUESTION;
+let sectionStartTime = null;
+let sectionEndTime = null;
+let tabSwitchCount = 0;
+let isShowingExplanation = false;
+let isTestActive = false;
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Tab switch detection
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && isTestActive) {
+    tabSwitchCount++;
+    document.getElementById('tabWarning').classList.add('show');
+    document.getElementById('tabWarningCount').textContent = `タブ離脱回数: ${tabSwitchCount}回`;
+  }
+});
+function dismissTabWarning() { document.getElementById('tabWarning').classList.remove('show'); }
+
+// ===== SCREEN SWITCHING =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+}
+
+// ===== STEP 1: NAME INPUT =====
+function submitName() {
+  const name = document.getElementById('userName').value.trim();
+  if (!name) {
+    document.getElementById('userName').style.borderColor = '#e53e3e';
+    document.getElementById('userName').placeholder = '氏名を入力してください';
+    return;
+  }
+  userName = name;
+  document.getElementById('headerUser').textContent = name;
+  buildSectionCards();
+  showScreen('selectScreen');
+}
+
+// ===== STEP 2: SECTION SELECT =====
+function buildSectionCards() {
+  const container = document.getElementById('sectionCards');
+  container.innerHTML = '';
+  SECTIONS.forEach((sec, i) => {
+    const card = document.createElement('div');
+    card.className = 'section-card';
+    card.onclick = () => startSection(sec.id);
+    card.innerHTML = `
+      <div class="section-card-icon">${sec.icon}</div>
+      <div class="section-card-body">
+        <div>
+          <span class="section-card-badge" style="background:${sec.color}">Section ${i + 1}</span>
+        </div>
+        <div class="section-card-title">${sec.name}</div>
+        <div class="section-card-desc">${sec.desc}</div>
+        <div class="section-card-meta">${sec.questions}問 / 1問あたり${TIME_PER_QUESTION}秒</div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ===== STEP 3: START QUIZ =====
+function startSection(sectionId) {
+  selectedSection = SECTIONS.find(s => s.id === sectionId);
+  currentQuestions = ALL_QUESTIONS[sectionId];
+  shuffledOptionsMap = currentQuestions.map(q => shuffleArray(q.options));
+  currentQ = 0;
+  answers = [];
+  tabSwitchCount = 0;
+  sectionStartTime = new Date();
+  sectionEndTime = null;
+  isTestActive = true;
+
+  document.getElementById('headerTitle').textContent = `${selectedSection.name}`;
+  document.getElementById('headerProgress').textContent = '';
+
+  showScreen('quizScreen');
+  showQuestion();
+}
+
+// ===== SHOW QUESTION =====
+function showQuestion() {
+  if (currentQ >= currentQuestions.length) { finishSection(); return; }
+
+  isShowingExplanation = false;
+  const q = currentQuestions[currentQ];
+  const opts = shuffledOptionsMap[currentQ];
+
+  document.getElementById('headerProgress').textContent = `${currentQ + 1} / ${currentQuestions.length}`;
+  document.getElementById('qNumber').textContent = `Q${currentQ + 1}`;
+
+  const badge = document.getElementById('qSection');
+  badge.textContent = selectedSection.name;
+  badge.style.background = selectedSection.color;
+
+  const lvl = document.getElementById('qLevel');
+  lvl.textContent = q.level === 1 ? 'Level 1' : q.level === 2 ? 'Level 2' : 'Level 3';
+  lvl.className = `q-level level-${q.level}`;
+
+  const scenarioEl = document.getElementById('qScenario');
+  if (q.scenario) { scenarioEl.style.display = 'block'; scenarioEl.textContent = q.scenario; }
+  else { scenarioEl.style.display = 'none'; }
+
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('skipNote').style.display = 'block';
+
+  const optContainer = document.getElementById('qOptions');
+  optContainer.innerHTML = '';
+  opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(i);
+    optContainer.appendChild(btn);
+  });
+
+  const expBox = document.getElementById('explanationBox');
+  expBox.classList.remove('show', 'correct-bg', 'wrong-bg', 'timeout-bg');
+
+  startTimer();
+}
+
+// ===== TIMER =====
+function startTimer() {
+  timeLeft = TIME_PER_QUESTION;
+  updateTimerDisplay();
+  clearInterval(timer);
+  timer = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) { clearInterval(timer); handleTimeout(); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const tv = document.getElementById('timerValue');
+  const tf = document.getElementById('timerFill');
+  tv.textContent = timeLeft;
+  tf.style.width = (timeLeft / TIME_PER_QUESTION) * 100 + '%';
+  tv.className = 'timer-value';
+  tf.className = 'timer-fill';
+  if (timeLeft <= 10) { tv.classList.add('danger'); tf.classList.add('danger'); }
+  else if (timeLeft <= 20) { tv.classList.add('warning'); tf.classList.add('warning'); }
+}
+
+function handleTimeout() {
+  answers[currentQ] = { selected: null, correct: false, timeSpent: TIME_PER_QUESTION };
+  showExplanation(null);
+}
+
+// ===== ANSWER =====
+function selectAnswer(optIndex) {
+  if (isShowingExplanation) return;
+  clearInterval(timer);
+  const q = currentQuestions[currentQ];
+  const opts = shuffledOptionsMap[currentQ];
+  const selected = opts[optIndex];
+  const isCorrect = selected === q.answer;
+
+  answers[currentQ] = { selected: optIndex, selectedText: selected, correct: isCorrect, timeSpent: TIME_PER_QUESTION - timeLeft };
+
+  const btns = document.querySelectorAll('#qOptions .option-btn');
+  btns.forEach((btn, i) => {
+    btn.disabled = true; btn.style.pointerEvents = 'none';
+    if (opts[i] === q.answer) btn.classList.add('correct-answer');
+    if (i === optIndex && !isCorrect) btn.classList.add('wrong-answer');
+    if (i === optIndex) btn.classList.add('selected');
+  });
+  showExplanation(isCorrect);
+}
+
+function showExplanation(isCorrect) {
+  isShowingExplanation = true;
+  const q = currentQuestions[currentQ];
+  const expBox = document.getElementById('explanationBox');
+  const expResult = document.getElementById('explanationResult');
+  document.getElementById('skipNote').style.display = 'none';
+
+  if (isCorrect === null) {
+    expBox.classList.add('show', 'timeout-bg');
+    expResult.textContent = '\u23f0 時間切れ'; expResult.style.color = 'var(--accent)';
+    document.querySelectorAll('#qOptions .option-btn').forEach((btn, i) => {
+      btn.disabled = true; btn.style.pointerEvents = 'none';
+      if (shuffledOptionsMap[currentQ][i] === q.answer) btn.classList.add('correct-answer');
+    });
+  } else if (isCorrect) {
+    expBox.classList.add('show', 'correct-bg');
+    expResult.textContent = '\u2b55 正解！'; expResult.style.color = 'var(--correct)';
+  } else {
+    expBox.classList.add('show', 'wrong-bg');
+    expResult.textContent = '\u274c 不正解'; expResult.style.color = 'var(--wrong)';
+  }
+
+  document.getElementById('explanationText').innerHTML = `<strong>正解: ${q.answer}</strong><br>${q.explanation}`;
+  document.getElementById('nextBtn').textContent = currentQ + 1 >= currentQuestions.length ? '結果を見る' : '次の問題へ';
+}
+
+function goNext() {
+  currentQ++;
+  document.getElementById('explanationBox').classList.remove('show', 'correct-bg', 'wrong-bg', 'timeout-bg');
+  showQuestion();
+}
+
+// ===== FINISH =====
+function finishSection() {
+  sectionEndTime = new Date();
+  clearInterval(timer);
+  isTestActive = false;
+
+  document.getElementById('headerTitle').textContent = `${selectedSection.name} - 結果`;
+  document.getElementById('headerProgress').textContent = '';
+
+  const total = currentQuestions.length;
+  const correct = answers.filter(a => a && a.correct).length;
+  const pct = Math.round((correct / total) * 100);
+
+  const circle = document.getElementById('scoreCircle');
+  circle.className = `score-circle ${pct >= 80 ? 'score-high' : pct >= 50 ? 'score-mid' : 'score-low'}`;
+  document.getElementById('scorePct').textContent = pct + '%';
+
+  document.getElementById('resultMsg').textContent =
+    pct >= 80 ? '素晴らしい！しっかり理解できています。' :
+    pct >= 50 ? 'もう少し！基本は理解できていますが、応用に課題があります。' :
+    '復習が必要です。講義の内容をもう一度振り返りましょう。';
+  document.getElementById('resultDetail').textContent = `${selectedSection.name}：${total}問中 ${correct}問正解（正答率 ${pct}%）`;
+
+  // Level breakdown
+  const levelBD = document.getElementById('levelBreakdown');
+  levelBD.innerHTML = '';
+  const levelNames = { 1: 'Level 1（基本）', 2: 'Level 2（実践）', 3: 'Level 3（応用）' };
+  [1, 2, 3].forEach(lv => {
+    let lTotal = 0, lCorrect = 0;
+    currentQuestions.forEach((q, i) => { if (q.level === lv) { lTotal++; if (answers[i] && answers[i].correct) lCorrect++; } });
+    if (lTotal === 0) return;
+    const lp = Math.round((lCorrect / lTotal) * 100);
+    const color = lp >= 80 ? 'var(--correct)' : lp >= 50 ? 'var(--accent)' : 'var(--wrong)';
+    levelBD.innerHTML += `<div class="breakdown-row"><span class="breakdown-name">${levelNames[lv]}</span><div class="breakdown-bar"><div class="breakdown-bar-fill" style="width:${lp}%;background:${color}"></div></div><span class="breakdown-score">${lCorrect}/${lTotal}</span></div>`;
+  });
+
+  // Stats
+  const totalTime = Math.round((sectionEndTime - sectionStartTime) / 1000);
+  const answeredQs = answers.filter(a => a && a.selected !== null);
+  const avgTime = answeredQs.length > 0 ? (answeredQs.reduce((s, a) => s + a.timeSpent, 0) / answeredQs.length).toFixed(1) : '-';
+  const unanswered = answers.filter(a => !a || a.selected === null).length;
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-item"><div class="stat-value">${avgTime}秒</div><div class="stat-label">平均回答時間</div></div>
+    <div class="stat-item"><div class="stat-value">${unanswered}問</div><div class="stat-label">未回答（時間切れ）</div></div>
+    <div class="stat-item"><div class="stat-value">${tabSwitchCount}回</div><div class="stat-label">タブ離脱回数</div></div>
+    <div class="stat-item"><div class="stat-value">${Math.floor(totalTime / 60)}分${totalTime % 60}秒</div><div class="stat-label">総所要時間</div></div>`;
+
+  // Review
+  const reviewContainer = document.getElementById('reviewContainer');
+  reviewContainer.innerHTML = '';
+  currentQuestions.forEach((q, i) => {
+    const a = answers[i];
+    let statusClass, statusText;
+    if (!a || a.selected === null) { statusClass = 'review-timeout'; statusText = '\u23f0 時間切れ'; }
+    else if (a.correct) { statusClass = 'review-correct'; statusText = '\u2b55 正解'; }
+    else { statusClass = 'review-wrong'; statusText = '\u274c 不正解'; }
+    reviewContainer.innerHTML += `<div class="review-item"><div class="review-q"><span class="${statusClass}">${statusText}</span> Q${i + 1} ${q.q.substring(0, 50)}${q.q.length > 50 ? '…' : ''}</div><div class="review-answer">正解: <strong>${q.answer}</strong>${a && a.selectedText && !a.correct ? '<br>あなたの回答: ' + a.selectedText : ''}</div><div class="review-explanation">${q.explanation}</div></div>`;
+  });
+
+  showScreen('resultScreen');
+  sendResults(correct, total, pct, avgTime, unanswered, totalTime);
+}
+
+// ===== BACK TO SELECT =====
+function backToSelect() {
+  document.getElementById('headerTitle').textContent = 'ロジカルシンキング研修クイズ';
+  document.getElementById('headerProgress').textContent = '';
+  showScreen('selectScreen');
+}
+
+// ===== SEND RESULTS =====
+function sendResults(correct, total, pct, avgTime, unanswered, totalTimeSec) {
+  if (!GAS_URL) {
+    document.getElementById('resultSaved').textContent = 'GAS URL未設定（結果は記録されません）';
+    document.getElementById('resultSaved').className = 'result-saved error';
+    return;
+  }
+
+  const levels = {};
+  [1, 2, 3].forEach(lv => {
+    let lT = 0, lC = 0;
+    currentQuestions.forEach((q, i) => { if (q.level === lv) { lT++; if (answers[i] && answers[i].correct) lC++; } });
+    levels[`Level${lv}`] = `${lC}/${lT}`;
+  });
+
+  const sections = {};
+  sections[selectedSection.name] = `${correct}/${total}`;
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      testName: `ロジカルシンキング - ${selectedSection.name}`,
+      name: userName,
+      correct, total, percentage: pct,
+      sections, levels,
+      avgTime, unanswered,
+      tabSwitchCount, totalTimeSec,
+      startTime: sectionStartTime.toISOString(),
+      endTime: sectionEndTime.toISOString(),
+    }),
+    mode: 'no-cors',
+  })
+  .then(() => {
+    document.getElementById('resultSaved').textContent = '結果を記録しました';
+    document.getElementById('resultSaved').className = 'result-saved success';
+  })
+  .catch(() => {
+    document.getElementById('resultSaved').textContent = '記録に失敗しました';
+    document.getElementById('resultSaved').className = 'result-saved error';
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>モレクレ研修テスト｜仕事の進め方</title>
+  <style>
+    :root {
+      --primary: #1a365d;
+      --primary-light: #2b6cb0;
+      --accent: #ed8936;
+      --correct: #38a169;
+      --wrong: #e53e3e;
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --text: #2d3748;
+      --text-light: #718096;
+      --border: #e2e8f0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    .header h1 { font-size: 1.6rem; margin-bottom: 0.3rem; }
+    .header p { font-size: 0.9rem; opacity: 0.85; }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    /* ===== Login Screen ===== */
+    .login-screen {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .login-screen h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .login-screen p { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1.5rem; }
+    .login-screen .login-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .user-info {
+      display: none;
+      background: #ebf8ff;
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+    .user-info .email { font-weight: 700; color: var(--primary); }
+    .name-input {
+      width: 100%;
+      max-width: 300px;
+      padding: 0.7rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      text-align: center;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .name-input:focus { border-color: var(--primary-light); }
+    .name-input::placeholder { color: #cbd5e0; }
+
+    /* ===== Quiz ===== */
+    .quiz-area { display: none; }
+    .quiz-area.show { display: block; }
+
+    .quiz-intro {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--accent);
+    }
+    .quiz-intro h2 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .quiz-intro p { font-size: 0.9rem; color: var(--text-light); }
+    .quiz-intro .notice {
+      margin-top: 0.8rem;
+      padding: 0.6rem 0.8rem;
+      background: #fff5f5;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--wrong);
+      font-weight: 600;
+    }
+    .quiz-intro .user-badge {
+      margin-top: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      background: #ebf8ff;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--primary);
+    }
+
+    .progress-bar {
+      background: var(--border);
+      border-radius: 20px;
+      height: 8px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, var(--primary-light), var(--accent));
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.4s ease;
+    }
+    .progress-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .question-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .question-card.answered-correct { border-left: 4px solid var(--correct); }
+    .question-card.answered-wrong { border-left: 4px solid var(--wrong); }
+    .result-badge {
+      display: inline-block;
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-left: 0.5rem;
+    }
+    .result-badge.correct { background: #f0fff4; color: var(--correct); }
+    .result-badge.wrong { background: #fff5f5; color: var(--wrong); }
+
+    .q-number {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      text-align: center; line-height: 28px;
+      font-size: 0.8rem; font-weight: 700;
+      margin-right: 0.5rem;
+    }
+    .q-category {
+      display: inline-block;
+      background: #ebf4ff;
+      color: var(--primary-light);
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .q-text {
+      font-size: 1.05rem; font-weight: 600;
+      margin: 0.8rem 0;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .option-btn {
+      display: block; width: 100%; text-align: left;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text);
+    }
+    .option-btn:hover:not(:disabled) { border-color: var(--primary-light); background: #ebf8ff; }
+    .option-btn:disabled { cursor: default; }
+    .option-btn.selected { border-color: var(--primary-light); background: #ebf8ff; }
+    .option-btn.correct { border-color: var(--correct); background: #f0fff4; color: var(--correct); font-weight: 600; }
+    .option-btn.wrong { border-color: var(--wrong); background: #fff5f5; color: var(--wrong); }
+
+    .explanation {
+      display: none;
+      margin-top: 0.8rem; padding: 0.8rem;
+      background: #fffff0;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      border-left: 3px solid var(--accent);
+    }
+    .explanation.show { display: block; }
+
+    .btn-primary {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff; border: none;
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,54,93,0.3); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary {
+      display: inline-block;
+      background: #fff; color: var(--primary);
+      border: 2px solid var(--primary);
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: var(--primary); color: #fff; }
+
+    .btn-group {
+      display: flex; gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem; flex-wrap: wrap;
+    }
+
+    .result-card {
+      display: none;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem; text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+    }
+    .result-card.show { display: block; }
+    .score-circle {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 2rem; font-weight: 800; color: #fff;
+    }
+    .score-high { background: linear-gradient(135deg, #38a169, #48bb78); }
+    .score-mid { background: linear-gradient(135deg, #d69e2e, #ed8936); }
+    .score-low { background: linear-gradient(135deg, #e53e3e, #fc8181); }
+    .result-msg { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .result-detail { font-size: 0.9rem; color: var(--text-light); }
+    .result-saved {
+      margin-top: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .result-saved.success { background: #f0fff4; color: var(--correct); }
+    .result-saved.error { background: #fff5f5; color: var(--wrong); }
+    .result-saved.saving { background: #ebf8ff; color: var(--primary-light); }
+
+    .category-breakdown {
+      margin-top: 1rem;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    .category-breakdown h3 {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      color: var(--text-light);
+    }
+    .cat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .cat-row:last-child { border-bottom: none; }
+    .cat-name { font-size: 0.82rem; }
+    .cat-score { font-weight: 700; font-size: 0.85rem; }
+
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.25rem; }
+      .container { padding: 1rem 0.8rem 3rem; }
+      .btn-group { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>モレクレ研修テスト｜仕事の進め方</h1>
+  <p>信用を毀損しない仕事設計 ― タスク管理・コミュニケーションの理解度チェック</p>
+</div>
+
+<div class="container">
+  <!-- ===== LOGIN ===== -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-icon">&#128221;</div>
+    <h2>テストを開始する</h2>
+    <p>氏名を入力してテストを開始してください。<br>回答結果は自動的にスプレッドシートに記録されます。</p>
+    <div class="user-info" id="userInfo">
+      ログイン中: <span class="email" id="userEmail"></span>
+    </div>
+    <div>
+      <input type="text" class="name-input" id="userName" placeholder="氏名を入力（例：山田 太郎）">
+    </div>
+    <div class="btn-group" style="margin-top:0.5rem">
+      <button class="btn-primary" id="startBtn" onclick="startQuiz()">テスト開始</button>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div id="quizArea" class="quiz-area">
+    <div class="quiz-intro">
+      <h2>モレクレ研修 理解度テスト（全20問）</h2>
+      <p>4択から最も適切なものを選んでください。全問回答後に「答え合わせ」ボタンで結果を確認できます。</p>
+      <div class="notice">※ 実際の業務シナリオを想定した応用問題です。研修資料の内容を理解した上で回答してください。</div>
+      <div class="user-badge" id="quizUserBadge"></div>
+    </div>
+
+    <div class="progress-text" id="progressText">0 / 20 回答済み</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+    <div id="quizContainer"></div>
+
+    <div class="btn-group" id="quizActions">
+      <button class="btn-primary" id="submitBtn" disabled onclick="gradeQuiz()">答え合わせをする</button>
+    </div>
+
+    <div class="result-card" id="resultCard">
+      <div class="score-circle" id="scoreCircle"></div>
+      <div class="result-msg" id="resultMsg"></div>
+      <div class="result-detail" id="resultDetail"></div>
+      <div class="category-breakdown" id="categoryBreakdown"></div>
+      <div class="result-saved saving" id="resultSaved">結果を記録中...</div>
+    </div>
+
+    <div class="btn-group" id="retryGroup" style="display:none">
+      <button class="btn-primary" onclick="scrollToReview()">答え合わせを確認する</button>
+      <button class="btn-secondary" onclick="resetQuiz()">もう一度挑戦する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================
+// GAS URL（必要に応じて書き換え）
+// =====================================================
+const GAS_URL = 'YOUR_GAS_WEB_APP_URL_HERE';
+// =====================================================
+
+const quizData = [
+  // ===== モレクレの基本理解（4問） =====
+  { q:"「売上が低いこと」と「モレクレを起こすこと」では、会社にとってどちらがより深刻とされていますか？その理由として最も適切なものを選んでください。",
+    answer:"モレクレの方が深刻。売上は状況で変動するが、信頼は一度失うとゼロになり回復に何倍もの時間がかかるから",
+    category:"モレクレの基本理解",
+    options:[
+      "モレクレの方が深刻。売上は状況で変動するが、信頼は一度失うとゼロになり回復に何倍もの時間がかかるから",
+      "売上低下の方が深刻。売上がなければ会社は存続できないから",
+      "どちらも同程度。売上と信頼は車の両輪であり優劣はつけられないから",
+      "状況による。大口案件なら売上、小口案件ならモレクレの方が深刻だから"
+    ],
+    explanation:"売上は上下しますが、信頼は失った瞬間にゼロになります。「あの人は約束を守らない」という印象がつくと取り返しに何倍もの時間がかかり、顧客喪失＝会社の存続リスクに直結します。" },
+
+  { q:"次のうち「モレクレ」に該当しないものはどれですか？",
+    answer:"提案書の内容について上司と意見が分かれ、議論に時間がかかった",
+    category:"モレクレの基本理解",
+    options:[
+      "依頼された資料作成を忘れ、期日を過ぎてから催促された",
+      "お客様からのメールを見落とし、3日間放置してしまった",
+      "提案書の内容について上司と意見が分かれ、議論に時間がかかった",
+      "先輩に確認せず自己判断で回答し、お客様に誤った情報を伝えてしまった"
+    ],
+    explanation:"モレクレとは「漏れ（タスク・返信の漏れ）」と「クレーム（顧客からのクレーム）」のことです。意見の相違や議論は業務上の正常なプロセスであり、モレクレには該当しません。" },
+
+  { q:"現在、社内のモレクレが大きな問題になっていない理由として、研修資料で述べられていることは何ですか？",
+    answer:"一部メンバーのフォローでギリギリ成立しているから",
+    category:"モレクレの基本理解",
+    options:[
+      "一部メンバーのフォローでギリギリ成立しているから",
+      "モレクレの発生件数が業界平均を下回っているから",
+      "クレーム対応専門のチームが設置されているから",
+      "自動化ツールでタスク漏れを防止しているから"
+    ],
+    explanation:"研修資料では「いま社内のモレクレの多くは、一部メンバーのフォローでギリギリ成立しています。裏を返せば、フォローがなければ顧客を失っていたということです」と述べられています。" },
+
+  { q:"モレクレを防ぐために身につけるべき4つのスキルとして、研修資料に含まれていないものはどれですか？",
+    answer:"営業トークの改善で顧客満足度を上げる",
+    category:"モレクレの基本理解",
+    options:[
+      "タスク漏れを構造的に防ぐ（記録・期日・担当）",
+      "即レス（2時間ルール）で相手を待たせない",
+      "営業トークの改善で顧客満足度を上げる",
+      "迷ったら即エスカレーションできる状態を作る"
+    ],
+    explanation:"研修で身につける4つは「タスク漏れの構造的防止」「即レス（2時間ルール）」「社外対応の文体と判断フローの遵守」「即エスカレーション」です。営業トークの改善はこの研修の範囲外です。" },
+
+  // ===== タスク管理（8問） =====
+  { q:"あなたは同時に3つのタスクを口頭で依頼されました。メモを取らずに席に戻ったところ、別の先輩から急ぎの質問を受けました。このとき最も起きやすいリスクは何ですか？",
+    answer:"急ぎの質問対応で記憶が上書きされ、3つの依頼のうち1つ以上を忘れる",
+    category:"タスク管理",
+    options:[
+      "急ぎの質問対応で記憶が上書きされ、3つの依頼のうち1つ以上を忘れる",
+      "3つのタスクは記憶に残るが、優先順位の判断を誤る",
+      "先輩の質問への回答品質が下がる",
+      "タスクの期日を間違えて記録してしまう"
+    ],
+    explanation:"脳は「やらなければならないこと」を記憶し続けるのが苦手です。複数依頼が重なると記憶は上書きされ、必ず漏れます。依頼を受けたらその場で記録することが大原則です。" },
+
+  { q:"タスクを「タスクとして成立させる」ために最低限必要な3点は「何を・いつまでに・誰が」です。同僚から「あの件よろしく」と言われた場合、最初にすべき行動は？",
+    answer:"「何の件か」「いつまでか」「自分がやるのか」をその場で確認して記録する",
+    category:"タスク管理",
+    options:[
+      "「何の件か」「いつまでか」「自分がやるのか」をその場で確認して記録する",
+      "「あの件」の内容は推測できるので、すぐに着手する",
+      "後で確認しようと思い、とりあえず「了解」と返す",
+      "同僚にメールで詳細を送るよう依頼する"
+    ],
+    explanation:"「何を・いつまでに・誰が」の3点が揃っていないものは「タスクがある状態」ではありません。曖昧な依頼はその場で確認して具体化し、記録することが重要です。" },
+
+  { q:"木曜が完成期日の資料作成を依頼されました。別の担当者の確認・承認が必要で、差し戻しの可能性もあります。自分が動くべき実際の期日はいつですか？",
+    answer:"火曜の午前中まで（差し戻しも想定して余裕を持つ）",
+    category:"タスク管理",
+    options:[
+      "火曜の午前中まで（差し戻しも想定して余裕を持つ）",
+      "水曜の夕方まで（確認は翌朝で間に合う）",
+      "木曜の午前中まで（期日当日に完成させればよい）",
+      "月曜中に完成させる（早ければ早いほどよい）"
+    ],
+    explanation:"複数工程があるタスクは期日から逆算し、確認者のレビュー時間＋差し戻し対応の余裕を含めて計画します。木曜完成なら、火曜午前に提出→確認→差し戻し対応の余裕を確保します。" },
+
+  { q:"以下のタスクを優先度順に正しく並べたものはどれですか？\nA：期日に余裕がある社内の振り返りレポート\nB：お客様からの問い合わせ（すぐに回答できない内容）\nC：期日を過ぎている社内タスク（自分がボールを持っている）",
+    answer:"B → C → A",
+    category:"タスク管理",
+    options:[
+      "B → C → A",
+      "C → B → A",
+      "B → A → C",
+      "A → B → C"
+    ],
+    explanation:"第1優先は外部顧客対応（B：まず一次返信が必要）、次に期日超過で相手を止めているタスク（C：自分ボールで止まっている場合は優先度UP）、最後に期日に余裕がある自己完結タスク（A）です。" },
+
+  { q:"お客様からスプレッドシートの項目を詳細に書き直す依頼を受けました。1時間ほどかかる見込みです。正しい対応はどれですか？",
+    answer:"「本日中で問題ないか」を確認し、OKなら定時後または翌営業日に対応する",
+    category:"タスク管理",
+    options:[
+      "「本日中で問題ないか」を確認し、OKなら定時後または翌営業日に対応する",
+      "重要なお客様なので、他のタスクを全て止めてその場で1時間かけて対応する",
+      "1時間かかることを伝え、翌週まで待ってもらうよう依頼する",
+      "簡易版を30分で作成し、詳細版は後日対応すると伝える"
+    ],
+    explanation:"長時間かかるタスクは何も考えずに取り掛かってはいけません。まず期日を確認し、「本日中でOK」なら定時後や翌営業日に対応します。判断が難しければ上司に相談しましょう。" },
+
+  { q:"退社前チェックの項目として、研修資料で述べられていないものはどれですか？",
+    answer:"翌日の商談資料を上司に事前共有したか",
+    category:"タスク管理",
+    options:[
+      "翌日の商談資料を上司に事前共有したか",
+      "今日返信すべきメッセージに返信漏れはないか",
+      "保留・回答待ちのタスクをそのまま忘れていないか",
+      "今日やる予定だったのにできなかったことを先輩社員に報告したか"
+    ],
+    explanation:"退社前チェック項目は「返信漏れ確認」「保留タスク確認」「期日超過・明日期日の確認」「自分の返信待ちの相手確認」「できなかったことの報告」の5つです。商談資料の事前共有は含まれていません。" },
+
+  { q:"Slackでタスクに関するメッセージを受け取りましたが、今は商談中で対応できません。最も適切な対応は？",
+    answer:"あえて未読にしておき、落ち着いて確認できるときに改めて認識・記録する",
+    category:"タスク管理",
+    options:[
+      "あえて未読にしておき、落ち着いて確認できるときに改めて認識・記録する",
+      "商談中でも即座に既読にして「後で対応します」と返信する",
+      "とりあえず既読にして、商談後に記憶を頼りに対応する",
+      "商談が終わるまでスマホの通知を全てオフにする"
+    ],
+    explanation:"出先・商談中・休日等に来た連絡は「あえて未読にしておき、落ち着いて確認できる時に改めて認識、記録できる状態に」することが推奨されています。既読にして忘れるリスクを防ぎます。" },
+
+  { q:"タスクの記録ツールとして研修資料で推奨されているものの組み合わせとして正しいものはどれですか？",
+    answer:"NotionのタスクDB、Slackのリマインド機能、カレンダー登録",
+    category:"タスク管理",
+    options:[
+      "NotionのタスクDB、Slackのリマインド機能、カレンダー登録",
+      "Excel管理表、メール下書き保存、付箋メモ",
+      "Trello、LINE、手帳への記録",
+      "Googleスプレッドシート、ChatWork、Todoistアプリ"
+    ],
+    explanation:"研修資料では「NotionのタスクDB（チーム共有タスクは必須）」「リマインダー機能（特にSlackのリマインド推奨）」「カレンダー登録」の3つが推奨されています。" },
+
+  // ===== コミュニケーション・即レス（4問） =====
+  { q:"お客様から技術的に難しい質問メールが届きました。社内確認に2日かかりそうです。最も適切な初動対応は？",
+    answer:"まず「確認いたします。〇日までにご連絡します」と一次返信し、社内確認を開始する",
+    category:"コミュニケーション",
+    options:[
+      "まず「確認いたします。〇日までにご連絡します」と一次返信し、社内確認を開始する",
+      "正確な回答ができるまで返信を控え、2日後に完璧な回答を送る",
+      "「わかりかねます」と返信し、上司のメールアドレスを伝える",
+      "技術担当に転送し、自分からは返信しない"
+    ],
+    explanation:"すぐに回答できない場合でも、まず「確認いたします」の一次返信を送ることが最優先です。回答期日も提示することで、お客様に安心感を与えます。" },
+
+  { q:"社内の後輩からSlackで質問が来ましたが、今は別のタスクに集中しています。「社内だから後でいい」と考えて3時間放置しました。これが問題になる理由として最も適切なものは？",
+    answer:"自分が返信しないことで後輩のタスクが止まっている可能性があるから",
+    category:"コミュニケーション",
+    options:[
+      "自分が返信しないことで後輩のタスクが止まっている可能性があるから",
+      "社内ルールで全てのSlackメッセージに1時間以内の返信が義務付けられているから",
+      "後輩の評価に悪影響を与えるから",
+      "Slackの既読率が人事評価に反映されるから"
+    ],
+    explanation:"社内向けでも、あなたが返信しないことで相手のタスクが止まっている状態なら先に対応すべきです。「社内だから後でいい」は自分の都合であり、AllStar Kansha Shinasaiの心を大切にしましょう。" },
+
+  { q:"お客様が「今日中に回答してほしい」と言っています。しかしお客様の定時は17時、自社の定時は18時です。この状況で考慮すべきこととして最も適切なものは？",
+    answer:"会社によって定時が異なることを踏まえ、相手の定時を意識して対応する",
+    category:"コミュニケーション",
+    options:[
+      "会社によって定時が異なることを踏まえ、相手の定時を意識して対応する",
+      "自社の定時18時までに回答すれば「今日中」の約束は果たせる",
+      "「今日中」は翌朝始業までを指すので、夜中でも問題ない",
+      "「今日中」は急かしているだけなので、翌営業日でも問題ない"
+    ],
+    explanation:"「お客さんが言う今日中の定義」は会社によって定時が異なります。急かしているだけのパターンもあり得ますが、相手の定時を意識した上で、定義を考えて動く（返信する）ことが大切です。" },
+
+  { q:"18時以降に回してよいタスクと、すぐ対応すべきタスクの判断として正しいものはどれですか？",
+    answer:"自分だけで完結し期日に余裕がある作業は18時以降OK、相手が今日中の返信を待っている連絡はすぐ対応",
+    category:"コミュニケーション",
+    options:[
+      "自分だけで完結し期日に余裕がある作業は18時以降OK、相手が今日中の返信を待っている連絡はすぐ対応",
+      "社外連絡は全て18時以降OK、社内連絡は全てすぐ対応",
+      "メールは18時以降OK、Slackはすぐ対応",
+      "上司からの依頼はすぐ対応、それ以外は全て18時以降OK"
+    ],
+    explanation:"18時以降OKなのは「自分だけで完結する期日に余裕がある作業」「重めタスクで本日中OKと確認済みのもの」等。すぐ対応すべきは「相手が今日中の返信を待っている連絡」「明日のスケジュールに影響する連絡」「一次返信」「至急・期日が近いタスク」です。" },
+
+  // ===== リカバリー・判断力（4問） =====
+  { q:"水曜に期日のタスクが間に合わないと月曜の時点で気づきました。正しい対処の順番はどれですか？",
+    answer:"月曜中に先輩社員に報告 → 現状と理由を伝える → 新しい期日を提示 → 社外連絡の要否を確認",
+    category:"リカバリー・判断力",
+    options:[
+      "月曜中に先輩社員に報告 → 現状と理由を伝える → 新しい期日を提示 → 社外連絡の要否を確認",
+      "水曜の朝に先輩社員に報告 → 理由を説明 → 延長を依頼",
+      "自力で水曜に間に合わせるため、他のタスクを全て後回しにする",
+      "月曜中にお客様に直接連絡し、期日変更を依頼する"
+    ],
+    explanation:"間に合わないと気づいた時点で即報告が鉄則です。期日当日ではなく気づいたら即連絡（遅くとも前日まで）。先輩社員にまず報告し、社外連絡が必要かは相談の上判断します。" },
+
+  { q:"期日に間に合わないときの報告で、最も信頼を失う行動はどれですか？",
+    answer:"期日を過ぎてから何も言わずに黙っている",
+    category:"リカバリー・判断力",
+    options:[
+      "期日を過ぎてから何も言わずに黙っている",
+      "期日前日に「間に合いません」と報告する",
+      "期日当日の朝に状況を説明する",
+      "期日の2日前に新しい期日を提示する"
+    ],
+    explanation:"「期日を過ぎてから何も言わない」が最も信頼を失う行動です。間に合わないと気づいた時点ですぐ動くことが重要で、遅くとも前日までに報告すべきです。" },
+
+  { q:"お客様からの依頼に対し、社内メンバーに確認を依頼して回答待ちの状態になりました。この状況で最も注意すべきことは？",
+    answer:"回答待ちタスクにリマインダーを設定し、自分ボールに戻っていないか定期確認する",
+    category:"リカバリー・判断力",
+    options:[
+      "回答待ちタスクにリマインダーを設定し、自分ボールに戻っていないか定期確認する",
+      "社内メンバーを信頼して、回答が来るまで何もせず待つ",
+      "お客様に「社内確認中です」と毎日連絡する",
+      "回答が来たら対応するので、他のタスクに集中する"
+    ],
+    explanation:"「回答待ち」状態のタスクは放置が起きやすいポイントです。リマインダーを設定し、お客様に述べた期日より前に回答できるよう管理することが重要です。記録されていないタスクは漏れます。" },
+
+  { q:"あなたは入社間もないNewTakerです。お客様から聞かれた内容に対し、自分なりに答えはわかるものの100%の自信がありません。最も適切な対応は？",
+    answer:"「社内で確認いたします」と一次返信し、先輩社員に確認してから正式回答する",
+    category:"リカバリー・判断力",
+    options:[
+      "「社内で確認いたします」と一次返信し、先輩社員に確認してから正式回答する",
+      "自分なりの答えで即回答し、後で間違いに気づいたら訂正する",
+      "「わかりかねます」とだけ返信する",
+      "先輩社員の確認が取れるまで一切返信しない"
+    ],
+    explanation:"先輩社員に確認せず自己判断して間違いが起きることはモレクレの一つです。迷ったら即エスカレーション。ただし一次返信（「確認いたします」）は先に送り、相手を待たせないことも重要です。" },
+];
+
+let userAnswers = {};
+let graded = false;
+let currentUser = { email: '', name: '' };
+let shuffledOptions = [];
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ===== LOGIN =====
+function startQuiz() {
+  const name = document.getElementById('userName').value.trim();
+  if (!name) {
+    document.getElementById('userName').style.borderColor = '#e53e3e';
+    document.getElementById('userName').placeholder = '氏名を入力してください';
+    return;
+  }
+  currentUser.name = name;
+  currentUser.email = '(直接開始)';
+  showQuiz();
+}
+
+function showQuiz() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('quizArea').classList.add('show');
+  document.getElementById('quizUserBadge').textContent =
+    `受験者: ${currentUser.name}`;
+  renderQuiz();
+}
+
+// ===== QUIZ =====
+function renderQuiz() {
+  shuffledOptions = quizData.map(q => shuffleArray(q.options));
+
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = quizData.map((q, i) => `
+    <div class="question-card" id="qcard-${i}">
+      <span class="q-number">${i+1}</span>
+      <span class="q-category">${q.category}</span>
+      <div class="q-text">${q.q}</div>
+      <div class="options">
+        ${shuffledOptions[i].map((opt, j) => `
+          <button class="option-btn" id="opt-${i}-${j}" onclick="selectOption(${i}, ${j}, this)">${opt}</button>
+        `).join('')}
+      </div>
+      <div class="explanation" id="exp-${i}">${q.explanation}</div>
+    </div>
+  `).join('');
+}
+
+function selectOption(qi, oi, el) {
+  if (graded) return;
+  userAnswers[qi] = { index: oi, value: shuffledOptions[qi][oi] };
+  for (let j = 0; j < shuffledOptions[qi].length; j++) {
+    document.getElementById(`opt-${qi}-${j}`).classList.toggle('selected', j === oi);
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  const count = Object.keys(userAnswers).length;
+  document.getElementById('progressText').textContent = `${count} / ${quizData.length} 回答済み`;
+  document.getElementById('progressFill').style.width = `${(count/quizData.length)*100}%`;
+  document.getElementById('submitBtn').disabled = count < quizData.length;
+}
+
+function gradeQuiz() {
+  if (Object.keys(userAnswers).length < quizData.length) return;
+  graded = true;
+  let correct = 0;
+
+  const catStats = {};
+  quizData.forEach((q, i) => {
+    const card = document.getElementById(`qcard-${i}`);
+    const isCorrect = userAnswers[i].value === q.answer;
+    if (isCorrect) correct++;
+    card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+
+    const badge = isCorrect
+      ? '<span class="result-badge correct">&#9675; 正解</span>'
+      : '<span class="result-badge wrong">&#10005; 不正解</span>';
+    card.querySelector('.q-number').insertAdjacentHTML('afterend', badge);
+
+    shuffledOptions[i].forEach((opt, j) => {
+      const btn = document.getElementById(`opt-${i}-${j}`);
+      btn.disabled = true;
+      if (opt === q.answer) btn.classList.add('correct');
+      if (j === userAnswers[i].index && !isCorrect) btn.classList.add('wrong');
+    });
+    document.getElementById(`exp-${i}`).classList.add('show');
+
+    if (!catStats[q.category]) catStats[q.category] = { correct: 0, total: 0 };
+    catStats[q.category].total++;
+    if (isCorrect) catStats[q.category].correct++;
+  });
+
+  const pct = Math.round((correct/quizData.length)*100);
+  const scoreCircle = document.getElementById('scoreCircle');
+  scoreCircle.textContent = `${pct}%`;
+  scoreCircle.className = 'score-circle ' + (pct >= 80 ? 'score-high' : pct >= 50 ? 'score-mid' : 'score-low');
+
+  const resultMsg = document.getElementById('resultMsg');
+  if (pct >= 80) resultMsg.textContent = '素晴らしい！モレクレ防止の基本がしっかり身についています';
+  else if (pct >= 50) resultMsg.textContent = 'もう少し！研修資料を復習して再挑戦しましょう';
+  else resultMsg.textContent = '研修資料をじっくり読み直し、もう一度挑戦してください';
+
+  document.getElementById('resultDetail').textContent = `${quizData.length}問中 ${correct}問正解（正答率 ${pct}%）`;
+
+  const catOrder = ['モレクレの基本理解','タスク管理','コミュニケーション','リカバリー・判断力'];
+  let catHtml = '<h3>カテゴリ別正答率</h3>';
+  catOrder.forEach(cat => {
+    if (catStats[cat]) {
+      const s = catStats[cat];
+      const catPct = Math.round((s.correct/s.total)*100);
+      catHtml += `<div class="cat-row"><span class="cat-name">${cat}</span><span class="cat-score">${s.correct}/${s.total}（${catPct}%）</span></div>`;
+    }
+  });
+  document.getElementById('categoryBreakdown').innerHTML = catHtml;
+
+  document.getElementById('resultCard').classList.add('show');
+  document.getElementById('quizActions').style.display = 'none';
+  document.getElementById('retryGroup').style.display = 'flex';
+
+  // スプレッドシートに送信
+  const categories = {};
+  catOrder.forEach(cat => {
+    if (catStats[cat]) {
+      categories[cat] = `${catStats[cat].correct}/${catStats[cat].total}`;
+    }
+  });
+
+  sendResult({
+    testName: 'モレクレ研修',
+    email: currentUser.email,
+    name: currentUser.name,
+    correct: correct,
+    total: quizData.length,
+    percentage: pct,
+    categories: categories
+  });
+
+  document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function sendResult(data) {
+  const savedEl = document.getElementById('resultSaved');
+
+  if (GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
+    savedEl.textContent = '※ GAS未設定のため結果は記録されていません';
+    savedEl.className = 'result-saved error';
+    return;
+  }
+
+  savedEl.textContent = '結果をスプレッドシートに記録中...';
+  savedEl.className = 'result-saved saving';
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+    mode: 'no-cors'
+  })
+  .then(() => {
+    savedEl.textContent = '結果をスプレッドシートに記録しました';
+    savedEl.className = 'result-saved success';
+  })
+  .catch(err => {
+    savedEl.textContent = '記録に失敗しました。管理者に連絡してください。';
+    savedEl.className = 'result-saved error';
+  });
+}
+
+function scrollToReview() {
+  document.getElementById('qcard-0').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetQuiz() {
+  userAnswers = {};
+  graded = false;
+  document.getElementById('resultCard').classList.remove('show');
+  document.getElementById('quizActions').style.display = 'flex';
+  document.getElementById('retryGroup').style.display = 'none';
+  renderQuiz();
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>

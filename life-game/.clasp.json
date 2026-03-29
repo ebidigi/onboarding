@@ -1,0 +1,17 @@
+{
+  "scriptId": "1wpKIuK4ltPi7s0Qwf0T9xTkkocv2PISDYOc6vjKDwdEHFx0vF9B7hwKn",
+  "rootDir": "/Users/ebineryota/code/onboarding/life-game",
+  "parentId": "1Z0VyC3XdOY-phKkx5Oo__Y0ZoLP7cmAhRIKel5ZFkGI",
+  "scriptExtensions": [
+    ".js",
+    ".gs"
+  ],
+  "htmlExtensions": [
+    ".html"
+  ],
+  "jsonExtensions": [
+    ".json"
+  ],
+  "filePushOrder": [],
+  "skipSubdirectories": false
+}
