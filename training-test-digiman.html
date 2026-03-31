@@ -299,7 +299,7 @@
   <div id="loginScreen" class="login-screen">
     <div class="login-icon">&#128221;</div>
     <h2>テストを開始する</h2>
-    <p>Googleアカウントで認証後、氏名を入力してテストを開始してください。<br>回答結果は自動的にスプレッドシートに記録されます。</p>
+    <p>氏名を入力してテストを開始してください。<br>回答結果は自動的にスプレッドシートに記録されます。</p>
     <div class="user-info" id="userInfo">
       ログイン中: <span class="email" id="userEmail"></span>
     </div>
@@ -307,14 +307,7 @@
       <input type="text" class="name-input" id="userName" placeholder="氏名を入力（例：山田 太郎）">
     </div>
     <div class="btn-group" style="margin-top:0.5rem">
-      <button class="btn-primary" id="startBtn" onclick="startQuiz()">Google認証してテスト開始</button>
-    </div>
-    <div id="manualStart" style="display:none; margin-top:1.5rem; text-align:center;">
-      <div style="background:#f0fff4; border:2px solid #38a169; border-radius:10px; padding:1.2rem; margin-bottom:0.8rem;">
-        <p style="font-size:1rem; font-weight:700; color:#38a169; margin-bottom:0.3rem;">認証が完了したらこちらをクリック</p>
-        <p style="font-size:0.82rem; color:#718096; margin-bottom:0.8rem;">認証画面のタブは手動で閉じてください</p>
-        <button class="btn-primary" onclick="forceStart()" style="width:100%; max-width:300px; font-size:1.05rem; padding:1rem;">テストを開始する</button>
-      </div>
+      <button class="btn-primary" id="startBtn" onclick="startQuiz()">テストを開始する</button>
     </div>
   </div>
 
@@ -475,37 +468,7 @@ function startQuiz() {
     return;
   }
   currentUser.name = name;
-
-  const btn = document.getElementById('startBtn');
-  btn.disabled = true;
-  btn.textContent = '認証中... ポップアップを確認してください';
-
-  // ポップアップでGAS認証ページを開く
-  const authWindow = window.open(GAS_URL, 'gas_auth', 'width=500,height=400');
-
-  // ポップアップブロック対策
-  if (!authWindow || authWindow.closed) {
-    btn.disabled = false;
-    btn.textContent = 'Google認証してテスト開始';
-    alert('ポップアップがブロックされました。ブラウザのポップアップを許可してから再度お試しください。');
-    return;
-  }
-
-  // ポップアップが閉じられたことを検知してクイズ開始
-  const pollTimer = setInterval(() => {
-    if (authWindow.closed) {
-      clearInterval(pollTimer);
-      currentUser.email = '(Google認証済み)';
-      showQuiz();
-    }
-  }, 500);
-
-  // 認証ポップアップを開いたら開始ボタンをすぐ表示
-  document.getElementById('manualStart').style.display = 'block';
-}
-
-function forceStart() {
-  currentUser.email = '(Google認証済み)';
+  currentUser.email = '';
   showQuiz();
 }
 
@@ -513,7 +476,7 @@ function showQuiz() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('quizArea').classList.add('show');
   document.getElementById('quizUserBadge').textContent =
-    `受験者: ${currentUser.name}（${currentUser.email}）`;
+    `受験者: ${currentUser.name}`;
   renderQuiz();
 }
 
@@ -626,7 +589,6 @@ function gradeQuiz() {
 
   sendResult({
     testName: 'DigiMan・ビジネスモデル理解',
-    email: currentUser.email,
     name: currentUser.name,
     correct: correct,
     total: quizData.length,

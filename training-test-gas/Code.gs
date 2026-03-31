@@ -1,12 +1,41 @@
 /**
- * モレクレ研修テスト - 回答記録用 Google Apps Script
+ * 研修テスト共通 - 回答記録用 Google Apps Script
  *
  * スプレッドシート: https://docs.google.com/spreadsheets/d/1A6uYGKB7lWJz498WvQPCoL8V9QNnpK0F3vAsW3koK9U/edit
- * シート名: 研修テスト
+ *
+ * 対応テスト:
+ *   - スタンス研修 理解度     → シート「スタンス研修理解度テスト」
+ *   - ビジネスマナー・ルール  → シート「マナー研修理解度テスト」
+ *   - DigiMan・ビジネスモデル理解 → シート「DigiMan・ビジネスモデル理解テスト」
+ *   - その他すべてのテスト    → シート「研修テスト」（マスター）
+ *
+ * testName ごとに専用シートへ記録し、全テストを「研修テスト」シートにも集約します。
  */
 
-const SHEET_NAME = '研修テスト';
+const MASTER_SHEET_NAME = '研修テスト';
 const TARGET_SS_ID = '1A6uYGKB7lWJz498WvQPCoL8V9QNnpK0F3vAsW3koK9U';
+
+// testName → 専用シート名のマッピング
+const TEST_SHEET_MAP = {
+  'スタンス研修 理解度':        'スタンス研修理解度テスト',
+  'ビジネスマナー・ルール':     'マナー研修理解度テスト',
+  'DigiMan・ビジネスモデル理解': 'DigiMan・ビジネスモデル理解テスト',
+};
+
+const HEADER_ROW = ['受験日時', 'テスト名', 'メールアドレス', '氏名', '正答数', '問題数', '正答率(%)', 'カテゴリ別詳細'];
+
+/**
+ * 指定名のシートを取得する。存在しない場合はヘッダー付きで新規作成する。
+ */
+function getOrCreateSheet(ss, sheetName) {
+  let sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName);
+    sheet.appendRow(HEADER_ROW);
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
 
 // GET: Google認証確認画面を表示
 function doGet(e) {
@@ -82,9 +111,9 @@ function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     const ss = SpreadsheetApp.openById(TARGET_SS_ID);
-    const sheet = ss.getSheetByName(SHEET_NAME);
 
     const email = Session.getActiveUser().getEmail() || data.email || '不明';
+    const testName = data.testName || '';
 
     // カテゴリ別結果を動的に組み立て
     const categoryDetails = [];
@@ -97,7 +126,7 @@ function doPost(e) {
 
     const row = [
       new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
-      data.testName || '',
+      testName,
       email,
       data.name || '',
       data.correct,
@@ -106,7 +135,16 @@ function doPost(e) {
       categoryString,
     ];
 
-    sheet.appendRow(row);
+    // 1. マスターシート（全テスト集約）に記録
+    const masterSheet = getOrCreateSheet(ss, MASTER_SHEET_NAME);
+    masterSheet.appendRow(row);
+
+    // 2. テスト名に対応する専用シートに記録
+    const dedicatedSheetName = TEST_SHEET_MAP[testName];
+    if (dedicatedSheetName) {
+      const dedicatedSheet = getOrCreateSheet(ss, dedicatedSheetName);
+      dedicatedSheet.appendRow(row);
+    }
 
     return ContentService
       .createTextOutput(JSON.stringify({ success: true, email: email }))

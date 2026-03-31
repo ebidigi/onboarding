@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>toB用語・ナレッジ 総合テスト</title>
+  <style>
+    :root {
+      --primary: #065f46;
+      --primary-light: #047857;
+      --accent: #f59e0b;
+      --correct: #38a169;
+      --wrong: #e53e3e;
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --text: #2d3748;
+      --text-light: #718096;
+      --border: #e2e8f0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    .header h1 { font-size: 1.6rem; margin-bottom: 0.3rem; }
+    .header p { font-size: 0.9rem; opacity: 0.85; }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    /* ===== Login Screen ===== */
+    .login-screen {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .login-screen h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .login-screen p { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1.5rem; }
+    .login-screen .login-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .user-info {
+      display: none;
+      background: #ecfdf5;
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+    .user-info .email { font-weight: 700; color: var(--primary); }
+    .name-input {
+      width: 100%;
+      max-width: 300px;
+      padding: 0.7rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      text-align: center;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .name-input:focus { border-color: var(--primary-light); }
+    .name-input::placeholder { color: #cbd5e0; }
+
+    /* ===== Quiz ===== */
+    .quiz-area { display: none; }
+    .quiz-area.show { display: block; }
+
+    .quiz-intro {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--accent);
+    }
+    .quiz-intro h2 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .quiz-intro p { font-size: 0.9rem; color: var(--text-light); }
+    .quiz-intro .notice {
+      margin-top: 0.8rem;
+      padding: 0.6rem 0.8rem;
+      background: #fff5f5;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--wrong);
+      font-weight: 600;
+    }
+    .quiz-intro .user-badge {
+      margin-top: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      background: #ecfdf5;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--primary);
+    }
+
+    .progress-bar {
+      background: var(--border);
+      border-radius: 20px;
+      height: 8px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, var(--primary-light), var(--accent));
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.4s ease;
+    }
+    .progress-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .question-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .question-card.answered-correct { border-left: 4px solid var(--correct); }
+    .question-card.answered-wrong { border-left: 4px solid var(--wrong); }
+    .result-badge {
+      display: inline-block;
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-left: 0.5rem;
+    }
+    .result-badge.correct { background: #f0fff4; color: var(--correct); }
+    .result-badge.wrong { background: #fff5f5; color: var(--wrong); }
+
+    .q-number {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      text-align: center; line-height: 28px;
+      font-size: 0.8rem; font-weight: 700;
+      margin-right: 0.5rem;
+    }
+    .q-category {
+      display: inline-block;
+      background: #ecfdf5;
+      color: var(--primary-light);
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .q-text {
+      font-size: 1.05rem; font-weight: 600;
+      margin: 0.8rem 0;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .option-btn {
+      display: block; width: 100%; text-align: left;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text);
+    }
+    .option-btn:hover:not(:disabled) { border-color: var(--primary-light); background: #ecfdf5; }
+    .option-btn:disabled { cursor: default; }
+    .option-btn.selected { border-color: var(--primary-light); background: #ecfdf5; }
+    .option-btn.correct { border-color: var(--correct); background: #f0fff4; color: var(--correct); font-weight: 600; }
+    .option-btn.wrong { border-color: var(--wrong); background: #fff5f5; color: var(--wrong); }
+
+    .explanation {
+      display: none;
+      margin-top: 0.8rem; padding: 0.8rem;
+      background: #fffff0;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      border-left: 3px solid var(--accent);
+    }
+    .explanation.show { display: block; }
+
+    .btn-primary {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff; border: none;
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(6,95,70,0.3); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary {
+      display: inline-block;
+      background: #fff; color: var(--primary);
+      border: 2px solid var(--primary);
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: var(--primary); color: #fff; }
+
+    .btn-group {
+      display: flex; gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem; flex-wrap: wrap;
+    }
+
+    .result-card {
+      display: none;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem; text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+    }
+    .result-card.show { display: block; }
+    .score-circle {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 2rem; font-weight: 800; color: #fff;
+    }
+    .score-high { background: linear-gradient(135deg, #38a169, #48bb78); }
+    .score-mid { background: linear-gradient(135deg, #d69e2e, #ed8936); }
+    .score-low { background: linear-gradient(135deg, #e53e3e, #fc8181); }
+    .result-msg { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .result-detail { font-size: 0.9rem; color: var(--text-light); }
+    .result-saved {
+      margin-top: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .result-saved.success { background: #f0fff4; color: var(--correct); }
+    .result-saved.error { background: #fff5f5; color: var(--wrong); }
+    .result-saved.saving { background: #ecfdf5; color: var(--primary-light); }
+
+    .category-breakdown {
+      margin-top: 1rem;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    .category-breakdown h3 {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      color: var(--text-light);
+    }
+    .cat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .cat-row:last-child { border-bottom: none; }
+    .cat-name { font-size: 0.82rem; }
+    .cat-score { font-weight: 700; font-size: 0.85rem; }
+
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.25rem; }
+      .container { padding: 1rem 0.8rem 3rem; }
+      .btn-group { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>toB用語・ナレッジ 総合テスト</h1>
+  <p>ビジネス用語・SaaS・営業・財務・法務の総合理解度チェック｜100問100点</p>
+</div>
+
+<div class="container">
+  <!-- ===== LOGIN ===== -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-icon">&#128221;</div>
+    <h2>テストを開始する</h2>
+    <p>氏名を入力してテストを開始してください。<br>回答結果は自動的にスプレッドシートに記録されます。</p>
+    <div class="user-info" id="userInfo">
+      ログイン中: <span class="email" id="userEmail"></span>
+    </div>
+    <div>
+      <input type="text" class="name-input" id="userName" placeholder="氏名を入力（例：山田 太郎）">
+    </div>
+    <div class="btn-group" style="margin-top:0.5rem">
+      <button class="btn-primary" id="startBtn" onclick="startQuiz()">テストを開始する</button>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div id="quizArea" class="quiz-area">
+    <div class="quiz-intro">
+      <h2>toB用語・ナレッジ 総合テスト（全20問）</h2>
+      <p>4択から正しいものを選んでください。全問回答後に「答え合わせ」ボタンで結果を確認できます。<br>合格ライン：80%（100問中80問以上）</p>
+      <div class="notice">※ テスト中は研修資料を見ないで回答してください。</div>
+      <div class="user-badge" id="quizUserBadge"></div>
+    </div>
+
+    <div class="progress-text" id="progressText">0 / 100 回答済み</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+    <div id="quizContainer"></div>
+
+    <div class="btn-group" id="quizActions">
+      <button class="btn-primary" id="submitBtn" disabled onclick="gradeQuiz()">答え合わせをする</button>
+    </div>
+
+    <div class="result-card" id="resultCard">
+      <div class="score-circle" id="scoreCircle"></div>
+      <div class="result-msg" id="resultMsg"></div>
+      <div class="result-detail" id="resultDetail"></div>
+      <div class="category-breakdown" id="categoryBreakdown"></div>
+      <div class="result-saved saving" id="resultSaved">結果を記録中...</div>
+    </div>
+
+    <div class="btn-group" id="retryGroup" style="display:none">
+      <button class="btn-primary" onclick="scrollToReview()">答え合わせを確認する</button>
+      <button class="btn-secondary" onclick="resetQuiz()">もう一度挑戦する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================
+// ★★★ GASデプロイ後、以下のURLを書き換えてください ★★★
+// =====================================================
+const GAS_URL = 'YOUR_GAS_WEB_APP_URL_HERE';
+// =====================================================
+
+const quizData = [
+
+  // ===== toBビジネス用語 基礎（20問） =====
+  {
+    q: "ROI（Return on Investment）の意味として最も適切なものはどれですか？",
+    answer: "投資に対してどれだけの利益を得られたかを示す指標",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "投資に対してどれだけの利益を得られたかを示す指標",
+      "月次の経常収益を示す指標",
+      "顧客が生涯にわたって生み出す価値の合計",
+      "製品の市場浸透率を示す指標"
+    ],
+    explanation: "ROI（投資利益率）は「（利益 ÷ 投資コスト）× 100」で計算します。例えば100万円投資して20万円の利益が出た場合、ROIは20%です。マーケティング施策・システム導入・採用などあらゆる投資判断の基準として使われます。"
+  },
+  {
+    q: "KPIとKGIの違いとして正しい説明はどれですか？",
+    answer: "KGIは最終目標（ゴール）、KPIはそこに至る中間プロセス指標",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "KPIは最終目標（ゴール）、KGIはそこに至る中間プロセス指標",
+      "KGIは最終目標（ゴール）、KPIはそこに至る中間プロセス指標",
+      "KPIとKGIは同じ意味で使われる言葉",
+      "KGIは定性目標、KPIは定量目標のこと"
+    ],
+    explanation: "KGI（Key Goal Indicator）は「年間売上1億円達成」などの最終目標。KPI（Key Performance Indicator）は「月間商談数50件」「成約率20%」など、KGIを達成するための中間プロセス指標です。KPIを管理することでKGIの達成を管理します。"
+  },
+  {
+    q: "BtoBとBtoCの違いとして最も適切な説明はどれですか？",
+    answer: "BtoBは企業間取引、BtoCは企業と一般消費者間の取引",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "BtoBは大企業向け、BtoCは中小企業向けの取引",
+      "BtoBは国内取引、BtoCは海外取引",
+      "BtoBは企業間取引、BtoCは企業と一般消費者間の取引",
+      "BtoBはオンライン取引、BtoCはオフライン取引"
+    ],
+    explanation: "BtoB（Business to Business）はSalesforceやSlackのように企業が企業に販売するモデル。BtoC（Business to Consumer）はAmazonや食品スーパーのように企業が一般消費者に販売するモデルです。決裁プロセスや購買動機が大きく異なります。"
+  },
+  {
+    q: "営業・マーケティングにおける「リード」の意味として正しいものはどれですか？",
+    answer: "自社商品・サービスに興味を持つ可能性がある見込み顧客",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "自社商品・サービスに興味を持つ可能性がある見込み顧客",
+      "既に契約した既存顧客のこと",
+      "競合他社の顧客リスト",
+      "営業チームのリーダーポジションの略称"
+    ],
+    explanation: "リードとは「見込み顧客」のことで、自社のウェブサイトに訪問した、資料請求した、セミナーに参加したなど、何らかの接点を持ち今後顧客になる可能性のある個人・企業を指します。リードを獲得・育成（ナーチャリング）して商談に進める流れがBtoBマーケティングの基本です。"
+  },
+  {
+    q: "コンバージョン（CV）の意味として最も適切なものはどれですか？",
+    answer: "マーケティングや営業で設定したゴール行動（資料請求・購入など）が達成されること",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "ウェブサイトへのアクセス数のこと",
+      "マーケティングや営業で設定したゴール行動（資料請求・購入など）が達成されること",
+      "顧客が解約することをコンバージョンと呼ぶ",
+      "新規顧客が既存顧客に変わる割合"
+    ],
+    explanation: "コンバージョン（CV）とは「変換・転換」を意味し、見込み顧客が目標とする行動（資料請求・問い合わせ・購入・契約など）を取ることを指します。コンバージョン率（CVR）は「CV数 ÷ 訪問者数 × 100」で計算します。"
+  },
+  {
+    q: "LTV（Life Time Value）の意味として正しいものはどれですか？",
+    answer: "1人の顧客が取引期間全体を通じて企業にもたらす収益の合計",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "月次の経常収益を表す指標",
+      "顧客獲得にかかったコストの合計",
+      "1人の顧客が取引期間全体を通じて企業にもたらす収益の合計",
+      "製品1つあたりの利益率"
+    ],
+    explanation: "LTV（顧客生涯価値）は「平均購入単価 × 購入頻度 × 継続期間」で計算します。SaaSビジネスでは特に重要で、LTVがCAC（顧客獲得コスト）を大きく上回ることが健全なビジネスの条件です。LTVを高めるためにカスタマーサクセスが重要です。"
+  },
+  {
+    q: "CAC（Customer Acquisition Cost）の意味として正しいものはどれですか？",
+    answer: "1人の新規顧客を獲得するためにかかった平均コスト",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "1人の新規顧客を獲得するためにかかった平均コスト",
+      "顧客が生涯にわたってもたらす収益の合計",
+      "月次のサポートコストの合計",
+      "製品の開発にかかった費用"
+    ],
+    explanation: "CAC（顧客獲得コスト）は「マーケ・営業の総コスト ÷ 獲得顧客数」で計算します。CACが低いほど効率よく顧客を獲得できています。「LTV ÷ CAC」が3以上であれば健全なビジネスとされることが多く、この比率がユニットエコノミクスの核心です。"
+  },
+  {
+    q: "チャーンレート（Churn Rate）の意味として正しいものはどれですか？",
+    answer: "一定期間内に解約・離脱した顧客の割合",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "新規顧客の獲得率",
+      "顧客満足度を示すスコア",
+      "一定期間内に解約・離脱した顧客の割合",
+      "月次売上の成長率"
+    ],
+    explanation: "チャーンレート（解約率）はSaaSや定額サービスで特に重視される指標で、「解約顧客数 ÷ 期首顧客数 × 100」で計算します。チャーンレートが高いとMRRやLTVが下がり、ビジネスの成長が難しくなります。カスタマーサクセスの主要KPIの一つです。"
+  },
+  {
+    q: "MRR（Monthly Recurring Revenue）の意味として正しいものはどれですか？",
+    answer: "月次の経常収益（毎月安定して入ってくる収益）",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "月次の経常収益（毎月安定して入ってくる収益）",
+      "毎月の新規顧客獲得コスト",
+      "年間の一括払い契約から得られる収益",
+      "月次の解約による損失額"
+    ],
+    explanation: "MRR（月次経常収益）はSaaSなどサブスクリプションビジネスの健全性を測る最重要指標の一つです。「新規MRR」「拡張MRR（アップセル）」「解約MRR」を管理することで収益の動態を把握します。ARR（年間経常収益）= MRR × 12 で計算されます。"
+  },
+  {
+    q: "ARR（Annual Recurring Revenue）の意味として正しいものはどれですか？",
+    answer: "年間の経常収益（毎年安定して入ってくる収益）",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "年間の経常収益（毎年安定して入ってくる収益）",
+      "年間の広告費用の合計",
+      "1年間の新規顧客獲得数",
+      "年間の解約による損失の合計"
+    ],
+    explanation: "ARR（年間経常収益）はSaaSビジネスの規模を示す代表的な指標で、MRR × 12 または年間契約の合計額で計算します。「ARR1億円」「ARR10億円」などの形でスタートアップの成長ステージを表すマイルストーンとして頻繁に使われます。"
+  },
+  {
+    q: "SaaS（Software as a Service）の意味と特徴として最も正しいものはどれですか？",
+    answer: "インターネット経由でソフトウェアをサービスとして提供するモデルで、月額・年額の定額課金が基本",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "インターネット経由でソフトウェアをサービスとして提供するモデルで、月額・年額の定額課金が基本",
+      "ソフトウェアをパッケージで販売し、買い切りで提供するモデル",
+      "ハードウェアとソフトウェアをセットで販売するビジネスモデル",
+      "企業内部でのみ使用するソフトウェアの開発モデル"
+    ],
+    explanation: "SaaSはSalesforce・Slack・Zoomのように、インターネット経由でソフトウェアをサービスとして提供するモデルです。従来の買い切り型と異なり、月額・年額の定額課金（サブスクリプション）が基本で、アップデートやサポートが継続的に提供されます。"
+  },
+  {
+    q: "サブスクリプションモデルとは何ですか？",
+    answer: "商品・サービスを一定期間、定額料金で継続利用できるビジネスモデル",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "商品を1回限りで購入するビジネスモデル",
+      "商品・サービスを一定期間、定額料金で継続利用できるビジネスモデル",
+      "使った量に応じて料金が発生する従量課金モデル",
+      "企業間でのみ適用される特殊な契約形態"
+    ],
+    explanation: "サブスクリプションモデルはNetflix・Spotify・SaaSなど幅広く採用される課金形式で、顧客が一定期間ごと（月次・年次）に定額を支払い継続利用します。企業にとっては収益が予測しやすくLTVが高まりやすいメリットがある一方、解約（チャーン）対策が重要になります。"
+  },
+  {
+    q: "ビジネスにおける「オンボーディング」の意味として最も適切なものはどれですか？",
+    answer: "新規顧客や新入社員が製品・組織に早期になじみ、成果を出せるよう支援するプロセス",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "製品の価格を段階的に引き上げるプロセス",
+      "新規顧客や新入社員が製品・組織に早期になじみ、成果を出せるよう支援するプロセス",
+      "顧客に対して解約を防止するための交渉プロセス",
+      "新しいプロジェクトを立ち上げる際の初期計画プロセス"
+    ],
+    explanation: "オンボーディングは「船（ボード）に乗り込む」が語源で、BtoBでは新規顧客が製品を使いこなして成果を出せるようになるまでの支援プロセスを指します。オンボーディングの質が顧客の継続利用（リテンション）に直結するためカスタマーサクセスの最重要フェーズです。"
+  },
+  {
+    q: "カスタマーサクセス（CS）の役割として最も正しい説明はどれですか？",
+    answer: "顧客が製品・サービスを活用して成果を出せるよう能動的に支援し、解約を防いでLTVを最大化する",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "顧客からのクレームや問い合わせに対応する受動的なサポート業務",
+      "顧客が製品・サービスを活用して成果を出せるよう能動的に支援し、解約を防いでLTVを最大化する",
+      "新規顧客を獲得するためのマーケティング活動",
+      "製品の不具合を修正する技術的サポート"
+    ],
+    explanation: "カスタマーサクセスは従来のカスタマーサポート（受動的な問い合わせ対応）と異なり、顧客が成果を出せるよう先回りして能動的に働きかける役割です。チャーン防止・アップセル・クロスセル・紹介獲得などを通じてLTV最大化を目指します。SaaS企業では特に重要なポジションです。"
+  },
+  {
+    q: "アップセルとクロスセルの違いとして正しい説明はどれですか？",
+    answer: "アップセルは上位プラン・グレードへの移行促進、クロスセルは関連する別製品・オプションの追加提案",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "アップセルは新規顧客獲得、クロスセルは既存顧客への追加提案",
+      "アップセルは上位プラン・グレードへの移行促進、クロスセルは関連する別製品・オプションの追加提案",
+      "アップセルとクロスセルは同じ意味で使われる",
+      "クロスセルは上位プランへの移行促進、アップセルは別製品の提案"
+    ],
+    explanation: "アップセルの例：スタンダードプランからプレミアムプランへの移行提案。クロスセルの例：CRMを導入した顧客にMAツールも提案する。どちらも既存顧客への提案であり、MRR拡大（拡張MRR）の主な手段です。カスタマーサクセスが担う重要な役割です。"
+  },
+  {
+    q: "PDCAサイクルとは何ですか？",
+    answer: "Plan（計画）→ Do（実行）→ Check（評価）→ Action（改善）を繰り返す業務改善サイクル",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "Plan（計画）→ Do（実行）→ Check（評価）→ Action（改善）を繰り返す業務改善サイクル",
+      "Problem（問題）→ Design（設計）→ Create（作成）→ Analysis（分析）の開発プロセス",
+      "Price（価格）→ Distribution（流通）→ Communication（伝達）→ Acquisition（獲得）のマーケ戦略",
+      "Project（企画）→ Deploy（展開）→ Collect（収集）→ Adjust（調整）のプロジェクト管理手法"
+    ],
+    explanation: "PDCAは品質管理の父・デミングが提唱した業務改善フレームワークです。計画を立て→実行し→結果を評価し→改善策を打つというサイクルを繰り返すことで継続的に成果を向上させます。ビジネスのあらゆる場面で活用される基本的な思考フレームです。"
+  },
+  {
+    q: "OKR（Objectives and Key Results）とは何ですか？",
+    answer: "「目標（Objective）」と「その達成を測る主要な成果指標（Key Results）」をセットで設定するゴール管理手法",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "年1回の人事評価制度で、上司が部下を評価するための仕組み",
+      "「目標（Objective）」と「その達成を測る主要な成果指標（Key Results）」をセットで設定するゴール管理手法",
+      "プロジェクトの工程表を作成・管理するためのフレームワーク",
+      "顧客の要望を優先順位付けして管理するバックログ手法"
+    ],
+    explanation: "OKRはIntelで生まれGoogleが普及させたゴール設定手法です。「売上No.1になる（O）」に対して「新規商談数を月50件にする（KR1）」「成約率を25%にする（KR2）」のように設定します。KRの達成率が60〜70%になるよう野心的に設定するのが特徴です。"
+  },
+  {
+    q: "マーケティングにおける「ペルソナ」の意味として正しいものはどれですか？",
+    answer: "ターゲット顧客像を具体的な人物として詳細に設定した架空のモデル顧客",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "ターゲット顧客像を具体的な人物として詳細に設定した架空のモデル顧客",
+      "SNSやゲームで使用するユーザーのアバター・プロフィール",
+      "競合他社の営業担当者の特徴をまとめたプロファイル",
+      "自社製品の主要な機能をリスト化したドキュメント"
+    ],
+    explanation: "ペルソナとは「年齢30歳・IT企業の営業部長・月の商談数が多く管理に課題を感じている」など、ターゲット顧客を具体的な人物像として詳細に定義したものです。ペルソナを設定することでメッセージング・コンテンツ・製品機能の方向性が明確になります。"
+  },
+  {
+    q: "営業ファネル（セールスファネル）とは何ですか？",
+    answer: "リード獲得から最終契約に至るまでの各段階を漏斗（ファネル）の形で可視化したフレームワーク",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "リード獲得から最終契約に至るまでの各段階を漏斗（ファネル）の形で可視化したフレームワーク",
+      "製品のコスト構造を分析するための財務フレームワーク",
+      "組織の階層構造を示した組織図のこと",
+      "競合比較を行うためのマトリクス分析手法"
+    ],
+    explanation: "ファネル（漏斗）は認知→興味→検討→意向→契約と段階が進むにつれて顧客数が絞られていく様子を表します。各段階の転換率（コンバージョン率）を把握・改善することで営業・マーケの効率を高めます。マーケファネルはさらに上流の認知段階を含みます。"
+  },
+  {
+    q: "NPS（Net Promoter Score）とは何ですか？",
+    answer: "「友人や同僚にこの製品・サービスを勧めますか？」への回答を基に顧客ロイヤルティを測るスコア",
+    category: "toBビジネス用語 基礎",
+    options: [
+      "顧客のサービス利用頻度を測定する指標",
+      "「友人や同僚にこの製品・サービスを勧めますか？」への回答を基に顧客ロイヤルティを測るスコア",
+      "製品の市場シェアを競合と比較した際のポジションスコア",
+      "月次の新規顧客獲得数を前月比で示す成長指標"
+    ],
+    explanation: "NPSは0〜10の11段階で推奨度を回答してもらい、9〜10点の「推奨者」の割合から0〜6点の「批判者」の割合を引いて算出します（-100〜+100の範囲）。顧客満足度（CSAT）と並んでカスタマーサクセスの重要KPIです。"
+  },
+
+  // ===== toBビジネス用語 応用（20問） =====
+  {
+    q: "TAM・SAM・SOMの関係として正しい説明はどれですか？",
+    answer: "TAMは市場全体の規模、SAMは自社がアプローチできる範囲、SOMは実際に取れる現実的なシェア",
+    category: "toBビジネス用語 応用",
+    options: [
+      "TAMは市場全体の規模、SAMは自社がアプローチできる範囲、SOMは実際に取れる現実的なシェア",
+      "TAMは売上目標、SAMは販売数量目標、SOMは利益目標の略称",
+      "TAMは短期目標、SAMは中期目標、SOMは長期目標のこと",
+      "TAMとSAMは同じ意味で使われ、SOMだけが異なる概念"
+    ],
+    explanation: "市場規模分析の際に使う3つの概念です。例：「HRテック市場全体（TAM）= 1兆円、中小企業向けに絞ると（SAM）= 2000億円、初年度に現実的に取れる（SOM）= 10億円」のように使います。投資家へのピッチや事業計画策定で頻出です。"
+  },
+  {
+    q: "ユニットエコノミクスとは何ですか？",
+    answer: "顧客1人単位の収益性を分析する指標で、主にLTV÷CACで評価される",
+    category: "toBビジネス用語 応用",
+    options: [
+      "工場の生産効率を単位時間あたりで計算する製造業の指標",
+      "顧客1人単位の収益性を分析する指標で、主にLTV÷CACで評価される",
+      "1製品あたりの原価と利益率を分析するコスト管理手法",
+      "1チームあたりの売上貢献度を評価する組織指標"
+    ],
+    explanation: "ユニットエコノミクスはビジネスモデルが持続可能かを判断するための重要な概念です。「LTV ÷ CAC ≧ 3」かつ「CACの回収期間が12ヶ月以内」が健全なSaaSの目安とされます。スタートアップの資金調達時や事業評価で必ず問われます。"
+  },
+  {
+    q: "バーンレート（Burn Rate）の意味として正しいものはどれですか？",
+    answer: "スタートアップが毎月使っているキャッシュ（現金）の消費速度",
+    category: "toBビジネス用語 応用",
+    options: [
+      "製品の廃棄・撤退にかかるコストのこと",
+      "スタートアップが毎月使っているキャッシュ（現金）の消費速度",
+      "顧客が解約するスピードを示す指標",
+      "サーバーの処理負荷（CPU使用率）を示すIT用語"
+    ],
+    explanation: "バーンレートは月次で支出しているキャッシュの量を指します。「グロスバーンレート」は総支出額、「ネットバーンレート」は収入を引いた純消費額です。ランウェイ（資金余命）= 手元現金 ÷ ネットバーンレートで算出します。資金調達タイミングの判断に重要です。"
+  },
+  {
+    q: "スタートアップ用語「ランウェイ（Runway）」の意味として正しいものはどれですか？",
+    answer: "現在の資金（キャッシュ）が尽きるまでの残り月数",
+    category: "toBビジネス用語 応用",
+    options: [
+      "製品ロードマップの今後の開発計画期間",
+      "現在の資金（キャッシュ）が尽きるまでの残り月数",
+      "新規顧客獲得のための広告出稿期間",
+      "事業計画における損益分岐点到達までの期間"
+    ],
+    explanation: "ランウェイは「飛行機の滑走路」が語源で、離陸（黒字化・次の資金調達）するまでの時間的余裕を表します。「手元現金 ÷ 月次バーンレート」で計算します。一般的にランウェイが12〜18ヶ月を切ると次の資金調達を本格的に動き始めます。"
+  },
+  {
+    q: "PMF（Product Market Fit）とは何ですか？",
+    answer: "製品が特定の市場のニーズに合致し、顧客に強く求められている状態",
+    category: "toBビジネス用語 応用",
+    options: [
+      "製品の製造コストと市場価格のバランスが最適化された状態",
+      "製品が特定の市場のニーズに合致し、顧客に強く求められている状態",
+      "製品のUI/UXが全ユーザーに最適化された状態",
+      "プロダクトマネージャーとマーケターが同じKPIを持つ組織状態"
+    ],
+    explanation: "PMFはMarc Andreessenが提唱した概念で、「良い市場に、その市場を満足させられる製品を持つ」状態を指します。PMF前は製品改善・ピボットが最優先で、PMF後にスケールさせるのがセオリーです。「製品なしでは困る」という顧客が40%以上いるかどうかが目安の一つです。"
+  },
+  {
+    q: "GTM戦略（Go To Market Strategy）とは何ですか？",
+    answer: "製品・サービスを市場に投入し顧客に届けるための総合的な市場参入戦略",
+    category: "toBビジネス用語 応用",
+    options: [
+      "Google Tag Managerを活用したデータ計測の設定方法",
+      "製品・サービスを市場に投入し顧客に届けるための総合的な市場参入戦略",
+      "既存製品の海外展開（グローバルマーケット）戦略",
+      "競合他社の製品に対抗するためのゲリラマーケティング戦略"
+    ],
+    explanation: "GTM戦略はターゲット顧客・価値提案・販売チャネル・価格設定・マーケティングメッセージ・営業体制などを包括的に定義する戦略です。新製品ローンチ時や新市場参入時に策定します。誰に・何を・どうやって届けるかを明確にします。"
+  },
+  {
+    q: "ABM（Account Based Marketing）の説明として最も正しいものはどれですか？",
+    answer: "重点企業（アカウント）を特定し、そこに集中してリソースを投じる営業・マーケティング手法",
+    category: "toBビジネス用語 応用",
+    options: [
+      "全ての潜在顧客に対して同一のマーケティングメッセージを発信する手法",
+      "重点企業（アカウント）を特定し、そこに集中してリソースを投じる営業・マーケティング手法",
+      "顧客の過去の購買履歴をもとに自動的にメールを送るシステム",
+      "SNS広告を活用して幅広く認知を獲得するマーケティング手法"
+    ],
+    explanation: "ABMは大企業や特定業界への販売に有効な戦略です。「この100社を攻略する」と対象企業を絞り込み、企業ごとにパーソナライズしたアプローチを営業・マーケが連携して行います。広く薄くアプローチするマスマーケティングとは対照的な手法です。"
+  },
+  {
+    q: "インサイドセールスとフィールドセールスの違いとして正しいものはどれですか？",
+    answer: "インサイドセールスは電話・メール・オンラインで完結する内勤営業、フィールドセールスは顧客先に訪問する外勤営業",
+    category: "toBビジネス用語 応用",
+    options: [
+      "インサイドセールスは大企業向け、フィールドセールスは中小企業向けの営業",
+      "インサイドセールスは電話・メール・オンラインで完結する内勤営業、フィールドセールスは顧客先に訪問する外勤営業",
+      "インサイドセールスは新規開拓、フィールドセールスは既存顧客のフォロー",
+      "インサイドセールスはマーケティング部門、フィールドセールスは営業部門の別名"
+    ],
+    explanation: "インサイドセールスはコール・メール・Web会議ツールを使って社内から営業活動を行います。移動コストが低く多くのリードを効率的にハンドリングできます。フィールドセールスは直接訪問による高関与の商談に適しています。近年はコロナを機にインサイドセールスが急速に普及しました。"
+  },
+  {
+    q: "SDRとBDRの違いとして正しいものはどれですか？",
+    answer: "SDRはインバウンドリード対応、BDRはアウトバウンドで新規開拓を担う営業開発職",
+    category: "toBビジネス用語 応用",
+    options: [
+      "SDRは新入社員向けのトレーニング制度、BDRは幹部社員向けの育成プログラム",
+      "SDRはインバウンドリード対応、BDRはアウトバウンドで新規開拓を担う営業開発職",
+      "SDRは既存顧客のカスタマーサクセス担当、BDRはパートナー企業との連携担当",
+      "SDRとBDRは同じ役割で、会社によって呼び方が異なるだけ"
+    ],
+    explanation: "SDR（Sales Development Representative）はマーケが獲得したインバウンドリードを受け取り、商談化する役割。BDR（Business Development Representative）はターゲット企業をリストアップしコールやメールで自ら開拓するアウトバウンド型です。どちらもAE（営業クローザー）に商談をパスする前段階を担います。"
+  },
+  {
+    q: "MQLとSQLの違いとして正しいものはどれですか？",
+    answer: "MQLはマーケが認定した見込み顧客、SQLは営業がアプローチ可能と判断した見込み顧客",
+    category: "toBビジネス用語 応用",
+    options: [
+      "MQLはマーケが認定した見込み顧客、SQLは営業がアプローチ可能と判断した見込み顧客",
+      "MQLはデータベースの操作言語、SQLはマーケティング用のプログラミング言語",
+      "MQLは中小企業向けリード、SQLは大企業向けリードの分類",
+      "MQLは有料経由のリード、SQLは無料経由のリードを指す"
+    ],
+    explanation: "MQL（Marketing Qualified Lead）はウェブフォーム入力・資料DL・セミナー参加などでマーケが「育成対象として有望」と認定したリードです。SQLは（Sales Qualified Lead）で、マーケやインサイドセールスが商談に値すると判断し営業に渡したリードです。MQL→SQL→商談→受注の流れでファネルを管理します。"
+  },
+  {
+    q: "パイプライン管理（セールスパイプライン）とは何ですか？",
+    answer: "商談の各ステージ（初回接触→提案→交渉→クロージング）ごとの進捗と金額を可視化して管理する手法",
+    category: "toBビジネス用語 応用",
+    options: [
+      "商談の各ステージ（初回接触→提案→交渉→クロージング）ごとの進捗と金額を可視化して管理する手法",
+      "製品の製造ラインを効率化するための工場管理手法",
+      "マーケティング施策の実施スケジュールを管理するカレンダー管理",
+      "社内の情報共有・ナレッジ管理のためのツール運用方法"
+    ],
+    explanation: "パイプラインはSalesforceなどのCRMで管理するのが一般的です。「商談数×平均単価×成約率」でフォーキャストを算出し、目標達成に向けて不足を補う施策を打ちます。営業マネージャーが週次・月次でチェックする最重要管理項目です。"
+  },
+  {
+    q: "フォーキャスト（Forecast）の意味として正しいものはどれですか？",
+    answer: "現在の商談パイプラインをもとに将来の売上を予測すること",
+    category: "toBビジネス用語 応用",
+    options: [
+      "昨年の売上実績をそのまま今年の目標に設定すること",
+      "現在の商談パイプラインをもとに将来の売上を予測すること",
+      "競合他社の業績を分析して自社の目標を設定すること",
+      "新規事業の5年後の収益を試算するロングタームプラン"
+    ],
+    explanation: "フォーキャストは「今四半期にいくら受注できるか」を現在の商談状況から予測するものです。各商談のクローズ確度（例：50%・80%・100%）を掛け合わせてWeighted Pipelineを算出します。経営判断・採用計画・在庫調整などに活用されます。"
+  },
+  {
+    q: "営業における「ホワイトスペース」の意味として正しいものはどれですか？",
+    answer: "既存顧客の中でまだ提案できていない・追加販売できる余地のある領域",
+    category: "toBビジネス用語 応用",
+    options: [
+      "デザインにおける余白のこと",
+      "既存顧客の中でまだ提案できていない・追加販売できる余地のある領域",
+      "競合他社が参入していない未開拓の新市場",
+      "契約書に追加条件を記入するための余白スペース"
+    ],
+    explanation: "営業・CSの文脈では「この顧客にはまだ〇〇の製品を使ってもらっていない」「部署Aには導入できたが部署BとCはまだ」といったアップセル・クロスセルの余地を「ホワイトスペース」と呼びます。既存顧客の深耕（エクスパンション）戦略の基本概念です。"
+  },
+  {
+    q: "ランディングページ（LP）の主な目的として正しいものはどれですか？",
+    answer: "広告や特定の流入元からアクセスした訪問者をコンバージョン（資料請求・問い合わせ等）させること",
+    category: "toBビジネス用語 応用",
+    options: [
+      "企業の歴史や経営理念を伝えるコーポレートサイトの役割",
+      "広告や特定の流入元からアクセスした訪問者をコンバージョン（資料請求・問い合わせ等）させること",
+      "社員やパートナーが業務に必要な情報を検索するための内部ポータル",
+      "採用候補者に向けて企業の魅力を伝える採用サイト"
+    ],
+    explanation: "LPは「ランディング（着地）ページ」で、広告クリックやSNSからの流入者を特定のアクション（資料DL・無料登録・問い合わせ）に誘導するためのページです。一般的なウェブサイトと異なり他ページへのリンクを最小化し、CVに集中した設計にするのが特徴です。"
+  },
+  {
+    q: "SEOとSEMの違いとして正しい説明はどれですか？",
+    answer: "SEOは検索エンジンへの自然流入を増やす施策、SEMは検索連動広告を含む有料施策を指す",
+    category: "toBビジネス用語 応用",
+    options: [
+      "SEOは国内向け施策、SEMは海外向け施策のこと",
+      "SEOは動画マーケティング、SEMはメールマーケティングの略称",
+      "SEOは検索エンジンへの自然流入を増やす施策、SEMは検索連動広告を含む有料施策を指す",
+      "SEOとSEMは全く同じ意味で使われる同義語"
+    ],
+    explanation: "SEO（Search Engine Optimization）はGoogleの検索結果で上位表示されるようサイト構造やコンテンツを最適化する施策です。SEM（Search Engine Marketing）はGoogle広告などの検索連動広告（リスティング広告）を含む有料施策を指します。どちらも検索からのリード獲得に重要です。"
+  },
+  {
+    q: "CPA（Cost Per Acquisition）の意味として正しいものはどれですか？",
+    answer: "1件のコンバージョン（顧客獲得・申込など）を達成するためにかかった広告・マーケコスト",
+    category: "toBビジネス用語 応用",
+    options: [
+      "1件のコンバージョン（顧客獲得・申込など）を達成するためにかかった広告・マーケコスト",
+      "1回のクリックにかかる広告費用（クリック単価）",
+      "1000回の広告表示にかかるコスト",
+      "顧客が契約を継続する期間の平均値"
+    ],
+    explanation: "CPA（顧客獲得単価）は「広告費 ÷ コンバージョン数」で計算します。例えば100万円の広告費で50件の資料請求が取れればCPAは2万円です。CACと混同されることがありますが、CACは営業コストも含む広い概念で、CPAは主に広告・マーケコストに限定して使われます。"
+  },
+  {
+    q: "CTR（Click Through Rate）の意味として正しいものはどれですか？",
+    answer: "広告やリンクが表示された回数に対してクリックされた割合",
+    category: "toBビジネス用語 応用",
+    options: [
+      "広告やリンクが表示された回数に対してクリックされた割合",
+      "メールを受信した人のうち実際に開封した割合",
+      "ウェブサイトを訪問した後すぐに離脱した割合",
+      "1クリックあたりの広告コスト"
+    ],
+    explanation: "CTR（クリック率）は「クリック数 ÷ 表示回数（インプレッション数）× 100」で計算します。例えば1000回表示されて20回クリックされればCTRは2%です。広告のクリエイティブやキーワードの効果測定に使う基本指標で、CTRが低い場合はメッセージやデザインの改善を検討します。"
+  },
+  {
+    q: "リテンション（Retention）の意味として正しいものはどれですか？",
+    answer: "顧客が製品・サービスを使い続ける（維持される）状態、または顧客維持率のこと",
+    category: "toBビジネス用語 応用",
+    options: [
+      "新規顧客を獲得するためのマーケティング活動全般",
+      "顧客が製品・サービスを使い続ける（維持される）状態、または顧客維持率のこと",
+      "競合他社から自社に乗り換えてきた顧客のこと",
+      "製品機能の改善・アップデートのサイクル"
+    ],
+    explanation: "リテンションはチャーン（解約）の反対概念で、「顧客をどれだけ維持できているか」を示します。SaaSでは「Nヶ月後も利用継続しているユーザーの割合」をコホート分析で追います。リテンション率が高いほどLTVが高まりビジネスの成長が安定します。"
+  },
+  {
+    q: "マーケティング・SaaSにおける「エンゲージメント」の意味として正しいものはどれですか？",
+    answer: "顧客・ユーザーが製品やコンテンツに積極的に関与・反応している度合い",
+    category: "toBビジネス用語 応用",
+    options: [
+      "法人顧客との契約締結・コミットメントのこと",
+      "顧客・ユーザーが製品やコンテンツに積極的に関与・反応している度合い",
+      "従業員の組合活動への参加率",
+      "製品の有料プランへの移行率"
+    ],
+    explanation: "エンゲージメントはSNSではいいね・シェア・コメント、SaaSではログイン頻度・機能使用率・セッション時間などで測ります。エンゲージメントが高い顧客はリテンション率が高くチャーンリスクが低い傾向があります。カスタマーサクセスのヘルススコア算出に活用されます。"
+  },
+  {
+    q: "PLG（Product Led Growth）とは何ですか？",
+    answer: "製品自体が主要な獲得・活性化・拡大のエンジンになる成長戦略（製品主導型グロース）",
+    category: "toBビジネス用語 応用",
+    options: [
+      "製品自体が主要な獲得・活性化・拡大のエンジンになる成長戦略（製品主導型グロース）",
+      "プロダクトマネージャーが主導する営業・マーケ一体型組織モデル",
+      "広告費をかけずに製品の口コミだけで成長するバイラル戦略",
+      "製品ラインアップを増やしていく多角化戦略"
+    ],
+    explanation: "PLGはSlack・Notion・Figmaなどに代表される戦略で、「無料プランで製品を試してもらい、価値を体験した人が自然に有料転換・社内展開する」設計です。営業主導型（SLG）と対比されます。ネットワーク効果とバイラルループが成長の鍵で、ユーザーがユーザーを呼ぶ仕組みを製品に組み込みます。"
+  },
+
+  // ===== SaaS・IT用語（10問） =====
+  {
+    q: "API（Application Programming Interface）の意味と用途として正しいものはどれですか？",
+    answer: "異なるソフトウェア・システム間でデータや機能をやり取りするための接続仕様・窓口",
+    category: "SaaS・IT用語",
+    options: [
+      "異なるソフトウェア・システム間でデータや機能をやり取りするための接続仕様・窓口",
+      "ウェブサイトのデザインを定義するスタイルシートの仕様",
+      "クラウドサーバーのセキュリティを管理するプロトコル",
+      "スマートフォンアプリを配信するプラットフォームの総称"
+    ],
+    explanation: "APIを活用することで、SalesforceとSlackを連携させて「商談が完了したら自動でSlack通知を送る」などが実現できます。現代のSaaSは多くの外部サービスとAPI連携することで機能を拡張します。「ZapierやMakeでAPIを繋ぐ」というのもAPI連携の一形態です。"
+  },
+  {
+    q: "Webhook（ウェブフック）とは何ですか？",
+    answer: "特定のイベントが発生した際に、自動的に指定したURLに通知（HTTPリクエスト）を送る仕組み",
+    category: "SaaS・IT用語",
+    options: [
+      "特定のイベントが発生した際に、自動的に指定したURLに通知（HTTPリクエスト）を送る仕組み",
+      "ウェブサイトに埋め込まれたトラッキングコードのこと",
+      "クラウドサービスへのログインを自動化するスクリプト",
+      "WebページのHTML構造を解析するスクレイピングツール"
+    ],
+    explanation: "WebhookはAPIのプル型（こちらからリクエストを送る）に対して、プッシュ型の通知手段です。「フォームが送信されたら自動でSalesforceにリードを登録する」「決済が完了したらSlackに通知する」などの自動化に使います。SaaS同士の連携でよく登場します。"
+  },
+  {
+    q: "SSO（Single Sign-On）とは何ですか？",
+    answer: "1つの認証情報でログインするだけで、複数のシステム・サービスを横断的に利用できる仕組み",
+    category: "SaaS・IT用語",
+    options: [
+      "1つの認証情報でログインするだけで、複数のシステム・サービスを横断的に利用できる仕組み",
+      "1つのパスワードを複数人で共有してアクセスするセキュリティ方式",
+      "ソフトウェアを1台のサーバーに集中させて管理する方式",
+      "SNSアカウントを一元管理するためのSNS管理ツール"
+    ],
+    explanation: "SSOはOkta・Google Workspaceなどで実現されており、「会社のGoogleアカウントでログインすればSalesforce・Slack・Zoomにも自動でログインできる」状態を作ります。従業員の利便性向上とパスワード管理リスク低減を同時に実現するため、中規模以上の企業では必須のセキュリティ施策です。"
+  },
+  {
+    q: "MFA（Multi-Factor Authentication）とは何ですか？",
+    answer: "パスワードに加えて、スマートフォンアプリのコードや生体認証など複数の要素で本人確認を行う認証方式",
+    category: "SaaS・IT用語",
+    options: [
+      "パスワードに加えて、スマートフォンアプリのコードや生体認証など複数の要素で本人確認を行う認証方式",
+      "1つの強力なパスワードだけで全サービスを管理する認証方式",
+      "複数の管理者が共同で承認しないとログインできない方式",
+      "生体認証（指紋・顔認証）のみを使った最新の認証方式"
+    ],
+    explanation: "MFA（多要素認証）は「知識（パスワード）＋所持（スマートフォン）＋生体情報（指紋）」の複数要素を組み合わせた認証です。2段階認証（2FA）もMFAの一種です。パスワード漏洩だけでは不正アクセスを防げるため、SaaSのセキュリティ強化で標準的な対策として求められます。"
+  },
+  {
+    q: "IaaS・PaaS・SaaSの違いとして正しい説明はどれですか？",
+    answer: "IaaSはインフラを提供、PaaSは開発基盤を提供、SaaSはアプリケーションをサービスとして提供",
+    category: "SaaS・IT用語",
+    options: [
+      "IaaSはインフラを提供、PaaSは開発基盤を提供、SaaSはアプリケーションをサービスとして提供",
+      "IaaSは個人向け、PaaSは中小企業向け、SaaSは大企業向けのクラウドサービス",
+      "IaaSは国内専用、PaaSはアジア向け、SaaSはグローバル向けのクラウド分類",
+      "IaaS・PaaS・SaaSはすべて同じサービス形態で、会社による呼び方の違いに過ぎない"
+    ],
+    explanation: "IaaS（Infrastructure as a Service）はAWSのEC2のようにサーバー・ネットワークなどインフラを提供。PaaS（Platform as a Service）はHerokuのように開発・デプロイ基盤を提供。SaaSはSalesforceのようにアプリケーション自体をサービスとして提供します。上に行くほどユーザーが管理する範囲が少なくなります。"
+  },
+  {
+    q: "オンプレミスとクラウドの違いとして正しい説明はどれですか？",
+    answer: "オンプレミスは自社でサーバーを所有・管理する形態、クラウドはベンダーのサーバーをネット経由で利用する形態",
+    category: "SaaS・IT用語",
+    options: [
+      "オンプレミスはセキュリティが低く、クラウドは高い",
+      "オンプレミスは自社でサーバーを所有・管理する形態、クラウドはベンダーのサーバーをネット経由で利用する形態",
+      "オンプレミスは月額課金、クラウドは一括買い切りの違い",
+      "オンプレミスは国内のみ、クラウドはグローバルで使えるという違い"
+    ],
+    explanation: "オンプレミス（on-premises）はサーバーを自社に設置・管理するため、カスタマイズ性が高い反面、初期費用・維持管理コストがかかります。クラウドはAWSやAzureのようにサーバーを持たずに利用できるため、初期投資が少なくスケールしやすい特徴があります。SaaS営業でよく比較される観点です。"
+  },
+  {
+    q: "マイクロサービスアーキテクチャとは何ですか？",
+    answer: "アプリケーションを独立した小さなサービスの集合体として構築・運用するシステム設計手法",
+    category: "SaaS・IT用語",
+    options: [
+      "アプリケーションを独立した小さなサービスの集合体として構築・運用するシステム設計手法",
+      "小規模なスタートアップ向けに特化したクラウドサービスの総称",
+      "1人のエンジニアが全ての機能を担当する開発体制のこと",
+      "マイクロコンピューターを活用した組み込みシステムの設計手法"
+    ],
+    explanation: "マイクロサービスはモノリシック（一枚岩）な設計と対比されます。Netflix・Amazonなど大規模SaaSが採用しており、「認証サービス」「決済サービス」「通知サービス」などを独立して開発・デプロイできるため、障害が局所化され特定機能だけスケールさせやすくなります。"
+  },
+  {
+    q: "CI/CD（継続的インテグレーション/継続的デリバリー）の意味として正しいものはどれですか？",
+    answer: "コードの変更を自動でテスト・ビルド・デプロイするパイプラインで、開発速度と品質を両立させる手法",
+    category: "SaaS・IT用語",
+    options: [
+      "コードの変更を自動でテスト・ビルド・デプロイするパイプラインで、開発速度と品質を両立させる手法",
+      "顧客からの要望を継続的に収集してプロダクトに反映するフロー",
+      "カスタマーインタビューを定期的に行うリサーチ手法",
+      "クラウドの請求（コスト）を継続的に最適化する管理手法"
+    ],
+    explanation: "CI（Continuous Integration）はコードをリポジトリにマージする際に自動テストを走らせる仕組み。CD（Continuous Delivery/Deployment）はテストを通過したコードを本番環境に自動でリリースする仕組みです。SaaS企業がバグを防ぎながら高頻度でリリースするために不可欠な開発プラクティスです。"
+  },
+  {
+    q: "RAG（Retrieval-Augmented Generation）とは何ですか？",
+    answer: "外部のデータベースや文書を検索して関連情報を取得し、LLMの回答生成に活用する技術",
+    category: "SaaS・IT用語",
+    options: [
+      "外部のデータベースや文書を検索して関連情報を取得し、LLMの回答生成に活用する技術",
+      "大量の画像データを自動収集・ラベリングするAI学習手法",
+      "クラウドのリソースを自動的に最適配分するスケジューリング技術",
+      "Webサイトのクローリングデータを活用した検索エンジン最適化技術"
+    ],
+    explanation: "RAG（検索拡張生成）はChatGPTなどのLLMがトレーニングデータに含まれない最新情報・社内固有情報を参照できるようにする技術です。「社内ドキュメントをベクトルDBに格納し、質問に対して関連文書を検索してからLLMが回答生成する」という流れです。SaaSへのAI機能組み込みで急速に普及しています。"
+  },
+  {
+    q: "ノーコード/ローコードとは何ですか？",
+    answer: "プログラミングコードをほとんど書かずにアプリやシステムを構築できるツール・開発手法",
+    category: "SaaS・IT用語",
+    options: [
+      "プログラミングコードをほとんど書かずにアプリやシステムを構築できるツール・開発手法",
+      "セキュリティ上の理由からコードの閲覧を制限する管理方式",
+      "エンジニアが最小限のコードでシステムを構築するリーン開発手法",
+      "コードレビューを省略して高速にデプロイする開発プロセス"
+    ],
+    explanation: "ノーコード（Bubble・Airtable・Webflow）はコード不要でGUI操作だけでアプリを作成。ローコード（OutSystems・Microsoft Power Apps）は少量のコードで高度なカスタマイズが可能です。エンジニアリソースがなくても業務システムを内製できるため、DX推進の文脈で注目されています。"
+  }
+
+,
+
+
+  // ===== 営業・マーケティング用語（Q51〜Q65）=====
+
+  { q: "BANT-CH条件の「C」と「H」が指す内容として正しいものはどれですか？",
+    answer: "C＝競合（Competitor）、H＝決裁の障壁（Hurdle）",
+    category: "営業・マーケティング用語",
+    options: [
+      "C＝コスト（Cost）、H＝本社（Headquarter）",
+      "C＝競合（Competitor）、H＝決裁の障壁（Hurdle）",
+      "C＝クライアント（Client）、H＝ヒアリング（Hearing）",
+      "C＝チャネル（Channel）、H＝歴史（History）"
+    ],
+    explanation: "BANT-CHはBudget（予算）・Authority（決裁権）・Need（必要性）・Timeline（導入時期）・Competitor（競合）・Hurdle（障壁）の頭文字です。受注のための確度判断に使います。" },
+
+  { q: "SPIN話法の4つの質問を正しく説明しているものはどれですか？",
+    answer: "状況質問・問題質問・示唆質問・解決質問の順で顧客の課題意識を高める手法",
+    category: "営業・マーケティング用語",
+    options: [
+      "サービス・価格・導入・納期の4項目を確認する手法",
+      "状況質問・問題質問・示唆質問・解決質問の順で顧客の課題意識を高める手法",
+      "スピーカー・ポイント・インパクト・ニーズを整理する手法",
+      "強み・弱み・機会・脅威を分析する手法"
+    ],
+    explanation: "SPINはSituation（状況）・Problem（問題）・Implication（示唆）・Need-payoff（解決）の質問を順番に行い、顧客自身が課題を認識し解決策の必要性を感じるよう導く営業手法です。" },
+
+  { q: "リードジェネレーションとリードナーチャリングの違いとして正しいものはどれですか？",
+    answer: "ジェネレーションは見込み客の獲得、ナーチャリングは獲得済み見込み客を育成すること",
+    category: "営業・マーケティング用語",
+    options: [
+      "ジェネレーションは成約まで進めること、ナーチャリングは新規開拓すること",
+      "ジェネレーションは見込み客の獲得、ナーチャリングは獲得済み見込み客を育成すること",
+      "どちらも同じ意味で、新規リードを増やすことを指す",
+      "ジェネレーションはオフライン施策、ナーチャリングはオンライン施策のことを指す"
+    ],
+    explanation: "リードジェネレーションは展示会・広告・SEOなどで新しい見込み客を獲得するプロセス。リードナーチャリングはメール配信・コンテンツ提供などで既存の見込み客を育て、購買意欲を高めるプロセスです。" },
+
+  { q: "ソリューション営業の説明として最も正しいものはどれですか？",
+    answer: "顧客の課題を深く理解し、自社商品・サービスを使った解決策を提案する営業スタイル",
+    category: "営業・マーケティング用語",
+    options: [
+      "製品スペックや価格を中心に説明する営業スタイル",
+      "顧客の課題を深く理解し、自社商品・サービスを使った解決策を提案する営業スタイル",
+      "既存顧客へのルート回りを中心とした営業スタイル",
+      "価格を下げることで受注を獲得する営業スタイル"
+    ],
+    explanation: "ソリューション営業は「何を売るか」ではなく「顧客の何を解決するか」を起点にします。単なる製品説明に留まらず、顧客課題を把握した上で最適な提案を行うことが特徴です。" },
+
+  { q: "コンサルティング営業とプロダクト営業の最大の違いはどれですか？",
+    answer: "コンサルティング営業は課題解決の上流から関わり、プロダクト営業は製品提案が中心",
+    category: "営業・マーケティング用語",
+    options: [
+      "コンサルティング営業は高額商品のみ、プロダクト営業は低価格商品のみ扱う",
+      "コンサルティング営業は課題解決の上流から関わり、プロダクト営業は製品提案が中心",
+      "コンサルティング営業はBtoC向け、プロダクト営業はBtoB向け",
+      "コンサルティング営業は訪問中心、プロダクト営業はオンライン中心"
+    ],
+    explanation: "プロダクト営業は自社製品・サービスの提案が軸です。コンサルティング営業は顧客の経営課題や業務課題を把握した上で、必要に応じて他社ソリューションも含めた包括的な提案を行います。" },
+
+  { q: "クロージングの正しい意味はどれですか？",
+    answer: "商談の最終段階で顧客の購買意思決定を促し、受注・契約を確定させること",
+    category: "営業・マーケティング用語",
+    options: [
+      "営業活動を一時停止すること",
+      "商談の最終段階で顧客の購買意思決定を促し、受注・契約を確定させること",
+      "アポイントを取得して初回訪問を設定すること",
+      "契約後にサービスを終了させること"
+    ],
+    explanation: "クロージングは「成約」を指す営業用語です。価格交渉・稟議サポート・次回アクション合意など、顧客の最終決断を引き出すための一連のアクションを含みます。" },
+
+  { q: "受注率（ウィンレート）の計算式として正しいものはどれですか？",
+    answer: "受注数 ÷ 商談数 × 100",
+    category: "営業・マーケティング用語",
+    options: [
+      "架電数 ÷ 受注数 × 100",
+      "受注数 ÷ 商談数 × 100",
+      "アポ数 ÷ 架電数 × 100",
+      "売上金額 ÷ 訪問件数 × 100"
+    ],
+    explanation: "ウィンレート（受注率）＝受注数 ÷ 商談数 × 100 です。商談化した案件のうちどれだけ受注できたかを示す指標で、営業力・提案力の測定に使います。" },
+
+  { q: "商談化率の正しい説明はどれですか？",
+    answer: "アポ取得件数のうち、実際に商談（具体的な提案・ヒアリング）に進んだ割合",
+    category: "営業・マーケティング用語",
+    options: [
+      "受注した件数のうち、継続契約になった割合",
+      "アポ取得件数のうち、実際に商談（具体的な提案・ヒアリング）に進んだ割合",
+      "架電数のうち担当者と話せた割合",
+      "見積提出数のうち受注できた割合"
+    ],
+    explanation: "商談化率＝商談数 ÷ アポ数 × 100 です。アポは取れても商談に至らない（キャンセル・ノーショウ等）ケースがあるため、アポ後の質を測る重要指標です。" },
+
+  { q: "ホットリード・ウォームリード・コールドリードの違いとして正しいものはどれですか？",
+    answer: "ホットは購買意欲が高い、ウォームは関心あり未成熟、コールドは関心が薄い見込み客",
+    category: "営業・マーケティング用語",
+    options: [
+      "ホットは新規、ウォームは既存、コールドは解約済みの顧客",
+      "ホットは購買意欲が高い、ウォームは関心あり未成熟、コールドは関心が薄い見込み客",
+      "ホットは大企業、ウォームは中堅企業、コールドは中小企業を指す",
+      "ホットはインバウンド、ウォームはSNS経由、コールドはアウトバウンドで獲得したリード"
+    ],
+    explanation: "リードの温度感（購買意欲の高さ）をホット・ウォーム・コールドで分類します。ホットリードは今すぐ検討中、ウォームリードは将来的に検討可能性あり、コールドリードはまだ認知・関心段階です。" },
+
+  { q: "インバウンドとアウトバウンドの違いとして正しいものはどれですか？",
+    answer: "インバウンドは顧客からの問い合わせ起点、アウトバウンドは自社からの働きかけ起点",
+    category: "営業・マーケティング用語",
+    options: [
+      "インバウンドは海外向け、アウトバウンドは国内向け営業",
+      "インバウンドは顧客からの問い合わせ起点、アウトバウンドは自社からの働きかけ起点",
+      "インバウンドはオンライン施策、アウトバウンドはオフライン施策",
+      "インバウンドはSaaS向け、アウトバウンドはハードウェア向け"
+    ],
+    explanation: "インバウンドはWebサイト・SEO・コンテンツなどで顧客を引き寄せる手法。アウトバウンドはテレアポ・飛び込み・DM送付など自社から働きかける手法です。DigiManのIS業務はアウトバウンド中心です。" },
+
+  { q: "コンテンツマーケティングの正しい説明はどれですか？",
+    answer: "見込み客に有益な情報・コンテンツを提供し続けることで、信頼関係を構築して購買を促す手法",
+    category: "営業・マーケティング用語",
+    options: [
+      "SNS広告を大量出稿して認知度を高める手法",
+      "見込み客に有益な情報・コンテンツを提供し続けることで、信頼関係を構築して購買を促す手法",
+      "競合他社のコンテンツを分析してシェアを奪う手法",
+      "商品スペックを詳細に説明する資料を作成する手法"
+    ],
+    explanation: "コンテンツマーケティングはブログ・動画・ホワイトペーパー・事例紹介などで顧客にとって有益な情報を継続提供し、自社への信頼と購買意欲を高めるマーケティング手法です。" },
+
+  { q: "MA（マーケティングオートメーション）の主な役割として正しいものはどれですか？",
+    answer: "見込み客の行動データを収集・分析し、最適なタイミングで自動的にアプローチする仕組み",
+    category: "営業・マーケティング用語",
+    options: [
+      "営業担当者のスケジュールを自動管理するツール",
+      "見込み客の行動データを収集・分析し、最適なタイミングで自動的にアプローチする仕組み",
+      "受発注業務を自動化するシステム",
+      "顧客へのメール送信を一括管理するだけのツール"
+    ],
+    explanation: "MAはWebサイト訪問・メール開封・資料ダウンロードなど見込み客の行動を追跡し、スコアリングやセグメント別の自動メール配信を行います。HubSpot・Marketo・Pardotなどが代表的です。" },
+
+  { q: "CRMとSFAの違いとして最も正しいものはどれですか？",
+    answer: "CRMは顧客関係管理（顧客データ・関係維持）、SFAは営業活動管理（商談・行動記録）",
+    category: "営業・マーケティング用語",
+    options: [
+      "CRMとSFAは同じ意味で使われる",
+      "CRMは顧客関係管理（顧客データ・関係維持）、SFAは営業活動管理（商談・行動記録）",
+      "CRMは新規開拓、SFAは既存顧客管理のためのシステム",
+      "CRMはマーケティング部門用、SFAは経営層向けのツール"
+    ],
+    explanation: "CRM（Customer Relationship Management）は顧客情報・接触履歴・満足度管理が目的。SFA（Sales Force Automation）は商談進捗・営業行動の記録・予実管理が目的です。Salesforceは両方の機能を持ちます。" },
+
+  { q: "マーケティングにおけるセグメンテーションの意味として正しいものはどれですか？",
+    answer: "市場や顧客を共通の特性でグループ分けし、訴求ターゲットを明確にすること",
+    category: "営業・マーケティング用語",
+    options: [
+      "競合他社との差別化ポイントを明確にすること",
+      "市場や顧客を共通の特性でグループ分けし、訴求ターゲットを明確にすること",
+      "商品の価格帯を複数設定すること",
+      "営業チームを役割別に分けること"
+    ],
+    explanation: "セグメンテーションは業種・規模・地域・行動パターンなどの軸で顧客市場を細分化することです。STP分析（Segmentation・Targeting・Positioning）の最初のステップです。" },
+
+  { q: "カスタマージャーニーの正しい説明はどれですか？",
+    answer: "顧客が認知から購買・継続までの各段階でとる行動・感情・接点を時系列で整理した地図",
+    category: "営業・マーケティング用語",
+    options: [
+      "顧客が自社オフィスを訪問する際の導線設計",
+      "顧客が認知から購買・継続までの各段階でとる行動・感情・接点を時系列で整理した地図",
+      "外回り営業のルートを最適化するための地図",
+      "新規顧客獲得にかかるコストを可視化したグラフ"
+    ],
+    explanation: "カスタマージャーニーマップは認知→興味→検討→購買→継続の各フェーズで顧客が何を感じ・何をするか・どのタッチポイントと接触するかを可視化します。施策設計の基本ツールです。" },
+
+  // ===== 財務・会計・経営（Q66〜Q80）=====
+
+  { q: "損益計算書（PL）に登場する3つの利益を上から正しい順序で並べたものはどれですか？",
+    answer: "売上総利益（粗利）→営業利益→経常利益",
+    category: "財務・会計・経営",
+    options: [
+      "営業利益→売上総利益→経常利益",
+      "売上総利益（粗利）→営業利益→経常利益",
+      "経常利益→営業利益→売上総利益",
+      "純利益→経常利益→営業利益"
+    ],
+    explanation: "PLは売上高から原価を引いた売上総利益、そこから販管費を引いた営業利益、さらに営業外収支を加減した経常利益の順で計算します。最終的な当期純利益は特別損益・税金を経て算出されます。" },
+
+  { q: "貸借対照表（BS）の基本構造として正しいものはどれですか？",
+    answer: "左側に資産、右側に負債と純資産が配置され、資産＝負債＋純資産が成立する",
+    category: "財務・会計・経営",
+    options: [
+      "左側に収益、右側に費用が配置される",
+      "左側に資産、右側に負債と純資産が配置され、資産＝負債＋純資産が成立する",
+      "上半分が固定資産、下半分が流動資産で構成される",
+      "左右に売掛金と買掛金が対称に配置される"
+    ],
+    explanation: "BS（Balance Sheet）は借方（左）に資産、貸方（右）に負債と純資産を記載します。「資産＝負債＋純資産」という等式が必ず成立し、これがバランスシートの名称の由来です。" },
+
+  { q: "キャッシュフロー計算書（CF計算書）の主な目的として正しいものはどれですか？",
+    answer: "一定期間における現金・預金の増減と、その原因（営業・投資・財務）を明示すること",
+    category: "財務・会計・経営",
+    options: [
+      "将来の売上予測を示すこと",
+      "一定期間における現金・預金の増減と、その原因（営業・投資・財務）を明示すること",
+      "固定資産の価値変動を記録すること",
+      "従業員の給与支払い履歴を開示すること"
+    ],
+    explanation: "CF計算書は営業CF（本業による現金の出入り）・投資CF（設備投資・M&A等）・財務CF（借入・返済・配当等）の3区分で実際の現金の動きを示します。黒字倒産を防ぐためにも重要です。" },
+
+  { q: "営業利益と経常利益の違いとして正しいものはどれですか？",
+    answer: "営業利益は本業の収益、経常利益は営業利益に金融収支など営業外損益を加味した利益",
+    category: "財務・会計・経営",
+    options: [
+      "営業利益は税引後、経常利益は税引前の利益",
+      "営業利益は本業の収益、経常利益は営業利益に金融収支など営業外損益を加味した利益",
+      "営業利益と経常利益は同じ意味",
+      "営業利益はBtoB企業、経常利益はBtoC企業に使う指標"
+    ],
+    explanation: "営業利益＝売上総利益－販売費及び一般管理費（本業の儲け）。経常利益＝営業利益＋受取利息・配当金－支払利息など（本業＋財務活動の儲け）。本業の実力は営業利益で判断します。" },
+
+  { q: "粗利（売上総利益）の計算式として正しいものはどれですか？",
+    answer: "売上高 ー 売上原価",
+    category: "財務・会計・経営",
+    options: [
+      "売上高 ー 販売費及び一般管理費",
+      "売上高 ー 売上原価",
+      "売上高 ー 人件費",
+      "売上高 × 利益率"
+    ],
+    explanation: "粗利（売上総利益）＝売上高 ー 売上原価 です。売上原価は商品の仕入れコストや製造コストを指します。粗利率（粗利÷売上高）は業種によって大きく異なります。" },
+
+  { q: "減価償却の意味として正しいものはどれですか？",
+    answer: "固定資産の購入費用を使用可能期間にわたって分割計上する会計処理",
+    category: "財務・会計・経営",
+    options: [
+      "資産の市場価格が下落したときに損失を計上すること",
+      "固定資産の購入費用を使用可能期間にわたって分割計上する会計処理",
+      "借入金の元本を毎期均等に返済すること",
+      "在庫の評価損を一括計上すること"
+    ],
+    explanation: "例えば1,000万円のシステムを5年で使う場合、毎年200万円ずつ費用計上します。現金支出は購入時に発生しますが、費用はPLに分散して計上されるため、CFとPLの差異が生じます。" },
+
+  { q: "M&Aの意味と主な目的として正しいものはどれですか？",
+    answer: "企業の合併・買収を通じて、事業拡大・技術獲得・市場参入・人材確保などを実現すること",
+    category: "財務・会計・経営",
+    options: [
+      "マーケティング＆アドバタイジングの略で広告戦略を指す",
+      "企業の合併・買収を通じて、事業拡大・技術獲得・市場参入・人材確保などを実現すること",
+      "月次・年次の経営会議のフレームワーク",
+      "主要取引先との長期契約交渉プロセス"
+    ],
+    explanation: "M&A（Mergers and Acquisitions）は「合併と買収」です。自社開発に比べスピーディーに事業・技術・顧客基盤を獲得できます。近年は中小企業の事業承継手段としても普及しています。" },
+
+  { q: "デューデリジェンス（DD）の正しい説明はどれですか？",
+    answer: "M&A等の取引前に対象企業の財務・法務・事業リスクを詳細に調査・検証すること",
+    category: "財務・会計・経営",
+    options: [
+      "経営者が行う日常的な意思決定プロセス",
+      "M&A等の取引前に対象企業の財務・法務・事業リスクを詳細に調査・検証すること",
+      "株主総会での議案の賛否を確認すること",
+      "新規事業の市場調査レポートを作成すること"
+    ],
+    explanation: "DDはM&Aや出資・融資の前に実施します。財務DD（会計・税務リスク）・法務DD（契約・訴訟リスク）・ビジネスDD（事業性・競合分析）などがあり、リスク把握と買収価格の根拠となります。" },
+
+  { q: "PMI（ポストマージャーインテグレーション）の意味として正しいものはどれですか？",
+    answer: "M&A成立後に2社を統合し、シナジーを実現するための経営・組織・システム統合プロセス",
+    category: "財務・会計・経営",
+    options: [
+      "M&A前に実施する事業評価プロセス",
+      "M&A成立後に2社を統合し、シナジーを実現するための経営・組織・システム統合プロセス",
+      "プロジェクト管理の国際資格の名称",
+      "マーケティング投資対効果を測定する指標"
+    ],
+    explanation: "M&Aは「買収完了」がゴールではなく、PMIによって初めて期待するシナジーが生まれます。組織文化の融合・ITシステム統合・人事制度の統一などが主な課題です。" },
+
+  { q: "MBO・TOB・LBOの違いとして正しいものはどれですか？",
+    answer: "MBOは経営陣が自社を買収、TOBは市場外での株式公開買付、LBOは買収対象の資産を担保にした借入による買収",
+    category: "財務・会計・経営",
+    options: [
+      "MBOは目標管理制度、TOBは株式公開、LBOはレバレッジ経営のこと",
+      "MBOは経営陣が自社を買収、TOBは市場外での株式公開買付、LBOは買収対象の資産を担保にした借入による買収",
+      "MBOは中小企業向け、TOBは上場企業向け、LBOは外資系向けの買収手法",
+      "三つともM&A後の経営統合手法の違い"
+    ],
+    explanation: "MBO（Management Buyout）：経営陣による自社買収。TOB（Take Over Bid）：不特定多数の株主から公開買付で株式取得。LBO（Leveraged Buyout）：対象会社の将来CFを担保に金融機関から借入して買収する手法です。" },
+
+  { q: "債務超過の意味として正しいものはどれですか？",
+    answer: "負債総額が資産総額を上回り、純資産がマイナスになっている財務状態",
+    category: "財務・会計・経営",
+    options: [
+      "借入金の返済が一時的に遅延している状態",
+      "負債総額が資産総額を上回り、純資産がマイナスになっている財務状態",
+      "売上高が前年比でマイナスになっている状態",
+      "営業利益が赤字になっている状態"
+    ],
+    explanation: "債務超過はBSで「資産＜負債」となる状態です。黒字でも債務超過になりえます。上場企業は一定期間債務超過が続くと上場廃止基準に抵触します。倒産リスクの重要シグナルです。" },
+
+  { q: "エクイティとデットの違いとして正しいものはどれですか？",
+    answer: "エクイティは株式による資金調達（返済不要）、デットは借入・社債による資金調達（返済必要）",
+    category: "財務・会計・経営",
+    options: [
+      "エクイティは国内資金調達、デットは海外資金調達",
+      "エクイティは株式による資金調達（返済不要）、デットは借入・社債による資金調達（返済必要）",
+      "エクイティは短期調達、デットは長期調達",
+      "エクイティは固定費、デットは変動費を指す財務用語"
+    ],
+    explanation: "エクイティファイナンス（株式発行）は返済義務がなく株主に利益を還元します。デットファイナンス（借入・社債）は利息を払い元本を返済します。両者のバランスが資本構成（資本政策）の核心です。" },
+
+  { q: "バリュエーション（企業価値評価）の代表的な手法として正しいものはどれですか？",
+    answer: "DCF法（将来CFを現在価値に割引）、マルチプル法（同業他社比較）、純資産法の3つが主流",
+    category: "財務・会計・経営",
+    options: [
+      "NPV法・IRR法・ROI法の3つが主流",
+      "DCF法（将来CFを現在価値に割引）、マルチプル法（同業他社比較）、純資産法の3つが主流",
+      "PLの営業利益に固定倍率を掛けるだけの手法",
+      "従業員数×業界平均年収で算出する手法"
+    ],
+    explanation: "M&Aや資金調達でよく使われます。DCF法は将来FCFを割引率（WACC）で現在価値化。マルチプル法はEBITDA倍率など同業他社の指標で比較。純資産法はBSの純資産をベースにします。" },
+
+  { q: "ホールディングス（持株会社）の仕組みとして正しいものはどれですか？",
+    answer: "子会社の株式を保有して経営を支配する会社で、各子会社が独立して事業を運営する構造",
+    category: "財務・会計・経営",
+    options: [
+      "社員が株主として会社を共同保有する仕組み",
+      "子会社の株式を保有して経営を支配する会社で、各子会社が独立して事業を運営する構造",
+      "複数の企業が対等合併して一つになった会社形態",
+      "フランチャイズ本部として加盟店を管理する会社形態"
+    ],
+    explanation: "ホールディングスは「純粋持株会社」ともいい、自らは事業を行わず子会社株式の保有を通じてグループ経営を行います。事業会社の独立性を保ちながら経営資源を効率配分できます。" },
+
+  { q: "コーポレートガバナンスの正しい説明はどれですか？",
+    answer: "企業が株主・顧客・社会などステークホルダーに対して適切に説明責任を果たし、健全な経営を実現する仕組み",
+    category: "財務・会計・経営",
+    options: [
+      "社内の業務マニュアルと規定を整備すること",
+      "企業が株主・顧客・社会などステークホルダーに対して適切に説明責任を果たし、健全な経営を実現する仕組み",
+      "経営者が社員を管理・監督するための人事制度",
+      "政府が企業活動を規制・監督するための法制度"
+    ],
+    explanation: "コーポレートガバナンスは取締役会の独立性確保・監査機能の強化・情報開示の徹底などを通じて、経営の透明性・公正性・持続可能性を高めます。上場企業ではコーポレートガバナンス・コードへの対応が求められます。" },
+
+  // ===== 契約・法務・企業知識（Q81〜Q95）=====
+
+  { q: "NDA（秘密保持契約）の主な目的として正しいものはどれですか？",
+    answer: "商談・提案・業務委託等の際に開示した機密情報を第三者に漏洩させないよう法的に拘束すること",
+    category: "契約・法務・企業知識",
+    options: [
+      "取引価格や納期の条件を確定させること",
+      "商談・提案・業務委託等の際に開示した機密情報を第三者に漏洩させないよう法的に拘束すること",
+      "知的財産権の帰属を明確にすること",
+      "業務上のミスが発生した場合の責任範囲を定めること"
+    ],
+    explanation: "NDA（Non-Disclosure Agreement）は秘密保持の対象情報・期間・罰則を規定します。商談開始前・業務委託前・システム導入前など情報を開示する前に締結するのが原則です。" },
+
+  { q: "SLA（サービスレベル合意）の正しい説明はどれですか？",
+    answer: "サービス提供者と利用者の間で、品質・可用性・応答時間などのサービス水準を数値で合意した文書",
+    category: "契約・法務・企業知識",
+    options: [
+      "契約書に付属する価格表のこと",
+      "サービス提供者と利用者の間で、品質・可用性・応答時間などのサービス水準を数値で合意した文書",
+      "従業員の職務レベルと給与を定めた人事規程",
+      "システム開発プロジェクトのスケジュール表"
+    ],
+    explanation: "SLA（Service Level Agreement）にはシステム稼働率（例：99.9%）・障害対応時間・問い合わせ応答時間などが数値で明記されます。SLAを下回った場合のペナルティ条項が設けられることもあります。" },
+
+  { q: "RFPとRFIの違いとして正しいものはどれですか？",
+    answer: "RFIは情報提供依頼（市場調査）、RFPは提案依頼（具体的な提案・見積もりを求める）",
+    category: "契約・法務・企業知識",
+    options: [
+      "RFIは社内向け、RFPは社外向けの申請書類",
+      "RFIは情報提供依頼（市場調査）、RFPは提案依頼（具体的な提案・見積もりを求める）",
+      "RFIは契約書の初稿、RFPは最終版の契約書",
+      "どちらも同じ意味で、ベンダーへの問い合わせ文書"
+    ],
+    explanation: "RFI（Request for Information）は市場・製品情報の収集が目的。RFP（Request for Proposal）は要件・予算・スケジュールを明示してベンダーに正式提案を求めるものです。RFI→RFP→選定の順で進めることが多いです。" },
+
+  { q: "コンプライアンスの正しい意味はどれですか？",
+    answer: "法令・社内規定・社会的規範・倫理に従って適切に行動すること",
+    category: "契約・法務・企業知識",
+    options: [
+      "顧客からのクレームに適切に対応すること",
+      "法令・社内規定・社会的規範・倫理に従って適切に行動すること",
+      "予算・目標を達成するために最大限努力すること",
+      "取引先との契約条件を有利に交渉すること"
+    ],
+    explanation: "コンプライアンス（Compliance）は「法令遵守」と訳されますが、法律だけでなく社内規定・業界ルール・社会的倫理も含みます。違反した場合は企業の信頼失墜・行政処分・損害賠償リスクがあります。" },
+
+  { q: "個人情報保護法における「個人情報」の基本的な定義として正しいものはどれですか？",
+    answer: "生存する個人に関する情報であって、氏名・生年月日等により特定の個人を識別できるもの",
+    category: "契約・法務・企業知識",
+    options: [
+      "会社が保有するすべての顧客データのこと",
+      "生存する個人に関する情報であって、氏名・生年月日等により特定の個人を識別できるもの",
+      "インターネット上に公開されているすべての個人情報",
+      "金融機関が保有する口座情報のみを指す"
+    ],
+    explanation: "個人情報保護法は2003年制定・2022年改正施行。個人情報には氏名・住所・電話番号・メールアドレスのほか、単独では識別不能でも他情報と容易に照合できるものも含まれます。取得・利用・管理・提供に関して厳格な義務があります。" },
+
+  { q: "下請法（下請代金支払遅延等防止法）の主な目的として正しいものはどれですか？",
+    answer: "親事業者による下請事業者への不当な代金減額・支払遅延・返品などを禁止し、取引の公正化を図ること",
+    category: "契約・法務・企業知識",
+    options: [
+      "中小企業の労働環境改善を目的とした法律",
+      "親事業者による下請事業者への不当な代金減額・支払遅延・返品などを禁止し、取引の公正化を図ること",
+      "下請け工事における安全管理基準を定めた法律",
+      "外注費用の上限を業界ごとに設定した法律"
+    ],
+    explanation: "下請法は親事業者が優越的地位を利用した不当行為を規制します。禁止行為には①受領拒否②支払遅延③下請代金の減額④返品⑤買いたたき⑥不当な経済上の利益の提供要請などがあります。" },
+
+  { q: "契約書の基本構成として正しいものはどれですか？",
+    answer: "前文（当事者・目的）、条項（権利義務の内容）、有効期間・解除条件、署名捺印欄の順で構成される",
+    category: "契約・法務・企業知識",
+    options: [
+      "見積書・発注書・納品書の3点セットで構成される",
+      "前文（当事者・目的）、条項（権利義務の内容）、有効期間・解除条件、署名捺印欄の順で構成される",
+      "法律の条文をそのまま引用した免責条項のみで構成される",
+      "甲乙の定義・価格表・支払い条件の3点のみで構成される"
+    ],
+    explanation: "契約書では甲（発注側）乙（受注側）を定義し、契約の目的・業務内容・対価・支払条件・有効期間・秘密保持・解除条件・管轄裁判所を定めます。双方の記名・捺印（または電子署名）で法的効力が生じます。" },
+
+  { q: "業務委託契約と派遣契約の最大の違いとして正しいものはどれですか？",
+    answer: "業務委託は成果物・業務の完遂に対して報酬が発生し、指揮命令は委託先が行う。派遣は指揮命令権が派遣先企業にある",
+    category: "契約・法務・企業知識",
+    options: [
+      "業務委託は正社員向け、派遣は非正規社員向けの雇用形態",
+      "業務委託は成果物・業務の完遂に対して報酬が発生し、指揮命令は委託先が行う。派遣は指揮命令権が派遣先企業にある",
+      "業務委託はITエンジニア向け、派遣は事務職向けの契約形態",
+      "どちらも同じ意味で、外部人材を活用する契約形態の総称"
+    ],
+    explanation: "偽装請負は厳しく規制されています。業務委託（請負・準委任）では受託者が自ら指揮命令して成果を出します。派遣契約では派遣先が指揮命令権を持ち、労働者派遣法の規制を受けます。" },
+
+  { q: "印紙税が必要な契約書の説明として正しいものはどれですか？",
+    answer: "印紙税法で定められた課税文書（請負契約書・売買契約書・金銭消費貸借契約書等）には収入印紙の貼付が必要",
+    category: "契約・法務・企業知識",
+    options: [
+      "すべての契約書には印紙税が必要",
+      "印紙税法で定められた課税文書（請負契約書・売買契約書・金銭消費貸借契約書等）には収入印紙の貼付が必要",
+      "印紙税は廃止されており、現在は不要",
+      "金額が100万円以上の契約書にのみ印紙税が必要"
+    ],
+    explanation: "印紙税法には課税文書の種類と税額が定められています。ただし、電子契約（クラウドサイン等）で締結した場合は課税文書に該当しないため印紙税が不要です（現行法の解釈）。" },
+
+  { q: "電子契約の法的有効性に関して正しいものはどれですか？",
+    answer: "電子署名法により、電子署名を付した電子契約は書面契約と同等の法的効力を持つ",
+    category: "契約・法務・企業知識",
+    options: [
+      "電子契約は日本では法的に無効であり、紙の契約書が必須",
+      "電子署名法により、電子署名を付した電子契約は書面契約と同等の法的効力を持つ",
+      "電子契約は金額100万円以下の取引にのみ有効",
+      "電子契約の有効性は取引先との合意のみで決まり、法律に定めはない"
+    ],
+    explanation: "2001年施行の電子署名法により、電子署名は書面・押印と同等の法的効力を持ちます。クラウドサイン・DocuSign等の電子契約サービスが広く普及しており、印紙税節減・締結スピード向上のメリットがあります。" },
+
+  { q: "ステークホルダーの正しい意味はどれですか？",
+    answer: "企業の事業活動に利害関係を持つすべての関係者（株主・顧客・従業員・取引先・地域社会等）",
+    category: "契約・法務・企業知識",
+    options: [
+      "会社の株主のみを指す経営用語",
+      "企業の事業活動に利害関係を持つすべての関係者（株主・顧客・従業員・取引先・地域社会等）",
+      "プロジェクトの発注者・責任者のことを指す",
+      "上場企業の取締役会のメンバー全員"
+    ],
+    explanation: "ステークホルダー（Stakeholder）は「利害関係者」と訳されます。株主・投資家・顧客・従業員・取引先・金融機関・行政・地域社会など多岐にわたります。ESG経営ではすべてのステークホルダーへの責任を重視します。" },
+
+  { q: "執行役員と取締役の最大の違いとして正しいものはどれですか？",
+    answer: "取締役は会社法上の機関で経営の監督・意思決定権を持つ。執行役員は業務執行を担う役割だが会社法上の役員ではない",
+    category: "契約・法務・企業知識",
+    options: [
+      "取締役は管理職、執行役員は現場スタッフを指す",
+      "取締役は会社法上の機関で経営の監督・意思決定権を持つ。執行役員は業務執行を担う役割だが会社法上の役員ではない",
+      "執行役員は取締役より上位の経営職",
+      "どちらも同じ意味で、企業によって呼び方が異なるだけ"
+    ],
+    explanation: "取締役は株主総会で選任され、登記が必要な会社法上の役員です。執行役員制度は日本独自の慣行で、業務執行権限を委任された上位管理職ですが法的な役員ではありません。役員報酬の税務上の扱いも異なります。" },
+
+  { q: "子会社と関連会社の違いとして正しいものはどれですか？",
+    answer: "子会社は議決権の過半数（50%超）を親会社が保有。関連会社は20%以上50%以下の持分保有で重要な影響力を持つ",
+    category: "契約・法務・企業知識",
+    options: [
+      "子会社は設立から5年以内、関連会社は5年以上経過した企業",
+      "子会社は議決権の過半数（50%超）を親会社が保有。関連会社は20%以上50%以下の持分保有で重要な影響力を持つ",
+      "子会社は国内企業のみ、関連会社は海外企業のみ指す",
+      "子会社と関連会社は同じ意味で、グループ企業を総称する言葉"
+    ],
+    explanation: "会計基準では子会社は連結財務諸表に取り込みます（連結対象）。関連会社は持分法で処理します。議決権比率だけでなく役員派遣・重要な取引関係なども支配・影響力の判断基準になります。" },
+
+  { q: "上場（IPO）の意味として正しいものはどれですか？",
+    answer: "自社の株式を証券取引所に公開し、不特定多数の投資家が市場で売買できるようにすること",
+    category: "契約・法務・企業知識",
+    options: [
+      "他社を買収して子会社化すること",
+      "自社の株式を証券取引所に公開し、不特定多数の投資家が市場で売買できるようにすること",
+      "金融機関から大型融資を受けること",
+      "海外市場に新たに進出すること"
+    ],
+    explanation: "IPO（Initial Public Offering＝新規株式公開）により資金調達の拡大・知名度向上・採用強化・創業者の利益確定などが可能になります。一方で情報開示義務・コンプライアンス強化・株主への説明責任が生じます。" },
+
+  { q: "IR（インベスター・リレーションズ）の正しい目的はどれですか？",
+    answer: "企業が投資家・株主に対して経営状況・財務情報・事業戦略を適切に開示し、適正な株式評価と資金調達を促進すること",
+    category: "契約・法務・企業知識",
+    options: [
+      "顧客満足度を高めるためのカスタマーサポート活動",
+      "企業が投資家・株主に対して経営状況・財務情報・事業戦略を適切に開示し、適正な株式評価と資金調達を促進すること",
+      "メディアへのプレスリリース配信やマスコミ対応活動",
+      "社内報や採用広報など従業員向け情報発信"
+    ],
+    explanation: "IR（Investor Relations）は上場企業の重要な義務です。決算説明会・有価証券報告書・適時開示情報等を通じて、投資家が適切な投資判断を下せるよう透明性の高い情報を提供します。" },
+
+  // ===== 総合・実務応用（Q96〜Q100）=====
+
+  { q: "DigiManの3事業として正しいものはどれですか？",
+    answer: "BPO事業（テレアポ代行）・HR事業（人材紹介/派遣）・SaaS事業（IT/DXツール提供）",
+    category: "総合・実務応用",
+    options: [
+      "広告代理事業・EC事業・コンサルティング事業",
+      "BPO事業（テレアポ代行）・HR事業（人材紹介/派遣）・SaaS事業（IT/DXツール提供）",
+      "メディア事業・物流事業・金融事業",
+      "製造業支援・小売支援・観光支援の3分野"
+    ],
+    explanation: "DigiManはBPO（テレアポ・IS代行）・HR（採用支援・人材派遣）・SaaS（DX推進ツール）の3事業を展開するBtoB特化型の企業です。各事業はシナジーを持ち、クロスセル提案が可能な構造になっています。" },
+
+  { q: "委託架電と自社架電の違いとして正しいものはどれですか？",
+    answer: "委託架電はクライアントから依頼を受けて代わりにアポを取る業務、自社架電はDigiManの自社サービスを売るための架電業務",
+    category: "総合・実務応用",
+    options: [
+      "委託架電は国内向け、自社架電は海外向けの架電業務",
+      "委託架電はクライアントから依頼を受けて代わりにアポを取る業務、自社架電はDigiManの自社サービスを売るための架電業務",
+      "委託架電は午前中、自社架電は午後に行う時間帯の区別",
+      "委託架電はリストを購入して行う架電、自社架電は既存顧客への架電"
+    ],
+    explanation: "DigiManのBPO事業では、クライアント企業のサービス・商品のアポ取得を代行するのが委託架電です。一方、DigiManのBPO・HR・SaaSサービス自体を提案するための架電が自社架電です。業務の目的・KPI・トークが異なります。" },
+
+  { q: "ISが追うKPIの正しい順序はどれですか？",
+    answer: "架電数 → 着電数（PR数） → アポ数",
+    category: "総合・実務応用",
+    options: [
+      "アポ数 → 商談数 → 受注数",
+      "架電数 → 着電数（PR数） → アポ数",
+      "リード獲得数 → 商談数 → 成約数",
+      "着電数 → 架電数 → アポ数"
+    ],
+    explanation: "ISのKPIは「架電数（行動量）→ 着電数/PR数（接続できた数）→ アポ数（成果）」の順で管理します。商談数・案件数・受注数はFSが追う指標です。まず行動量を確保してから質の改善を議論します。" },
+
+  { q: "架電to着電率の基準値として正しいものはどれですか？",
+    answer: "10%",
+    category: "総合・実務応用",
+    options: [
+      "3%",
+      "10%",
+      "30%",
+      "50%"
+    ],
+    explanation: "架電to着電率の基準値は10%です。100件架電して10件つながれば標準的な水準です。これを下回る場合は、リストの摩耗・ターゲット設定のズレ・受付突破の方法に問題がある可能性を検討します。" },
+
+  { q: "データドリブンな運用で「着電toアポ率が低い」場合の主な原因として最も適切なものはどれですか？",
+    answer: "トークの質が低い（訴求が刺さっていない・アポ切りが弱い）またはサービスへの理解不足・顧客理解不足",
+    category: "総合・実務応用",
+    options: [
+      "架電数が少ないため、数を増やすべき",
+      "トークの質が低い（訴求が刺さっていない・アポ切りが弱い）またはサービスへの理解不足・顧客理解不足",
+      "リストの質が悪く、ターゲットが外れている",
+      "受付を突破できていないため受付へのアプローチを見直すべき"
+    ],
+    explanation: "着電toアポ率はつながった相手にアポを取れているかを示します。つながった後の問題なので、原因はトーク力・訴求内容・サービス理解・顧客理解にあります。リストや受付突破は架電to着電率に影響する要素です。" }
+
+];
+// 
