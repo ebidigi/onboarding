@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code導入・運用理解度テスト</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+            color: #1a1a2e;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            color: white;
+        }
+        header h1 {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+        }
+        header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        .question-card {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e8e8e8;
+            transition: border-color 0.3s;
+        }
+        .question-card.correct { border-color: #10b981; background: #f0fdf4; }
+        .question-card.incorrect { border-color: #ef4444; background: #fef2f2; }
+        .question-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .question-text {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+            line-height: 1.7;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        .option:hover { border-color: #667eea; background: #f5f3ff; }
+        .option.selected { border-color: #667eea; background: #ede9fe; }
+        .option.correct-answer { border-color: #10b981; background: #d1fae5; }
+        .option.wrong-answer { border-color: #ef4444; background: #fee2e2; }
+        .option input { margin-top: 3px; }
+        .explanation {
+            display: none;
+            margin-top: 16px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+        .explanation.show { display: block; }
+        .explanation.correct-exp { background: #ecfdf5; border-left: 4px solid #10b981; }
+        .explanation.incorrect-exp { background: #fef2f2; border-left: 4px solid #ef4444; }
+        .submit-area {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .btn {
+            padding: 14px 48px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-reset {
+            background: #6b7280;
+            color: white;
+            margin-left: 12px;
+        }
+        .result {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 30px;
+        }
+        .result.show { display: block; }
+        .result .score {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #667eea;
+        }
+        .result .message {
+            font-size: 1.1rem;
+            margin-top: 8px;
+            color: #4b5563;
+        }
+        .tag {
+            display: inline-block;
+            background: #ede9fe;
+            color: #6d28d9;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Claude Code 導入・運用 理解度テスト</h1>
+            <p>INT MTG「AI朝までそれ正解シリーズ1」の内容から出題（全5問）</p>
+        </header>
+
+        <div class="result" id="result">
+            <div class="score" id="score-text"></div>
+            <div class="message" id="result-message"></div>
+        </div>
+
+        <!-- Q1: Mac セットアップ -->
+        <div class="question-card" id="q1">
+            <span class="tag">Macセットアップ</span>
+            <div class="question-number">1</div>
+            <div class="question-text">Mac環境でClaude Codeをセットアップする際、Homebrewではなく公式ネイティブインストーラーを推奨した理由として最も適切なものはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q1" value="a">
+                    <span>HomebrewはIntel Macでしか動作しないため</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q1" value="b">
+                    <span>公式が現在提供しているデフォルト手順に沿うことを第一方針としたため</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q1" value="c">
+                    <span>Homebrewはセキュリティリスクがあるとの公式発表があったため</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q1" value="d">
+                    <span>Homebrewではアップデートが自動で行われないため</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp1"></div>
+        </div>
+
+        <!-- Q2: Git/GitHub（既存） -->
+        <div class="question-card" id="q2">
+            <span class="tag">ファイル共有・バージョン管理</span>
+            <div class="question-number">2</div>
+            <div class="question-text">Git/GitHubの導入に関して、MTGで決定された方針として正しいものはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q2" value="a">
+                    <span>全ての顧客に対して初回からGitHubを必須とする</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q2" value="b">
+                    <span>Gitは使用せず、Google Driveのみで完結させる</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q2" value="c">
+                    <span>1周目はGoogle Drive等の既存ツールで共有し、Git/GitHubは「2周目」の選択肢として位置づける</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q2" value="d">
+                    <span>エンジニア以外はGitを一切使わない方針とする</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp2"></div>
+        </div>
+
+        <!-- Q3: 共有ドライブリスク（既存） -->
+        <div class="question-card" id="q3">
+            <span class="tag">リスク管理</span>
+            <div class="question-number">3</div>
+            <div class="question-text">共有ドライブ（Google Drive等）上のファイルをClaude Codeで扱う際の推奨運用として正しいものはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q3" value="a">
+                    <span>共有ドライブ上で直接Claude Codeを動かして効率化する</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q3" value="b">
+                    <span>共有ファイルは一度ローカルにコピーしてから作業する</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q3" value="c">
+                    <span>Claude Codeには読み取り専用モードがあるのでそのまま使える</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q3" value="d">
+                    <span>共有ドライブのバックアップ設定を有効にすれば問題ない</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp3"></div>
+        </div>
+
+        <!-- Q4: デスクトップアプリ -->
+        <div class="question-card" id="q4">
+            <span class="tag">デスクトップアプリ</span>
+            <div class="question-number">4</div>
+            <div class="question-text">Claude Codeのデスクトップアプリについて、「今この瞬間のベストプラクティス」として議論された内容はどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q4" value="a">
+                    <span>デスクトップアプリだけをインストールすれば全て完結する</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q4" value="b">
+                    <span>デスクトップアプリは不安定なので使用せず、CLIのみで運用する</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q4" value="c">
+                    <span>先にCLIをインストールしてからデスクトップアプリを入れる。将来的にはデスクトップアプリのみで完結できる見込み</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q4" value="d">
+                    <span>デスクトップアプリとCLIは完全に別物なので両方独立してインストールする</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp4"></div>
+        </div>
+
+        <!-- Q5: フォルダ管理 -->
+        <div class="question-card" id="q5">
+            <span class="tag">フォルダ管理</span>
+            <div class="question-number">5</div>
+            <div class="question-text">初心者ユーザーにプロジェクトフォルダの作成を案内する際、MTGで推奨された方法はどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q5" value="a">
+                    <span>ターミナルでmkdirコマンドを使ってフォルダを作成してもらう</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q5" value="b">
+                    <span>デスクトップアプリの「新規プロジェクト」機能でClaude自身にフォルダを作成させる</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q5" value="c">
+                    <span>Finderで手動でフォルダを作成し、パスをコピーしてClaude Codeに渡す</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q5" value="d">
+                    <span>GitHub上でリポジトリを作成し、クローンしてもらう</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp5"></div>
+        </div>
+
+        <div class="submit-area">
+            <button class="btn btn-primary" id="submit-btn" onclick="submitAnswers()">採点する</button>
+            <button class="btn btn-reset" id="reset-btn" onclick="resetQuiz()" style="display:none;">もう一度</button>
+        </div>
+    </div>
+
+    <script>
+        const answers = {
+            q1: 'b',
+            q2: 'c',
+            q3: 'b',
+            q4: 'c',
+            q5: 'b'
+        };
+
+        const explanations = {
+            q1: {
+                correct: '正解！Homebrewか公式かの議論があったものの、公式が現在提供しているデフォルト手順に沿うことを第一方針とすることに決定しました。どちらでも動作はしますが、統一性とサポートのしやすさを重視した判断です。',
+                incorrect: '不正解。正解は「公式が現在提供しているデフォルト手順に沿うことを第一方針としたため」です。技術的にはどちらでも良いが、公式推奨に沿うことで顧客サポートを統一しやすくする方針です。'
+            },
+            q2: {
+                correct: '正解！Git/GitHubはエンジニア向けまたは上級者向けの「2周目」の選択肢として位置づけ、1周目は顧客が既に使い慣れているGoogle DriveやDropboxで共有する方針です。定着してきたらGitをおすすめする流れです。',
+                incorrect: '不正解。正解は「1周目はGoogle Drive等で共有し、Git/GitHubは2周目の選択肢」です。顧客が使い慣れたツールから始め、定着後にGitを推奨する段階的アプローチが決定されました。'
+            },
+            q3: {
+                correct: '正解！共有ドライブ上で直接Claude Codeを動かすと全消しリスク等があるため、共有ファイルは一度ローカルにコピーしてから作業する運用が推奨されています。',
+                incorrect: '不正解。正解は「一度ローカルにコピーしてから作業する」です。共有ドライブ上で直接Claude Codeを動かすと、ファイルの全消し等のリスクがあるため、必ずローカルにコピーしてから作業する運用が推奨されています。'
+            },
+            q4: {
+                correct: '正解！現状はデスクトップアプリ単体ではGit・Node.js未インストール等の問題が起きることがあるため、先にCLI経由でセットアップし、その後デスクトップアプリを導入するのがベストプラクティスです。早ければ1ヶ月以内にデスクトップアプリのみで完結できるようになる見込みです。',
+                incorrect: '不正解。正解は「先にCLIをインストールしてからデスクトップアプリを入れる」です。現状はGit/Node.jsの未インストールが原因でデスクトップアプリ単体だとうまくいかないことがあるため、CLI先行が推奨されています。将来的にはデスクトップのみで完結予定です。'
+            },
+            q5: {
+                correct: '正解！デスクトップアプリの「新規プロジェクト」機能を使い、Claude自身にフォルダを作成させる方が初心者には簡単です。親フォルダ（例：「コード」フォルダ）を作成し、その配下にプロジェクトを整理することも推奨されています。',
+                incorrect: '不正解。正解は「デスクトップアプリの新規プロジェクト機能でClaude自身にフォルダを作成させる」です。ターミナルコマンドの知識は持っておくと有利ですが必須ではなく、初心者にはClaude自身に任せる方法が推奨されました。'
+            }
+        };
+
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                const name = this.querySelector('input').name;
+                document.querySelectorAll(`[name="${name}"]`).forEach(r => {
+                    r.closest('.option').classList.remove('selected');
+                });
+                this.classList.add('selected');
+                this.querySelector('input').checked = true;
+            });
+        });
+
+        function submitAnswers() {
+            let score = 0;
+            let allAnswered = true;
+
+            for (let i = 1; i <= 5; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!selected) { allAnswered = false; continue; }
+
+                const card = document.getElementById(`q${i}`);
+                const exp = document.getElementById(`exp${i}`);
+                const correctAnswer = answers[`q${i}`];
+                const isCorrect = selected.value === correctAnswer;
+
+                if (isCorrect) {
+                    score++;
+                    card.classList.add('correct');
+                    exp.className = 'explanation show correct-exp';
+                    exp.textContent = explanations[`q${i}`].correct;
+                } else {
+                    card.classList.add('incorrect');
+                    exp.className = 'explanation show incorrect-exp';
+                    exp.textContent = explanations[`q${i}`].incorrect;
+                    selected.closest('.option').classList.add('wrong-answer');
+                }
+                document.querySelector(`[name="q${i}"][value="${correctAnswer}"]`).closest('.option').classList.add('correct-answer');
+            }
+
+            if (!allAnswered) {
+                alert('全ての問題に回答してください。');
+                return;
+            }
+
+            const result = document.getElementById('result');
+            const scoreText = document.getElementById('score-text');
+            const message = document.getElementById('result-message');
+
+            scoreText.textContent = `${score} / 5`;
+
+            if (score === 5) message.textContent = '全問正解！MTGの内容を完璧に理解しています。';
+            else if (score >= 4) message.textContent = 'ほぼ完璧です！あと少しで満点です。';
+            else if (score >= 3) message.textContent = '合格ラインです。間違えた箇所を復習しましょう。';
+            else message.textContent = 'MTGの議事録をもう一度確認して復習しましょう。';
+
+            result.classList.add('show');
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('reset-btn').style.display = 'inline-block';
+
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+            document.querySelectorAll('.option').forEach(o => o.style.cursor = 'default');
+        }
+
+        function resetQuiz() {
+            document.querySelectorAll('input[type="radio"]').forEach(r => { r.checked = false; r.disabled = false; });
+            document.querySelectorAll('.option').forEach(o => {
+                o.classList.remove('selected', 'correct-answer', 'wrong-answer');
+                o.style.cursor = 'pointer';
+            });
+            document.querySelectorAll('.question-card').forEach(c => c.classList.remove('correct', 'incorrect'));
+            document.querySelectorAll('.explanation').forEach(e => { e.className = 'explanation'; e.textContent = ''; });
+            document.getElementById('result').classList.remove('show');
+            document.getElementById('submit-btn').style.display = 'inline-block';
+            document.getElementById('reset-btn').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
