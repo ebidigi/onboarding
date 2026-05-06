@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>時事AIニュース理解度テスト</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+            color: #1a1a2e;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            color: white;
+        }
+        header h1 {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+        }
+        header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        .question-card {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e8e8e8;
+            transition: border-color 0.3s;
+        }
+        .question-card.correct { border-color: #10b981; background: #f0fdf4; }
+        .question-card.incorrect { border-color: #ef4444; background: #fef2f2; }
+        .question-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .question-text {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+            line-height: 1.7;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        .option:hover { border-color: #667eea; background: #f5f3ff; }
+        .option.selected { border-color: #667eea; background: #ede9fe; }
+        .option.correct-answer { border-color: #10b981; background: #d1fae5; }
+        .option.wrong-answer { border-color: #ef4444; background: #fee2e2; }
+        .option input { margin-top: 3px; }
+        .explanation {
+            display: none;
+            margin-top: 16px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+        .explanation.show { display: block; }
+        .explanation.correct-exp { background: #ecfdf5; border-left: 4px solid #10b981; }
+        .explanation.incorrect-exp { background: #fef2f2; border-left: 4px solid #ef4444; }
+        .submit-area {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .btn {
+            padding: 14px 48px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-reset {
+            background: #6b7280;
+            color: white;
+            margin-left: 12px;
+        }
+        .result {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 30px;
+        }
+        .result.show { display: block; }
+        .result .score {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #667eea;
+        }
+        .result .message {
+            font-size: 1.1rem;
+            margin-top: 8px;
+            color: #4b5563;
+        }
+        .tag {
+            display: inline-block;
+            background: #ede9fe;
+            color: #6d28d9;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .tag.external { background: #fef3c7; color: #92400e; }
+        .tag.basic { background: #dbeafe; color: #1e40af; }
+        .tag.internal { background: #d1fae5; color: #065f46; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>時事AIニュース 理解度テスト</h1>
+            <p>DigiMan Wiki／ナレッジシェアの直近トピックから出題（全10問）</p>
+        </header>
+
+        <div class="result" id="result">
+            <div class="score" id="score-text"></div>
+            <div class="message" id="result-message"></div>
+        </div>
+
+        <!-- Q1: Microsoft 365 Copilot -->
+        <div class="question-card" id="q1">
+            <span class="tag external">外部AIニュース</span>
+            <div class="question-number">1</div>
+            <div class="question-text">2026年4月22日にMicrosoftが発表したMicrosoft 365 Copilot（Word/Excel/PowerPoint）のアップデート内容として最も適切なものはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q1" value="a">
+                    <span>Microsoft 365 Copilotが完全無料化され、全ユーザーが利用可能になった</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q1" value="b">
+                    <span>Word/Excel/PowerPointのCopilotが、受動的アシスタントから「ファイル内でタスクを自律的に実行する知的コラボレーター」に進化した</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q1" value="c">
+                    <span>Word/Excel/PowerPointが廃止され、Copilot単体アプリに統合された</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q1" value="d">
+                    <span>CopilotがNotion/Salesforce等の外部SaaSと直接連携できるようになった</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp1"></div>
+        </div>
+
+        <!-- Q2: Scrapling -->
+        <div class="question-card" id="q2">
+            <span class="tag external">外部AIニュース</span>
+            <div class="question-number">2</div>
+            <div class="question-text">ナレッジシェアで紹介された次世代スクレイピングフレームワーク「Scrapling」の特徴として正しいものはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q2" value="a">
+                    <span>Rust製コアにPythonバインディングを被せた構成で、動的サイトはPlaywright併用が前提となる</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q2" value="b">
+                    <span>MCPサーバ機能を持ちClaude Code/Cursorから直接呼び出し可能。BS4+Lxml比 約784倍高速のベンチも報告</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q2" value="c">
+                    <span>Cloudflare等のbot対策が入ったサイトはサポート対象外で、公開API・robots.txt許可サイト限定で運用する</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q2" value="d">
+                    <span>GPLライセンスのため社内SaaSに組み込む際は法務確認が必要で、教育・研究用途で広く使われている</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp2"></div>
+        </div>
+
+        <!-- Q3: Fyxer AI -->
+        <div class="question-card" id="q3">
+            <span class="tag external">外部AIニュース</span>
+            <div class="question-number">3</div>
+            <div class="question-text">AIメールアシスタント「Fyxer AI」について、ナレッジ調査レポートの内容として最も適切なものはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q3" value="a">
+                    <span>主要機能はAI返信ドラフトに特化しており、会議ノート・スケジュール調整は競合Superhumanと連携して補う構成</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q3" value="b">
+                    <span>米国の不動産大手 eXp Realty で 87,000人以上のエージェントが利用可能になるなど、不動産業界が最大の導入先</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q3" value="c">
+                    <span>2026年Q1にロンドン市場へ上場し、収益の95%は大企業との直接契約から生じている</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q3" value="d">
+                    <span>米Anthropicが2026年に買収し、Claude Desktopへの統合がロードマップ化されている</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp3"></div>
+        </div>
+
+        <!-- Q4: アシスタント／エージェント／オペレーター -->
+        <div class="question-card" id="q4">
+            <span class="tag basic">AI基礎概念</span>
+            <div class="question-number">4</div>
+            <div class="question-text">AIアシスタント・AIエージェント・AIオペレーター（Computer Use系）を整理する切り口として、ナレッジで提案されたフレームはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q4" value="a">
+                    <span>「日本製か海外製か」×「無料か有料か」</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q4" value="b">
+                    <span>「テキスト処理か画像処理か」×「リアルタイムかバッチか」</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q4" value="c">
+                    <span>「誰が主導するか（人 or AI）」×「どこで動くか（クラウド or ローカル/PC常駐）」</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q4" value="d">
+                    <span>「2024年以前に登場したか以後か」×「クローズドかオープンソースか」</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp4"></div>
+        </div>
+
+        <!-- Q5: AIの5種類 -->
+        <div class="question-card" id="q5">
+            <span class="tag basic">AI基礎概念</span>
+            <div class="question-number">5</div>
+            <div class="question-text">ナレッジ「AIの種類を把握」で示された5分類のうち、ClaudeCodeの位置づけとして正しいのはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q5" value="a">
+                    <span>単体性能が他より圧倒的に高いドキュメント生成AIの代表格</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q5" value="b">
+                    <span>Slack→Salesforceなど定型連携を得意とするワークフロー系AI</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q5" value="c">
+                    <span>「エージェントAI」に分類され、他の種類のAIを組み合わせて使い分ける統合役を担う</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q5" value="d">
+                    <span>アプリケーション内AIの一種で、Claude Desktop内のデータ要約に特化している</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp5"></div>
+        </div>
+
+        <!-- Q6: 業務自動化 ❌△⭕ -->
+        <div class="question-card" id="q6">
+            <span class="tag basic">AI基礎概念</span>
+            <div class="question-number">6</div>
+            <div class="question-text">ナレッジ「AIエージェント活用｜業務自動化の優先順位フレームワーク（❌△⭕）」で「⭕（最優先）」とされた業務はどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q6" value="a">
+                    <span>全社の最新数字を一覧化し、朝会・週次レビューで参照できるダッシュボードを毎朝自動更新する</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q6" value="b">
+                    <span>freee人事労務とfreee会計の従業員データを連携し、入退社時の二重入力を解消するワークフローを構築する</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q6" value="c">
+                    <span>散在した過去3年分の顧客データを抽出・整理し、既存顧客への再提案による着電率向上に繋げる</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q6" value="d">
+                    <span>商談前の事前リサーチを自動化し、レポート形式で営業担当に届けるワークフローを構築する</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp6"></div>
+        </div>
+
+        <!-- Q7: AI朝までそれ正解 第1回 -->
+        <div class="question-card" id="q7">
+            <span class="tag internal">社内AI実践</span>
+            <div class="question-number">7</div>
+            <div class="question-text">第1回「AI朝までそれ正解」（2026/4/22 Claude Code 導入の正解）で決着したルールとして正しいものはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q7" value="a">
+                    <span>Google DriveやDropboxなどの共有ドライブにClaude Codeを直接接続することで、ローカルコピーの手間を省く運用を全社標準とする</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q7" value="b">
+                    <span>Cowork vs Claude Codeの公式な使い分け見解はまだ出ていないという前提のもと、現時点はデスクトップ版Claude Codeを推奨する</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q7" value="c">
+                    <span>1周目から全員にGitHubアカウント作成を必須とし、個人リポジトリでClaude Codeを動かすルールに統一する</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q7" value="d">
+                    <span>Markdown閲覧ツールはObsidianに一本化し、社内ドキュメントの開き方を統一して生産性を担保する</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp7"></div>
+        </div>
+
+        <!-- Q8: AI朝までそれ正解 第2回 CLAUDE.md -->
+        <div class="question-card" id="q8">
+            <span class="tag internal">社内AI実践</span>
+            <div class="question-number">8</div>
+            <div class="question-text">第2回「AI朝までそれ正解」（2026/4/28）でCLAUDE.md（指示書）の運用について、エンジニア界隈の定説として共有されたものはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q8" value="a">
+                    <span>グローバル設定（~/.claude/CLAUDE.md）に全プロジェクト共通の指示を厚く書くべき</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q8" value="b">
+                    <span>グローバル設定は空にし、フォルダ（プロジェクト）単位でCLAUDE.mdを書くのが推奨</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q8" value="c">
+                    <span>CLAUDE.mdは廃止予定なので、設定はsettings.json側に全て寄せる</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q8" value="d">
+                    <span>CLAUDE.mdは1ファイル500行を超えないと十分な精度が出ない</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp8"></div>
+        </div>
+
+        <!-- Q9: プロンプト精度 -->
+        <div class="question-card" id="q9">
+            <span class="tag basic">AI基礎概念</span>
+            <div class="question-number">9</div>
+            <div class="question-text">ナレッジ「AIの出力精度を高める指示」で示された、出力の質を劇的に上げるためにプロンプトに加えるべき"3要素"はどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q9" value="a">
+                    <span>文字数制限／英語指定／フォーマット指定</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q9" value="b">
+                    <span>自分の状況の詳細／調査ソースの指定／ソースの優先順位と理由</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q9" value="c">
+                    <span>モデル名指定／温度パラメータ／出力フォーマット</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q9" value="d">
+                    <span>締切日／予算／関係者の役職</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp9"></div>
+        </div>
+
+        <!-- Q10: 動画フレーム抽出×AI分析 -->
+        <div class="question-card" id="q10">
+            <span class="tag internal">社内AI実践</span>
+            <div class="question-number">10</div>
+            <div class="question-text">ナレッジ「動画フレーム抽出×AI分析による要件定義手法」が解決した課題と手法として最も適切なものはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q10" value="a">
+                    <span>文字起こしでは画面共有資料の中身が拾えないため、ffmpegで動画を圧縮→1分間隔でフレーム抽出→Claude CodeのReadツールで画像読み取り、を組み合わせて要件定義に反映する</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q10" value="b">
+                    <span>Whisperで音声書き起こしの精度を高め、画面共有時の発言から登場した資料名を推定して要件定義に反映する</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q10" value="c">
+                    <span>会議録画をそのままClaudeにアップロードし、動画全編を一度に解析させて視覚情報と発言を統合的に抽出する</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q10" value="d">
+                    <span>Zoomの画面共有録画を自動でスクリーンショット化するブラウザ拡張機能を作り、Notionに自動保存する</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp10"></div>
+        </div>
+
+        <div class="submit-area">
+            <button class="btn btn-primary" id="submit-btn" onclick="submitAnswers()">採点する</button>
+            <button class="btn btn-reset" id="reset-btn" onclick="resetQuiz()" style="display:none;">もう一度</button>
+        </div>
+    </div>
+
+    <script>
+        const TOTAL = 10;
+        const answers = {
+            q1: 'b',
+            q2: 'b',
+            q3: 'b',
+            q4: 'c',
+            q5: 'c',
+            q6: 'c',
+            q7: 'b',
+            q8: 'b',
+            q9: 'b',
+            q10: 'a'
+        };
+
+        const explanations = {
+            q1: {
+                correct: '正解！ファイル内でタスクを自律実行する「知的コラボレーター」化が今回の核です。各社が「AIが自律的にタスクを代行する」方向に収束しており、Microsoftの強みは"ユーザーが既に毎日触っているOfficeの中で完結する"こと。DigiManの社内運用への直接影響は小さいが、M365中心の支援先企業への提案カードとして価値が高いアップデートです。',
+                incorrect: '不正解。正解は「Word/Excel/PowerPointのCopilotが知的コラボレーター化」。Wordはトーン適用や構造改善、Excelは傾向抽出やモデル構築、PowerPointはスライド自動更新まで自律実行できるようになりました。最終決定はユーザー承認制です。'
+            },
+            q2: {
+                correct: '正解！5,000ノード要素のテキスト抽出ベンチで2.02ms（BS4+Lxmlは1,584ms＝約784倍遅い）。MCP連携によりClaude Codeから直接スクレイピングタスクをトークン消費少なく実行できる点が強み。BDRピック・SalesPigリスト・企業リサーチの自動化に直結します。',
+                incorrect: '不正解。正解は「MCP対応＆BS4+Lxml比 約784倍高速」。BSD-3-Clauseライセンスで商用利用OK、StealthyFetcherでCloudflare Turnstile/Interstitialの自動突破にも対応します。BDRピック自動化やSalesPig拡充の手段として注目されています。'
+            },
+            q3: {
+                correct: '正解！不動産業界での導入が際立つ事例です。eXp Realtyは40ユーザー試験→8週間で2,000ユーザー→現在87,000人以上に展開。ARRは8ヶ月で\$1M→\$17Mに急成長。Knight Frank等にも採用拡大中で、TikTokでは不動産エージェントの活用動画が多数投稿されています。',
+                incorrect: '不正解。正解は「不動産業界が最大の導入先」。Fyxerは「メール+会議ノート+スケジュール調整」を統合したAIアシスタントで、ロンドン発・未上場、収益の95%は個人サインアップ経由（仕事用メール→企業ライセンスへ拡張する"Land and Expand"戦略）です。'
+            },
+            q4: {
+                correct: '正解！「主導×実行場所」で切ると、アシスタント=人主導/クラウド、エージェント=AI主導/クラウド+ツール、オペレーター=AI常駐/ローカル常時起動、と整理できます。Computer Use系を「エージェント」と呼ぶと意味が曖昧になるため「オペレーター」「常駐AI」「デジタルワーカー」等の呼び分けが提案されました。',
+                incorrect: '不正解。正解は「誰が主導×どこで動くか」。この軸だと"どこまで任せるか"の議論に自然に接続でき、研修後半のリスク・ガバナンス論にも繋げやすいのがポイントです。'
+            },
+            q5: {
+                correct: '正解！AIは①生成 ②ワークフロー ③サーチ ④アプリ内 ⑤エージェント の5種類。ClaudeCodeが凄いのは"単体で賢いから"ではなく"複数AIを使い分ける（束ねる）から"。これが"学級委員長"のメタファです。',
+                incorrect: '不正解。正解は「エージェントAIに分類され、複数AIを束ねる学級委員長」。「ClaudeCodeが凄い理由＝単体性能」ではなく「他AIを使い分ける統合役だから」と理解するのが要点です。'
+            },
+            q6: {
+                correct: '正解！データ救出PJはこのフレームワークの代表例です。3年分の散在データから10,093件の有効データを2日で抽出し、既存顧客への再提案で着電率向上に繋げた事例として共有されました。⭕は経営者・管理職が考えるべき"売上に直結する"領域で、ワークフロー自動化（△）で成功体験を積みつつも満足せず⭕に踏み込むのが要点です。',
+                incorrect: '不正解。正解は「散在した過去3年分の顧客データを抽出・整理し、既存顧客への再提案に繋げる」。aは❌（見るだけで売上に繋がらない）、b・dは△（やるべきだが差別化にならない定型ワークフロー）。⭕はKGI/KPIに直結するクリエイティブ領域で、要件定義に2〜3時間かけることがAI活用の成否を分けます。'
+            },
+            q7: {
+                correct: '正解！Cowork vs Claude Codeは「公式見解なしという事実」で決着。技術差はサンドボックス有無（Cowork=仮想環境内、Claude Code=ローカル直接実行）。当面はデスクトップ版Claude Codeを推奨です。共有Drive直繋ぎは全消しリスクでNG、GitHubは"2周目"扱い、Markdownツールは一本化見送りでした。',
+                incorrect: '不正解。正解は「Cowork vs Claude Codeは公式見解なし、現時点はデスクトップ版Claude Code推奨」。aは全消しリスクで明確にNG、cは1周目はDrive運用、dは「ツール選定より"Markdownで蓄積する発想"が本質」との声で一本化見送りとなりました。'
+            },
+            q8: {
+                correct: '正解！グローバル設定はAIに無用な指示を渡してしまい賢さが下がるため、空にしてフォルダ単位でCLAUDE.mdを置くのがエンジニア界隈の定説です。harnessはCLAUDE.md＋hooks＋MCP＋skills等のツール群を含む大きな概念で、こちらもプロジェクト単位で組むのが基本。',
+                incorrect: '不正解。正解は「グローバル設定は空、プロジェクト単位で書く」。Salesforceプロジェクトなど実例でも、パッケージフォルダ単位でCLAUDE.md＋ツール群（=harness）を組む方針が採られています。'
+            },
+            q9: {
+                correct: '正解！①状況を詳細に記す（誰に・どんな場面で・何のために）／②調査ソースを指定／③ソースの優先順位と理由を添える、の3点でAIの出力が劇的に変わります。オムロン例では、3要素なしだと一般論しか出ないが、3要素ありだと「グローバルコアポジション」「平均2名以上の後継者確保」など固有施策が出てきます。',
+                incorrect: '不正解。正解は「自分の状況／調査ソースの指定／ソースの優先順位と理由」。プロンプトの長さに遠慮しないのがコツで、AIは具体的な文脈ほど精度が上がります。'
+            },
+            q10: {
+                correct: '正解！文字起こしでは取れない"画面共有のExcelカラム名・システム画面のフィールド名"を視覚情報として要件定義に反映するのが狙いです。74分動画→75枚フレーム→Excel帳票のカラム構成（勘定科目コード等）やServiceNow決裁モジュールのテーブル名・承認フローまで特定し、Notion要件定義＋Miro業務フロー図に反映できた実例があります。',
+                incorrect: '不正解。正解はa。ffmpeg圧縮→1分間隔フレーム抽出（fps=1/60）→Claude CodeのReadツールで画像読み取り、というワークフロー。tldv等の文字起こしと組み合わせることで、お客様への画面情報の再確認往復を削減できます。'
+            }
+        };
+
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                const name = this.querySelector('input').name;
+                document.querySelectorAll(`[name="${name}"]`).forEach(r => {
+                    r.closest('.option').classList.remove('selected');
+                });
+                this.classList.add('selected');
+                this.querySelector('input').checked = true;
+            });
+        });
+
+        function submitAnswers() {
+            let score = 0;
+            let allAnswered = true;
+
+            for (let i = 1; i <= TOTAL; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!selected) { allAnswered = false; }
+            }
+
+            if (!allAnswered) {
+                alert('全ての問題に回答してください。');
+                return;
+            }
+
+            for (let i = 1; i <= TOTAL; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                const card = document.getElementById(`q${i}`);
+                const exp = document.getElementById(`exp${i}`);
+                const correctAnswer = answers[`q${i}`];
+                const isCorrect = selected.value === correctAnswer;
+
+                if (isCorrect) {
+                    score++;
+                    card.classList.add('correct');
+                    exp.className = 'explanation show correct-exp';
+                    exp.textContent = explanations[`q${i}`].correct;
+                } else {
+                    card.classList.add('incorrect');
+                    exp.className = 'explanation show incorrect-exp';
+                    exp.textContent = explanations[`q${i}`].incorrect;
+                    selected.closest('.option').classList.add('wrong-answer');
+                }
+                document.querySelector(`[name="q${i}"][value="${correctAnswer}"]`).closest('.option').classList.add('correct-answer');
+            }
+
+            const result = document.getElementById('result');
+            const scoreText = document.getElementById('score-text');
+            const message = document.getElementById('result-message');
+
+            scoreText.textContent = `${score} / ${TOTAL}`;
+
+            if (score === TOTAL) message.textContent = '全問正解！直近のAI動向を完璧に把握できています。';
+            else if (score >= 8) message.textContent = 'ほぼ完璧。あと少しで満点です。';
+            else if (score >= 6) message.textContent = '合格ライン。間違えた箇所はNotionで復習しましょう。';
+            else message.textContent = 'DigiMan Wikiとナレッジシェアの直近トピックをもう一度確認しましょう。';
+
+            result.classList.add('show');
+            document.getElementById('submit-btn').style.display = 'none';
+            document.getElementById('reset-btn').style.display = 'inline-block';
+
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+            document.querySelectorAll('.option').forEach(o => o.style.cursor = 'default');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetQuiz() {
+            document.querySelectorAll('input[type="radio"]').forEach(r => { r.checked = false; r.disabled = false; });
+            document.querySelectorAll('.option').forEach(o => {
+                o.classList.remove('selected', 'correct-answer', 'wrong-answer');
+                o.style.cursor = 'pointer';
+            });
+            document.querySelectorAll('.question-card').forEach(c => c.classList.remove('correct', 'incorrect'));
+            document.querySelectorAll('.explanation').forEach(e => { e.className = 'explanation'; e.textContent = ''; });
+            document.getElementById('result').classList.remove('show');
+            document.getElementById('submit-btn').style.display = 'inline-block';
+            document.getElementById('reset-btn').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
