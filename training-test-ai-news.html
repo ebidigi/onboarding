@@ -157,7 +157,7 @@
     <div class="container">
         <header>
             <h1>時事AIニュース 理解度テスト</h1>
-            <p>DigiMan Wiki／ナレッジシェアの直近トピックから出題（全10問）</p>
+            <p>DigiMan Wiki／ナレッジシェアの直近トピックから出題（全15問）</p>
         </header>
 
         <div class="result" id="result">
@@ -425,6 +425,136 @@
             <div class="explanation" id="exp10"></div>
         </div>
 
+        <!-- Q11: AIアップデートスピード 120倍 -->
+        <div class="question-card" id="q11">
+            <span class="tag external">外部AIニュース</span>
+            <div class="question-number">11</div>
+            <div class="question-text">2026年4月23日のDigiMan経営会議で共有された「AIベンダーのアップデート頻度の増加倍率」は、従来比で何倍と整理されたか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q11" value="a">
+                    <span>約12倍（四半期1回 → 月1回）</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q11" value="b">
+                    <span>約120倍（四半期1回 → 日1回）</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q11" value="c">
+                    <span>約1,200倍（四半期1回 → 2時間に1回）</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q11" value="d">
+                    <span>約36倍（半年1回 → 週1回）</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp11"></div>
+        </div>
+
+        <!-- Q12: OpenAI Workspace Agents -->
+        <div class="question-card" id="q12">
+            <span class="tag external">外部AIニュース</span>
+            <div class="question-number">12</div>
+            <div class="question-text">2026年4月にOpenAIが発表した「ChatGPT Workspace Agents」の最大の特徴として正しいものはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q12" value="a">
+                    <span>ChatGPT Proプラン限定の画像生成専用機能で、Images 2.0と統合されている</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q12" value="b">
+                    <span>Slack・Linear・Google等を横断し、オフライン時でも24時間自律的にタスクを遂行する</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q12" value="c">
+                    <span>GPT-4oの後継モデルとして発表され、推論性能が3倍に向上した</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q12" value="d">
+                    <span>Notionと公式統合され、Notionワークスペース内でのみ動作するエージェントである</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp12"></div>
+        </div>
+
+        <!-- Q13: freee-mcp 公開 -->
+        <div class="question-card" id="q13">
+            <span class="tag external">外部AIニュース</span>
+            <div class="question-number">13</div>
+            <div class="question-text">2026年5月9日にfreeeが公式OSSとして公開した「freee-mcp」について、Claude等のAIから直接実行可能な操作数として最も近いものはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q13" value="a">
+                    <span>約50操作（会計記帳のみに限定）</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q13" value="b">
+                    <span>約150操作（会計＋給与モジュール）</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q13" value="c">
+                    <span>約270操作（会計・人事労務・請求書・工数管理・販売など複数モジュール）</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q13" value="d">
+                    <span>約500操作（freeeの公開API全て）</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp13"></div>
+        </div>
+
+        <!-- Q14: AIツール使い分け -->
+        <div class="question-card" id="q14">
+            <span class="tag basic">AI基礎概念</span>
+            <div class="question-number">14</div>
+            <div class="question-text">ナレッジ「AIツール深掘り（5/7）」で整理された Claude / ChatGPT / Gemini / Notion AI の使い分けマップで、「長文の構造的理解・複雑な分析・コード生成」が特に強みとされたツールはどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q14" value="a">
+                    <span>ChatGPT（GPT-4o系・Workspace Agentsで強い）</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q14" value="b">
+                    <span>Gemini（Google Workspace連携で強い）</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q14" value="c">
+                    <span>Claude（Anthropic・Claude Code）</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q14" value="d">
+                    <span>Notion AI（Notion内ドキュメント要約で強い）</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp14"></div>
+        </div>
+
+        <!-- Q15: Google Workspace MCP -->
+        <div class="question-card" id="q15">
+            <span class="tag external">外部AIニュース</span>
+            <div class="question-number">15</div>
+            <div class="question-text">2026年4月にGoogleが発表した「ホステッド型 Google Workspace MCP」について、最も適切な説明はどれか？</div>
+            <div class="options">
+                <label class="option" data-value="a">
+                    <input type="radio" name="q15" value="a">
+                    <span>ローカル環境にPythonで構築するMCPサーバで、GoogleがOSSライセンスで公開した形式</span>
+                </label>
+                <label class="option" data-value="b">
+                    <input type="radio" name="q15" value="b">
+                    <span>OAuth方式に加え、Googleがホスト提供するMCPサーバを利用できる二重対応の構成</span>
+                </label>
+                <label class="option" data-value="c">
+                    <input type="radio" name="q15" value="c">
+                    <span>Google Workspaceの有料プラン限定機能で、無料ユーザーは利用不可</span>
+                </label>
+                <label class="option" data-value="d">
+                    <input type="radio" name="q15" value="d">
+                    <span>Chrome拡張機能としてのみ提供され、ブラウザ上でGmail/Calendarに常駐する</span>
+                </label>
+            </div>
+            <div class="explanation" id="exp15"></div>
+        </div>
+
         <div class="submit-area">
             <button class="btn btn-primary" id="submit-btn" onclick="submitAnswers()">採点する</button>
             <button class="btn btn-reset" id="reset-btn" onclick="resetQuiz()" style="display:none;">もう一度</button>
@@ -432,7 +562,7 @@
     </div>
 
     <script>
-        const TOTAL = 10;
+        const TOTAL = 15;
         const answers = {
             q1: 'b',
             q2: 'b',
@@ -443,7 +573,12 @@
             q7: 'b',
             q8: 'b',
             q9: 'b',
-            q10: 'a'
+            q10: 'a',
+            q11: 'b',
+            q12: 'b',
+            q13: 'c',
+            q14: 'c',
+            q15: 'b'
         };
 
         const explanations = {
@@ -486,6 +621,26 @@
             q10: {
                 correct: '正解！文字起こしでは取れない"画面共有のExcelカラム名・システム画面のフィールド名"を視覚情報として要件定義に反映するのが狙いです。74分動画→75枚フレーム→Excel帳票のカラム構成（勘定科目コード等）やServiceNow決裁モジュールのテーブル名・承認フローまで特定し、Notion要件定義＋Miro業務フロー図に反映できた実例があります。',
                 incorrect: '不正解。正解はa。ffmpeg圧縮→1分間隔フレーム抽出（fps=1/60）→Claude CodeのReadツールで画像読み取り、というワークフロー。tldv等の文字起こしと組み合わせることで、お客様への画面情報の再確認往復を削減できます。'
+            },
+            q11: {
+                correct: '正解！従来は四半期1回程度だった大型アップデートが、現在は毎日リリースされる状態（=約120倍）。経営会議では「このペースが続けば2時間に1回、さらに進めば1分に1回」と整理されました。営業観点では「導入したAIが3ヶ月で陳腐化するリスク」が上がり、DigiManの『実装伴走・継続アップデート支援』の価値が相対的に上がっています。',
+                incorrect: '不正解。正解は「約120倍（四半期1回→日1回）」。人間が追いつけない領域へ移行中で、提案の現場では「単発導入で終わらない継続支援」を打ち出すのが要点です。'
+            },
+            q12: {
+                correct: '正解！Workspace AgentsはGPTsの進化版で、組織のワークフロー全体を自律稼働させるエージェント。営業例なら「リード取得→優先度判定→提案資料送付→フォローメール」を人間の指示なしで実行。DigiManの『営業代行』が『営業AI』と差別化するには、人間の営業センス×AI効率化のハイブリッドであることを顧客に言語化できる必要があります。',
+                incorrect: '不正解。正解は「Slack・Linear・Googleなどを横断して24時間自律的にタスクを遂行する」。営業代行ビジネスの差別化軸の再定義が急務で、Workspace Agents登場後のFAQを社内で共有しておくのが要点です。'
+            },
+            q13: {
+                correct: '正解！会計・人事労務・請求書・工数管理・販売など全モジュールがClaudeなどから操作可能（約270操作）。freeeが「AIエージェントから使われるSaaS」へ舵を切った象徴で、freee顧客への提案やCCC研修の『業界別AI再実装』教材として価値が高い動きです。',
+                incorrect: '不正解。正解は「約270操作」。公式OSS提供のため商用利用OK。freee利用顧客との会話では「経理DXの次の一手」を語る素材として即戦力です。'
+            },
+            q14: {
+                correct: '正解！Claudeは長文の構造的理解と複雑な分析、コード生成（Claude Code）で他より優位とされました。一方ChatGPTはWorkspace Agents・画像生成（Images 2.0）など"アプリケーション統合"で強く、GeminiはGoogle Workspace連携、Notion AIはNotion内ドキュメント要約で強み。「単体性能の優劣」より「用途別の使い分け」が現実解です。',
+                incorrect: '不正解。正解はClaude。ClaudeCodeを『学級委員長（他AIを束ねる役）』と位置づけるナレッジ（Q5）とセットで理解するのがポイント。社内で『どの用途にどれを使うか』を言語化できる状態を目指しましょう。'
+            },
+            q15: {
+                correct: '正解！GoogleがMCPホステッドサーバを開放したため、従来のOAuth方式と二重対応に。エコシステム間連携の標準化が進む一方、提案時の技術選択（ローカルMCP vs ホステッドMCP）が複雑化します。Claude/ChatGPT等のクライアントからGmail/Drive/Calendar/Sheetsへの直接アクセスが選択肢として広がっています。',
+                incorrect: '不正解。正解は「OAuth方式に加え、Googleがホスト提供するMCPサーバを利用できる二重対応」。営業提案の現場では、顧客環境（M365 vs Google Workspace）に応じたMCP戦略の使い分けが要点です。'
             }
         };
 
