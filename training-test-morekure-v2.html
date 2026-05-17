@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>モレクレ研修テスト v2｜仕事の教科書</title>
+  <style>
+    :root {
+      --primary: #1a365d;
+      --primary-light: #2b6cb0;
+      --accent: #ed8936;
+      --correct: #38a169;
+      --wrong: #e53e3e;
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --text: #2d3748;
+      --text-light: #718096;
+      --border: #e2e8f0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    .header h1 { font-size: 1.6rem; margin-bottom: 0.3rem; }
+    .header p { font-size: 0.9rem; opacity: 0.85; }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    /* ===== Login Screen ===== */
+    .login-screen {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .login-screen h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .login-screen p { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1.5rem; }
+    .login-screen .login-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .user-info {
+      display: none;
+      background: #ebf8ff;
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+    .user-info .email { font-weight: 700; color: var(--primary); }
+    .name-input {
+      width: 100%;
+      max-width: 300px;
+      padding: 0.7rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      text-align: center;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .name-input:focus { border-color: var(--primary-light); }
+    .name-input::placeholder { color: #cbd5e0; }
+
+    /* ===== Quiz ===== */
+    .quiz-area { display: none; }
+    .quiz-area.show { display: block; }
+
+    .quiz-intro {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--accent);
+    }
+    .quiz-intro h2 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .quiz-intro p { font-size: 0.9rem; color: var(--text-light); }
+    .quiz-intro .notice {
+      margin-top: 0.8rem;
+      padding: 0.6rem 0.8rem;
+      background: #fff5f5;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--wrong);
+      font-weight: 600;
+    }
+    .quiz-intro .user-badge {
+      margin-top: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      background: #ebf8ff;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--primary);
+    }
+
+    .progress-bar {
+      background: var(--border);
+      border-radius: 20px;
+      height: 8px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, var(--primary-light), var(--accent));
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.4s ease;
+    }
+    .progress-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .question-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .question-card.answered-correct { border-left: 4px solid var(--correct); }
+    .question-card.answered-wrong { border-left: 4px solid var(--wrong); }
+    .result-badge {
+      display: inline-block;
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-left: 0.5rem;
+    }
+    .result-badge.correct { background: #f0fff4; color: var(--correct); }
+    .result-badge.wrong { background: #fff5f5; color: var(--wrong); }
+
+    .q-number {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      text-align: center; line-height: 28px;
+      font-size: 0.8rem; font-weight: 700;
+      margin-right: 0.5rem;
+    }
+    .q-category {
+      display: inline-block;
+      background: #ebf4ff;
+      color: var(--primary-light);
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .q-text {
+      font-size: 1.05rem; font-weight: 600;
+      margin: 0.8rem 0;
+      white-space: pre-wrap;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .option-btn {
+      display: block; width: 100%; text-align: left;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text);
+    }
+    .option-btn:hover:not(:disabled) { border-color: var(--primary-light); background: #ebf8ff; }
+    .option-btn:disabled { cursor: default; }
+    .option-btn.selected { border-color: var(--primary-light); background: #ebf8ff; }
+    .option-btn.correct { border-color: var(--correct); background: #f0fff4; color: var(--correct); font-weight: 600; }
+    .option-btn.wrong { border-color: var(--wrong); background: #fff5f5; color: var(--wrong); }
+
+    .explanation {
+      display: none;
+      margin-top: 0.8rem; padding: 0.8rem;
+      background: #fffff0;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      border-left: 3px solid var(--accent);
+    }
+    .explanation.show { display: block; }
+
+    .btn-primary {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff; border: none;
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,54,93,0.3); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary {
+      display: inline-block;
+      background: #fff; color: var(--primary);
+      border: 2px solid var(--primary);
+      padding: 0.8rem 2rem; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: var(--primary); color: #fff; }
+
+    .btn-group {
+      display: flex; gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem; flex-wrap: wrap;
+    }
+
+    .result-card {
+      display: none;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 2rem; text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+    }
+    .result-card.show { display: block; }
+    .score-circle {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 2rem; font-weight: 800; color: #fff;
+    }
+    .score-high { background: linear-gradient(135deg, #38a169, #48bb78); }
+    .score-mid { background: linear-gradient(135deg, #d69e2e, #ed8936); }
+    .score-low { background: linear-gradient(135deg, #e53e3e, #fc8181); }
+    .result-msg { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .result-detail { font-size: 0.9rem; color: var(--text-light); }
+    .result-saved {
+      margin-top: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .result-saved.success { background: #f0fff4; color: var(--correct); }
+    .result-saved.error { background: #fff5f5; color: var(--wrong); }
+    .result-saved.saving { background: #ebf8ff; color: var(--primary-light); }
+
+    .category-breakdown {
+      margin-top: 1rem;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    .category-breakdown h3 {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      color: var(--text-light);
+    }
+    .cat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .cat-row:last-child { border-bottom: none; }
+    .cat-name { font-size: 0.82rem; }
+    .cat-score { font-weight: 700; font-size: 0.85rem; }
+
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.25rem; }
+      .container { padding: 1rem 0.8rem 3rem; }
+      .btn-group { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>モレクレ研修テスト v2｜仕事の教科書</h1>
+  <p>市場価値を高める行動原則 ― タスク管理・コミュニケーションの理解度チェック（全25問）</p>
+</div>
+
+<div class="container">
+  <!-- ===== LOGIN ===== -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-icon">&#128221;</div>
+    <h2>テストを開始する</h2>
+    <p>氏名を入力してテストを開始してください。<br>回答結果は自動的にスプレッドシートに記録されます。</p>
+    <div class="user-info" id="userInfo">
+      ログイン中: <span class="email" id="userEmail"></span>
+    </div>
+    <div>
+      <input type="text" class="name-input" id="userName" placeholder="氏名を入力（例：山田 太郎）">
+    </div>
+    <div class="btn-group" style="margin-top:0.5rem">
+      <button class="btn-primary" id="startBtn" onclick="startQuiz()">テスト開始</button>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div id="quizArea" class="quiz-area">
+    <div class="quiz-intro">
+      <h2>モレクレ研修 理解度テスト v2（全25問）</h2>
+      <p>4択から最も適切なものを選んでください。全問回答後に「答え合わせ」ボタンで結果を確認できます。</p>
+      <div class="notice">※ 実際の業務シナリオを想定した応用問題です。「仕事の教科書｜モレクレを防ぐ」を理解した上で回答してください。</div>
+      <div class="user-badge" id="quizUserBadge"></div>
+    </div>
+
+    <div class="progress-text" id="progressText">0 / 25 回答済み</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+    <div id="quizContainer"></div>
+
+    <div class="btn-group" id="quizActions">
+      <button class="btn-primary" id="submitBtn" disabled onclick="gradeQuiz()">答え合わせをする</button>
+    </div>
+
+    <div class="result-card" id="resultCard">
+      <div class="score-circle" id="scoreCircle"></div>
+      <div class="result-msg" id="resultMsg"></div>
+      <div class="result-detail" id="resultDetail"></div>
+      <div class="category-breakdown" id="categoryBreakdown"></div>
+      <div class="result-saved saving" id="resultSaved">結果を記録中...</div>
+    </div>
+
+    <div class="btn-group" id="retryGroup" style="display:none">
+      <button class="btn-primary" onclick="scrollToReview()">答え合わせを確認する</button>
+      <button class="btn-secondary" onclick="resetQuiz()">もう一度挑戦する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================
+// GAS URL（必要に応じて書き換え）
+// =====================================================
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyyzji_hwrDsoLd4KbbeC8Zm2fIR2ApLa8bhUyrXUVp-3rvuSphNti1kqAq_FcOItc0/exec';
+// =====================================================
+
+const quizData = [
+  // ===== ① モレクレの基本理解（3問） =====
+  { q:"「モレクレ」とは何の略ですか？最も正確な定義を選んでください。",
+    answer:"漏れ（タスク・返信の漏れ）＋クレーム（顧客からのクレーム）",
+    category:"モレクレの基本理解",
+    options:[
+      "漏れ（タスク・返信の漏れ）＋クレーム（顧客からのクレーム）",
+      "漏電クレーム（システム障害に起因する顧客クレーム）",
+      "漏れ（情報漏洩）＋クレジット（信用毀損）",
+      "漏れ（売上漏れ）＋クレーム（顧客の不満）"
+    ],
+    explanation:"モレクレ＝漏れ（タスク・返信の漏れ）＋クレーム（顧客からのクレーム）です。依頼を忘れる、返信を放置する、期日に間に合わない、確認せず進めるなど、日常の小さな行動の積み重ねで起こります。" },
+
+  { q:"研修資料では「売上が低いことよりも、モレクレを起こす方が罪が重い」と述べられています。その理由として最も適切なものは？",
+    answer:"売上は状況によって上下するが、信頼は失った瞬間にゼロになり、取り返しに何倍もの時間がかかるから",
+    category:"モレクレの基本理解",
+    options:[
+      "売上は状況によって上下するが、信頼は失った瞬間にゼロになり、取り返しに何倍もの時間がかかるから",
+      "売上不足は来期に取り戻せるが、モレクレは法的責任を問われるから",
+      "売上は数字なので可視化できるが、モレクレは数値化できず管理できないから",
+      "売上が低くても会社が存続できるが、モレクレが起きると即倒産するから"
+    ],
+    explanation:"「売上は状況によって上下します。しかし信頼は、失った瞬間にゼロになります。一度『あの人は約束を守らない』という印象がつくと、取り返しに何倍もの時間がかかります」と述べられています。" },
+
+  { q:"以下のうち、モレクレに該当しないものはどれですか？",
+    answer:"上司から指示されたタスクを期日通りに完了し、完了報告も行った",
+    category:"モレクレの基本理解",
+    options:[
+      "上司から指示されたタスクを期日通りに完了し、完了報告も行った",
+      "依頼されたことを忘れていた",
+      "返信すべきメッセージを放置した",
+      "先輩社員に確認せず自己判断で進めて間違いが起きた"
+    ],
+    explanation:"モレクレは「依頼を忘れる／返信を放置する／約束した期日に間に合わない／確認せず判断して間違いを起こす」などが該当します。期日通りの完了＋完了報告はモレクレの逆、信頼を積み上げる行動です。" },
+
+  // ===== ② タスク管理｜記録と3点（3問） =====
+  { q:"研修資料では「タスク管理が苦手な人」に共通する傾向が指摘されています。それは何ですか？",
+    answer:"頭の中だけで管理しようとする＝記憶に頼る傾向",
+    category:"タスク管理｜記録と3点",
+    options:[
+      "頭の中だけで管理しようとする＝記憶に頼る傾向",
+      "タスクを細かく分解しすぎる傾向",
+      "完璧主義で着手が遅れる傾向",
+      "他人にタスクを振りすぎる傾向"
+    ],
+    explanation:"「タスク管理が苦手な人は『頭の中だけで管理しようとする＝記憶に頼る』傾向があります。脳は『やらなければならないこと』を記憶し続けるのが得意ではなく、複数依頼が重なると必ず漏れます」と述べられています。" },
+
+  { q:"タスクを「タスクとして成立」させるために最低限必要な3点は何ですか？",
+    answer:"何を／いつまでに／誰が",
+    category:"タスク管理｜記録と3点",
+    options:[
+      "何を／いつまでに／誰が",
+      "目的／予算／納期",
+      "依頼者／担当者／確認者",
+      "優先度／工数／期日"
+    ],
+    explanation:"「何を（具体的な作業内容）／いつまでに（期日・曖昧なら確認）／誰が（自分・依頼先）」の3点が揃っていないものは『タスクがある状態』ではありません。" },
+
+  { q:"先輩から「あの件、よろしく頼むね」と曖昧に依頼されました。最初に取るべき行動は？",
+    answer:"その場で「何の件か」「いつまでか」「自分がやるのか」を確認し記録する",
+    category:"タスク管理｜記録と3点",
+    options:[
+      "その場で「何の件か」「いつまでか」「自分がやるのか」を確認し記録する",
+      "とりあえず「承知しました」と返事をして、後で詳細を確認する",
+      "「あの件」が何を指すか推測してすぐに着手する",
+      "他のメンバーに「あの件」が何か聞いて回る"
+    ],
+    explanation:"「何を・いつまでに・誰が」の3点が揃っていなければタスクは成立していません。曖昧な依頼はその場で確認し、具体化して記録します。『あとで記録しよう』は記憶上書きで漏れます。" },
+
+  // ===== ③ タスク管理｜優先順位（3問） =====
+  { q:"研修資料の優先順位の考え方として、第1優先（最優先）に位置づけられているのはどれですか？",
+    answer:"外部・繁忙相手からの依頼／至急タスク",
+    category:"タスク管理｜優先順位",
+    options:[
+      "外部・繁忙相手からの依頼／至急タスク",
+      "複数工程があるタスク（確認・承認が必要なもの）",
+      "社内・業務委託・後輩からの依頼",
+      "自己研鑽・自己完結タスク"
+    ],
+    explanation:"第1優先＝外部・繁忙相手からの依頼／至急タスク、第2優先＝複数工程があるタスク（FB・承認・レビューが必要）、第3優先＝社内・自己完結タスクです。" },
+
+  { q:"以下のタスクを優先度順に正しく並べたものはどれですか？\nA：期日に余裕がある自分だけの資料作成\nB：お客様からの問い合わせ（すぐ回答できない内容）\nC：社内の後輩からの確認依頼（後輩のタスクが自分の返信待ちで止まっている）",
+    answer:"B → C → A",
+    category:"タスク管理｜優先順位",
+    options:[
+      "B → C → A",
+      "B → A → C",
+      "A → B → C",
+      "C → B → A"
+    ],
+    explanation:"Bは第1優先（外部対応）。Cは社内だが「自分ボールで相手が止まっている」状態なので優先度UPで第2相当。Aは第3優先。社内でも自分が返信しないことで相手が止まる状態なら、社外と同等に優先します。" },
+
+  { q:"木曜が完成期日の資料作成を依頼されました。別担当者の内容確認・承認が必要で、差し戻しの可能性もあります。自分がアウトプットを上げるべき実際の期日はいつですか？",
+    answer:"火曜の午前中まで（差し戻しを想定して余裕を持つ）",
+    category:"タスク管理｜優先順位",
+    options:[
+      "火曜の午前中まで（差し戻しを想定して余裕を持つ）",
+      "水曜の夕方まで（確認は翌朝で間に合う）",
+      "木曜の午前中まで（期日当日に完成させればよい）",
+      "依頼を受けた翌日まで（早ければ早いほど良い）"
+    ],
+    explanation:"複数工程があるタスクは、期日から逆算して動きます。差し戻しを想定し、レビュー時間＋差し戻し対応の余裕を含めて自分の動く期日を設定します。木曜完成なら火曜午前提出が安全です。" },
+
+  // ===== ④ タスク管理｜着手の仕方（3問） =====
+  { q:"研修資料における「仕事の着手」の正しい定義はどれですか？",
+    answer:"相手に迷惑や不安を残さないよう、先に『認識・計画（一次返信＋期限提示）』を取る動きを含む",
+    category:"タスク管理｜着手の仕方",
+    options:[
+      "相手に迷惑や不安を残さないよう、先に『認識・計画（一次返信＋期限提示）』を取る動きを含む",
+      "実際に手を動かしてタスクを開始した時刻のこと",
+      "依頼を受けてからタスクを記録した時点のこと",
+      "上司に着手報告を行った時点のこと"
+    ],
+    explanation:"「タスクを開始する時刻」ではなく、相手に迷惑や不安を残さないよう、先に『認識・計画（一次返信＋期限提示）』を取る動きを含みます。特に重いタスクほど、先に『いつまでにやるか』を決めてから着手します。" },
+
+  { q:"お客様からスプレッドシートの項目を詳細に書き直す依頼（作業時間1時間程度）を、終業1時間前に受け取りました。研修資料に沿った正しい対応はどれですか？",
+    answer:"「本日中で問題ないか」を確認し、OKなら定時後または翌営業日に対応する",
+    category:"タスク管理｜着手の仕方",
+    options:[
+      "「本日中で問題ないか」を確認し、OKなら定時後または翌営業日に対応する",
+      "重要なお客様なので、その場ですぐ1時間かけて対応する",
+      "1時間かかるので翌週まで待ってもらうよう依頼する",
+      "簡易版を30分で作成して、後日詳細版を出すと伝える"
+    ],
+    explanation:"長時間かかるタスクは何も考えずに取り掛かってはいけません。まず期日を確認し、本日中OKなら定時後／翌営業日に対応します。判断が難しければ上司に相談しましょう。" },
+
+  { q:"明日の商談に関わるアポキャンセル連絡（軽め）がお客様から届きました。今は別の作業中です。研修資料が示す正しい対応は？",
+    answer:"明日のスケジュールに関わるので、その場で／遅くとも2時間以内に返信する",
+    category:"タスク管理｜着手の仕方",
+    options:[
+      "明日のスケジュールに関わるので、その場で／遅くとも2時間以内に返信する",
+      "軽い内容なので、今日の終業後にまとめて返信する",
+      "翌朝、出社時に対応する",
+      "別作業を中断したくないので、翌営業日に対応する"
+    ],
+    explanation:"軽い内容でも『明日に影響する連絡』は後回しNGです。即返信／遅くとも2時間以内が原則。夜まで放置はNG、明日の話に関わる内容ならその日のうちに対応します。" },
+
+  // ===== ⑤ 記録方法・退社前チェック（3問） =====
+  { q:"研修資料で「特におすすめ」とされているタスクのリマインダー方法はどれですか？",
+    answer:"Slackメッセージを右クリック→「後でリマインドする」→カスタムで時間を設定",
+    category:"記録方法・退社前チェック",
+    options:[
+      "Slackメッセージを右クリック→「後でリマインドする」→カスタムで時間を設定",
+      "毎朝、紙の手帳に一日のタスクを書き出す",
+      "Slackのスター機能でメッセージを保存する",
+      "メールの未読フォルダにタスクを溜める"
+    ],
+    explanation:"おすすめはSlackのメッセージに対する『リマインド』の活用。右クリック→『後でリマインドする』→カスタム時間設定で、自分が対応できる時間にリマインドを置くのがポイントです。" },
+
+  { q:"出先・商談中・休日にSlackやメールで連絡が届いたとき、研修資料が推奨する対応はどれですか？",
+    answer:"あえて未読にしておき、落ち着いて確認できる時に改めて認識・記録する",
+    category:"記録方法・退社前チェック",
+    options:[
+      "あえて未読にしておき、落ち着いて確認できる時に改めて認識・記録する",
+      "とりあえず既読にして、後で記憶を頼りに対応する",
+      "商談中でも即座に既読＆返信する",
+      "終わるまで通知を切り、後で気づいた順に処理する"
+    ],
+    explanation:"出先・商談中・休日に来た連絡は、既読にすると「対応した気」になって漏れやすくなります。あえて未読にして、落ち着いて確認・記録できる状態にしておきます。" },
+
+  { q:"研修資料が示す「退社前チェック」に含まれていない項目はどれですか？",
+    answer:"翌日のスケジュールを15分単位で詳細に組む",
+    category:"記録方法・退社前チェック",
+    options:[
+      "翌日のスケジュールを15分単位で詳細に組む",
+      "今日返信すべきメッセージに、返信漏れはないか",
+      "保留／回答待ちのタスクを忘れていないか",
+      "今日やる予定だったのにできなかったことを、先輩社員に報告したか"
+    ],
+    explanation:"退社前チェックは「返信漏れ・回答待ちの放置・期日超過／明日期日タスクの確認・自分の返信を待っている相手・できなかったことを先輩に報告」の5項目。翌日の詳細スケジューリングは含まれません。" },
+
+  // ===== ⑥ 即レス・一次返信（3問） =====
+  { q:"DigiManにおける「即レス」の定義として最も正確なものはどれですか？",
+    answer:"早くて秒〜遅くとも2時間以内に「認識していることを伝える」一次返信を行うこと",
+    category:"即レス・一次返信",
+    options:[
+      "早くて秒〜遅くとも2時間以内に「認識していることを伝える」一次返信を行うこと",
+      "2時間以内に完璧な回答を出して送ること",
+      "営業時間内に返信すれば即レスとみなされる",
+      "1営業日以内に何らかのアクションをとること"
+    ],
+    explanation:"「2時間以内に回答を出して送る」ではなく、「2時間以内に『認識していることを伝える』一次返信」をする、というのがDigiManの定義です。" },
+
+  { q:"お客様からの問い合わせに対し、社内確認に2日かかる見込みです。一次返信として最も適切な型はどれですか？",
+    answer:"「内容を社内確認の上、〇月〇日（曜日）までにご回答申し上げます。」と期日を明示する",
+    category:"即レス・一次返信",
+    options:[
+      "「内容を社内確認の上、〇月〇日（曜日）までにご回答申し上げます。」と期日を明示する",
+      "正確な回答が出るまで返信を控え、2日後に完璧な回答を送る",
+      "「確認中です」とだけ送り、期日には触れない",
+      "「わかりかねます」と返信し、担当者のアドレスを伝える"
+    ],
+    explanation:"一次返信は『社内確認の上、〇日までにご連絡致します』と、期日を明示するのが基本です。期日は『絶対に守れる日』を、不確実なら『〇日〜〇日の間に』と幅を持たせます。" },
+
+  { q:"研修資料が「期日」に関して述べている考え方として誤っているものはどれですか？",
+    answer:"早く対応できることを示すため、極力短い期限（明日午前中など）を伝えるべき",
+    category:"即レス・一次返信",
+    options:[
+      "早く対応できることを示すため、極力短い期限（明日午前中など）を伝えるべき",
+      "絶対に守れる日を述べる",
+      "不確実なら「〇日〜〇日の間に」と幅を持たせる",
+      "守れない期日を言うことは、嘘をつくことと同じ"
+    ],
+    explanation:"短い期限は「本当に守れる自信がある場合のみ」使います。むしろ余裕を持った期日を伝え、それより早く回答できると印象が良くなります。守れない期日は嘘と同じです。" },
+
+  // ===== ⑦ テキストコミュニケーション（4問） =====
+  { q:"社外（取引先・クライアント）への返信として、最も適切な「了解」の表現はどれですか？",
+    answer:"承知致しました。／かしこまりました。",
+    category:"テキストコミュニケーション",
+    options:[
+      "承知致しました。／かしこまりました。",
+      "承知です／了解です",
+      "了解しました！",
+      "わかりました"
+    ],
+    explanation:"NGは『承知です／了解です／わかりました』、OKは『承知致しました／かしこまりました』。極力漢字を使うこと（『致します』『宜しく』等）も、社外向けでは丁寧に映ります。" },
+
+  { q:"社外の人がいるチャンネルで、お客様から丁寧なメッセージを受け取りました。最も適切な対応は？",
+    answer:"スタンプではなく、丁寧な文章で返答する",
+    category:"テキストコミュニケーション",
+    options:[
+      "スタンプではなく、丁寧な文章で返答する",
+      "「承知です！」と感嘆符付きで親しみを示す",
+      "リアクション絵文字（👍）を付けて簡潔に済ます",
+      "急ぎではないので、後で返信する"
+    ],
+    explanation:"社外の人がいるチャンネルは、スタンプではなく基本的に文章で返答すべきです。社内でも、相手が丁寧に連絡してきたものにスタンプだけで済ますのは控えましょう。感嘆符の使用もNG。" },
+
+  { q:"重要な文章をお客様に送る前にやるべきことは？研修資料の方針に最も合致するものを選んでください。",
+    answer:"「この文章で問題ないか」「相手から見て印象が悪くならないか」を自問し、不安ならAIに整えてもらった上で自分で見直して送る",
+    category:"テキストコミュニケーション",
+    options:[
+      "「この文章で問題ないか」「相手から見て印象が悪くならないか」を自問し、不安ならAIに整えてもらった上で自分で見直して送る",
+      "AIに完全に任せて、AIの出力をそのままコピーして送る",
+      "速度優先で、誤字脱字は気にせずまず送る",
+      "上司に毎回全文をチェックしてもらってから送る"
+    ],
+    explanation:"送信前の2つの自問『この文章で送って問題ないか』『相手から見て印象が悪くならないか』を毎回行い、不安なときはAIを最終校閲として活用しつつ、必ず自分で見直してから送ります。AIの結果は全て読み返すこと。" },
+
+  { q:"テキスト返信の表現として、NG／OKの組み合わせが正しいものはどれですか？",
+    answer:"NG「ありがとうございます！」 → OK「ありがとうございます。」",
+    category:"テキストコミュニケーション",
+    options:[
+      "NG「ありがとうございます！」 → OK「ありがとうございます。」",
+      "NG「ありがとうございます。」 → OK「ありがとうございます！」",
+      "NG「ありがとうございます」 → OK「あざっす」",
+      "NG「感謝です」 → OK「ありがとうです！」"
+    ],
+    explanation:"感嘆符（！）の使用はNGです。相手のテンションに合わせてラフな返しをしたくなっても、控えるのが原則。『承知致しました。』『よろしくお願い致します。』等の体言止めや句点で締める表現がOKです。" },
+
+  // ===== ⑧ 社内報連相・エスカレーション（4問） =====
+  { q:"上司に相談したいことが出てきました。研修資料が示す「正しい順序」の最初のステップは？",
+    answer:"直接ではなくテキストで行うべき内容でないか、一度考える",
+    category:"社内報連相・エスカレーション",
+    options:[
+      "直接ではなくテキストで行うべき内容でないか、一度考える",
+      "上司のデスクに行き、すぐ声をかける",
+      "DMで上司に直接送る",
+      "他のメンバーにまず相談する"
+    ],
+    explanation:"声かけの順序は ①テキストで行うべきか考える → ②上司のカレンダーを確認する → ③Slackに整理して送る → ④「先程Slackでお送りした内容なのですが」と一言添える。即話しかけは原則NGです。" },
+
+  { q:"SlackのDMが原則禁止とされている理由として、研修資料に明記されていないものはどれですか？",
+    answer:"DMは検索性が低く、後から見返せないから",
+    category:"社内報連相・エスカレーション",
+    options:[
+      "DMは検索性が低く、後から見返せないから",
+      "他のメンバーが気づいて助けてくれる可能性がゼロになるから",
+      "やり取りの履歴がチームの資産にならないから",
+      "Claudeを活用したナレッジ化ができず、会社のデータ蓄積につながらないから"
+    ],
+    explanation:"研修資料に明記されているDM禁止の理由は『①他メンバーの支援可能性がゼロ／②やり取り履歴が残らずチームの資産にならない／③ナレッジ化されず会社のデータ蓄積に繋がらない』の3点です。" },
+
+  { q:"案件担当の菊池さんが不在だったため、増谷さんに代理で相談して対応しました。研修資料が示す「その後の必須対応」は？",
+    answer:"菊池さんに「増谷さんに相談して〜の対応を取りました。対応に問題ないかご確認お願い致します」と報告・確認する",
+    category:"社内報連相・エスカレーション",
+    options:[
+      "菊池さんに「増谷さんに相談して〜の対応を取りました。対応に問題ないかご確認お願い致します」と報告・確認する",
+      "増谷さんに相談した時点で対応は完結しているので、菊池さんへの報告は不要",
+      "次回菊池さんに会ったときに口頭で軽く伝える",
+      "クライアントから問い合わせが来たら、その時菊池さんに伝える"
+    ],
+    explanation:"代理相談者の回答が正しいとは限らないため、本来相談したかった担当者に必ず報告・対応確認をします。これがないと、後日クライアントから話題が出たとき担当者が状況把握しておらず混乱します。" },
+
+  { q:"研修資料が示す「エスカレーションすべき状況」に該当しないものはどれですか？",
+    answer:"自分で5分考えて回答できそうな業務上の判断",
+    category:"社内報連相・エスカレーション",
+    options:[
+      "自分で5分考えて回答できそうな業務上の判断",
+      "クライアントからクレームが来た",
+      "期日に間に合わない",
+      "自分の権限では判断できない内容を聞かれた"
+    ],
+    explanation:"エスカレーションすべきは『クレーム／期日に間に合わない／権限で判断できない／担当者不在で相手が急いでいる』等。自分で考えられる範囲は、まず自分なりの答えを持ってから確認するのが原則です。" },
+
+  // ===== ⑨ 実例応用・リカバリー（2問） =====
+  { q:"金曜が期日のタスクが間に合わないと水曜の時点で気づきました。研修資料に沿った正しい対処の最初のステップは？",
+    answer:"気づいた水曜のうちに先輩社員へ報告する（期日当日ではなく、遅くとも前日まで）",
+    category:"実例応用・リカバリー",
+    options:[
+      "気づいた水曜のうちに先輩社員へ報告する（期日当日ではなく、遅くとも前日まで）",
+      "金曜の朝に報告する（期日当日まで自力で粘る）",
+      "他のタスクを全て止めて、自力で金曜に間に合わせる",
+      "水曜中にお客様に直接連絡し、期日変更を依頼する"
+    ],
+    explanation:"間に合わないと気づいた時点で即報告が鉄則。①先輩に報告（前日まで）→②現状と理由を短く伝える→③新しい期日を提示→④社外連絡の要否を相談。社外連絡は自己判断ではなく相談の上で。" },
+
+  { q:"客先から急ぎの問い合わせが来たが、本来の担当上司が不在で捕まりません。NG例として研修資料が指摘するパターンはどれですか？",
+    answer:"「後で確認しよう」と判断し、客先には「明日午前中に回答します」と守れる保証のない期限を送る",
+    category:"実例応用・リカバリー",
+    options:[
+      "「後で確認しよう」と判断し、客先には「明日午前中に回答します」と守れる保証のない期限を送る",
+      "「確認いたします」と即レスし、別の案件担当者に代理相談する",
+      "現状を一次返信し、余裕を持った期日（〇日まで）を提示する",
+      "期日前日に進捗確認し、間に合わなければ事前連絡する"
+    ],
+    explanation:"NG例は「①一次返信で無理な期限を提示→②翌朝も情報が揃わず→③期日を過ぎて再催促」というパターン。放置＋無理な期限で信頼を二重に失います。OKは「確認します」＋余裕のある現実的な期日設定。" },
+];
+
+let userAnswers = {};
+let graded = false;
+let currentUser = { email: '', name: '' };
+let shuffledOptions = [];
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ===== LOGIN =====
+function startQuiz() {
+  const name = document.getElementById('userName').value.trim();
+  if (!name) {
+    document.getElementById('userName').style.borderColor = '#e53e3e';
+    document.getElementById('userName').placeholder = '氏名を入力してください';
+    return;
+  }
+  currentUser.name = name;
+  currentUser.email = '(直接開始)';
+  showQuiz();
+}
+
+function showQuiz() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('quizArea').classList.add('show');
+  document.getElementById('quizUserBadge').textContent =
+    `受験者: ${currentUser.name}`;
+  renderQuiz();
+}
+
+// ===== QUIZ =====
+function renderQuiz() {
+  shuffledOptions = quizData.map(q => shuffleArray(q.options));
+
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = quizData.map((q, i) => `
+    <div class="question-card" id="qcard-${i}">
+      <span class="q-number">${i+1}</span>
+      <span class="q-category">${q.category}</span>
+      <div class="q-text">${q.q}</div>
+      <div class="options">
+        ${shuffledOptions[i].map((opt, j) => `
+          <button class="option-btn" id="opt-${i}-${j}" onclick="selectOption(${i}, ${j}, this)">${opt}</button>
+        `).join('')}
+      </div>
+      <div class="explanation" id="exp-${i}">${q.explanation}</div>
+    </div>
+  `).join('');
+}
+
+function selectOption(qi, oi, el) {
+  if (graded) return;
+  userAnswers[qi] = { index: oi, value: shuffledOptions[qi][oi] };
+  for (let j = 0; j < shuffledOptions[qi].length; j++) {
+    document.getElementById(`opt-${qi}-${j}`).classList.toggle('selected', j === oi);
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  const count = Object.keys(userAnswers).length;
+  document.getElementById('progressText').textContent = `${count} / ${quizData.length} 回答済み`;
+  document.getElementById('progressFill').style.width = `${(count/quizData.length)*100}%`;
+  document.getElementById('submitBtn').disabled = count < quizData.length;
+}
+
+function gradeQuiz() {
+  if (Object.keys(userAnswers).length < quizData.length) return;
+  graded = true;
+  let correct = 0;
+
+  const catStats = {};
+  quizData.forEach((q, i) => {
+    const card = document.getElementById(`qcard-${i}`);
+    const isCorrect = userAnswers[i].value === q.answer;
+    if (isCorrect) correct++;
+    card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+
+    const badge = isCorrect
+      ? '<span class="result-badge correct">&#9675; 正解</span>'
+      : '<span class="result-badge wrong">&#10005; 不正解</span>';
+    card.querySelector('.q-number').insertAdjacentHTML('afterend', badge);
+
+    shuffledOptions[i].forEach((opt, j) => {
+      const btn = document.getElementById(`opt-${i}-${j}`);
+      btn.disabled = true;
+      if (opt === q.answer) btn.classList.add('correct');
+      if (j === userAnswers[i].index && !isCorrect) btn.classList.add('wrong');
+    });
+    document.getElementById(`exp-${i}`).classList.add('show');
+
+    if (!catStats[q.category]) catStats[q.category] = { correct: 0, total: 0 };
+    catStats[q.category].total++;
+    if (isCorrect) catStats[q.category].correct++;
+  });
+
+  const pct = Math.round((correct/quizData.length)*100);
+  const scoreCircle = document.getElementById('scoreCircle');
+  scoreCircle.textContent = `${pct}%`;
+  scoreCircle.className = 'score-circle ' + (pct >= 80 ? 'score-high' : pct >= 50 ? 'score-mid' : 'score-low');
+
+  const resultMsg = document.getElementById('resultMsg');
+  if (pct >= 80) resultMsg.textContent = '素晴らしい！モレクレ防止の基本がしっかり身についています';
+  else if (pct >= 50) resultMsg.textContent = 'もう少し！研修資料を復習して再挑戦しましょう';
+  else resultMsg.textContent = '研修資料をじっくり読み直し、もう一度挑戦してください';
+
+  document.getElementById('resultDetail').textContent = `${quizData.length}問中 ${correct}問正解（正答率 ${pct}%）`;
+
+  const catOrder = [
+    'モレクレの基本理解',
+    'タスク管理｜記録と3点',
+    'タスク管理｜優先順位',
+    'タスク管理｜着手の仕方',
+    '記録方法・退社前チェック',
+    '即レス・一次返信',
+    'テキストコミュニケーション',
+    '社内報連相・エスカレーション',
+    '実例応用・リカバリー'
+  ];
+  let catHtml = '<h3>カテゴリ別正答率</h3>';
+  catOrder.forEach(cat => {
+    if (catStats[cat]) {
+      const s = catStats[cat];
+      const catPct = Math.round((s.correct/s.total)*100);
+      catHtml += `<div class="cat-row"><span class="cat-name">${cat}</span><span class="cat-score">${s.correct}/${s.total}（${catPct}%）</span></div>`;
+    }
+  });
+  document.getElementById('categoryBreakdown').innerHTML = catHtml;
+
+  document.getElementById('resultCard').classList.add('show');
+  document.getElementById('quizActions').style.display = 'none';
+  document.getElementById('retryGroup').style.display = 'flex';
+
+  // スプレッドシートに送信
+  const categories = {};
+  catOrder.forEach(cat => {
+    if (catStats[cat]) {
+      categories[cat] = `${catStats[cat].correct}/${catStats[cat].total}`;
+    }
+  });
+
+  sendResult({
+    testName: 'モレクレ研修 v2',
+    email: currentUser.email,
+    name: currentUser.name,
+    correct: correct,
+    total: quizData.length,
+    percentage: pct,
+    categories: categories
+  });
+
+  document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function sendResult(data) {
+  const savedEl = document.getElementById('resultSaved');
+
+  if (GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
+    savedEl.textContent = '※ GAS未設定のため結果は記録されていません';
+    savedEl.className = 'result-saved error';
+    return;
+  }
+
+  savedEl.textContent = '結果をスプレッドシートに記録中...';
+  savedEl.className = 'result-saved saving';
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+    mode: 'no-cors'
+  })
+  .then(() => {
+    savedEl.textContent = '結果をスプレッドシートに記録しました';
+    savedEl.className = 'result-saved success';
+  })
+  .catch(err => {
+    savedEl.textContent = '記録に失敗しました。管理者に連絡してください。';
+    savedEl.className = 'result-saved error';
+  });
+}
+
+function scrollToReview() {
+  document.getElementById('qcard-0').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetQuiz() {
+  userAnswers = {};
+  graded = false;
+  document.getElementById('resultCard').classList.remove('show');
+  document.getElementById('quizActions').style.display = 'flex';
+  document.getElementById('retryGroup').style.display = 'none';
+  renderQuiz();
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
